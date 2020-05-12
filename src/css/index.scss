@@ -1,3 +1,192 @@
 @import "./reset.scss";
 @import "./mixin.scss";
-@import "./content.scss";
+@import "./talk.scss";
+html,
+body {
+    height: 100%;
+}
+
+.app>.title {
+    width: 100%;
+    height: .90rem;
+    background: #3e3e3e;
+    color: #ffffff;
+    font-weight: bold;
+    text-align: center;
+    line-height: .9rem;
+    font-size: .32rem;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+}
+.app>.istalk {
+    background:#3e3e3e;
+}
+.app>.title>.ListBack {
+    width: .22rem;
+    height: .36rem;
+    position: absolute;
+    left: .23rem;
+    top: 50%;
+    margin-top: -.18rem;
+    box-sizing: border-box;
+    padding: .30rem;
+}
+
+.app>.title>.ListBack>img {
+    width: .22rem;
+    height: .36rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.app>.title>.accountName {
+    position: absolute;
+    line-height: 2;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.app>.title>.mymessage {
+   position: absolute;
+   left: 50%;
+   bottom: -.22rem;
+   transform: translateX(-50%);
+   font-size: .24rem;
+   color:#999999;
+    // display: none;
+}
+.app {
+    height: 100%;
+    overflow: auto;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    ::selection {
+        background: none;
+    }
+
+    &::-moz-selection {
+        background: none;
+    }
+
+    &::-webkit-selection {
+        background: none;
+    }
+
+    .itemWrap {
+        margin-top: .9rem;
+        
+
+        &.talkPage {
+            height: 100%;
+            background: #333;
+        }
+
+        .item {
+            width: 6.90rem;
+            height: 1.60rem;
+            background: #fff;
+            border-radius: .20rem;
+            margin: 0 auto;
+            box-shadow: 0 0rem .10rem .08rem #e6e6e6;
+            display: flex;
+            font-size: 0.24rem;
+            align-items: center;
+            position: relative;
+            margin-bottom: .20rem;
+
+            .taskIcon {
+                width: 1.2rem;
+                height: 1.2rem;
+                border-radius: 50%;
+                margin-right: 0.15rem;
+                margin-left: .32rem;
+                overflow: hidden;
+                background-size: cover;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+
+            .taskContent {
+                line-height: 0.4rem;
+
+                .taskName {
+                    color: #333333;
+                    font-size: 0.30rem;
+                }
+
+                .taskContext {
+                    color: #999999;
+                    width: 3.49rem;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    font-size: 0.24rem;
+                    overflow: hidden;
+
+                    .message {}
+                }
+            }
+
+            .contentWrap {
+                position: absolute;
+                right: .40rem;
+                line-height: 0.4rem;
+
+                .redIcon {
+                    white-space: nowrap;
+                    font-size: .26rem;
+                    font-weight: bold;
+                    color: #333333;
+
+                    .dian {
+                        width: .20rem;
+                        height: .20rem;
+                        background: #e6604d;
+                        border-radius: 50%;
+                        display: inline-block;
+                    }
+                }
+
+                .plusMoney {
+                    margin-left: -.08rem;
+                    font-size: 0.28rem;
+                    color: #ffab00;
+
+                    .num {}
+
+                    .xiaoxi {
+                        display: inline-block;
+                        min-width: .30rem;
+                        height: .30rem;
+                        background: #e6604d;
+                        border-radius: 50%;
+                        float: right;
+                        color: #fff;
+                        text-align: center;
+                        font-size: .22rem;
+                        line-height: .30rem;
+                    }
+                }
+
+
+
+
+            }
+        }
+
+        .lastBorderDone:nth-last-child(2)::before {
+            border: 0;
+        }
+
+        .EverylastBorderDone:nth-last-child(1)::before {
+            border: 0;
+        }
+
+    }
+}

@@ -1,0 +1,44 @@
+@import "./reset";
+
+html,
+body {
+    background: #fff;
+}
+
+.app {
+
+    .loginWrap {
+        width: 6rem;
+        margin: 1.47rem auto 0;
+        font-size: .30rem;
+
+        .inp {
+            width: 6rem;
+            height: 1rem;
+            background: #f1f1f1;
+            border-radius: .50rem;
+            outline: none;
+            margin: 0 auto;
+            border: 0;
+            font-size: .40rem;
+        }
+
+        .inp::-webkit-input-placeholder {
+            font-size: .30rem;
+            color: #bbbbbb;
+        }
+
+        .username {
+            margin-bottom: .60rem;
+        }
+
+        .password {
+            margin-bottom: 1.1rem;
+        }
+
+        .login {
+            background: #ffb500;
+            color: #fff;
+        }
+    }
+}

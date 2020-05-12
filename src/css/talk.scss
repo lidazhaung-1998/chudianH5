@@ -1,0 +1,98 @@
+.app {
+    display: flex;
+    flex-direction: column;
+
+    .itemWrap {
+        flex: 1;
+        overflow: auto;
+        padding-top: .2rem;
+
+        .content {
+            // box-sizing: border-box;
+            // padding: 0 .24rem 0 .26rem;
+
+            
+                .contextBox {
+                    height: .95rem;
+                    box-sizing: border-box;
+                    padding: 0 .24rem 0 .26rem;
+                    .head {
+                        width: .9rem;
+                        height: .9rem;
+                        border-radius: 50%;
+                        background: #000;
+                    }
+                }
+            
+        }
+
+    }
+
+    footer {
+        width: 100%;
+        background: #333;
+        padding-bottom: .37rem;
+
+        .inputBox {
+            width: 6.94rem;
+            height: .86rem;
+            border-radius: .43rem;
+            background: #5b5b5b;
+            position: relative;
+            left: 50%;
+            margin-left: -3.47rem;
+            overflow: hidden;
+
+            .input {
+                width: 60%;
+                height: 100%;
+                position: absolute;
+                top: -.07rem;
+                left: .20rem;
+                background: #5b5b5b;
+                outline: none;
+                border: 0;
+                color: #fff;
+                font-size: .35rem;
+
+                &::-webkit-input-placeholder {
+                    color: #fff;
+                }
+            }
+
+            .sendmsg {
+                width: .42rem;
+                height: .42rem;
+                background: url(../img/seng.png)no-repeat;
+                background-size: cover;
+                position: absolute;
+                right: .33rem;
+                top: 50%;
+                margin-top: -.21rem;
+
+            }
+
+            .checkImg {
+                width: .42rem;
+                height: .42rem;
+                background: url(../img/seng.png)no-repeat;
+                background-size: cover;
+                position: absolute;
+                right: 2rem;
+                top: 50%;
+                margin-top: -.21rem;
+
+                .inputFile {
+                    width: 100%;
+                    height: 100%;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    opacity: 0;
+                }
+            }
+        }
+    }
+
+
+}

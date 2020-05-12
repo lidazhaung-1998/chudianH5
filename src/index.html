@@ -16,17 +16,40 @@
     <!-- uc全屏显示 -->
     <meta name="full-screen" content="yes">
     <title>家族邀请</title>
-    <style>
-
-    </style>
 </head>
 
 <body>
     <div class="app">
-       
-        
+        <div class="title">
+            <div class="ListBack"><img src="./img/back.png" alt=""></div>
+            <div>账号列表</div>
+        </div>
+        <div class="itemWrap">
+            <dl class="item border-1px EverylastBorderDone">
+                <dd class="taskIcon">
+                    <img alt="">
+                </dd>
+                <dd class="taskContent">
+                    <div class="taskName">${item.name}</div>
+
+                    <div class="taskContext">
+                        <span class="message"> ${item.text}</span>
+                    </div>
+
+                </dd>
+                <dd class="contentWrap">
+                    <div class="redIcon">
+                        <!-- <div class="dian"></div> -->
+                        未回消息${item.weihui}条
+                    </div>
+                    <div class="plusMoney">
+                        积分:<span class="num">${item.score}</span>
+                    </div>
+
+                </dd>
+            </dl>
+        </div>
     </div>
-    <!-- <script src="https://resource.qxiu.com/common/js/jquery/jquery-1.7.2.min.js"></script> -->
 </body>
 
 </html>
