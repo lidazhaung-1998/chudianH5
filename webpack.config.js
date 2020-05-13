@@ -22,12 +22,6 @@ var htmlArray = [{
 		favicon: "./src/favicon.ico"
 	},
 	{
-		_html: "index",
-		title: "首页",
-		chunks: ['index'],
-		favicon: "./src/favicon.ico"
-	},
-	{
 		_html: "talk",
 		title: "聊天",
 		chunks: ['talk'],
@@ -63,7 +57,6 @@ module.exports = function (env) {
 		mode: env.dev ? 'development' : 'production',
 		entry: {
 			login: './src/js/login.js',
-			index: './src/js/index.js',
 			talk: "./src/js/talk.js"
 		},
 		output: {

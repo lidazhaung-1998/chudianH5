@@ -16,28 +16,46 @@
     <!-- uc全屏显示 -->
     <meta name="full-screen" content="yes">
     <title>账号登录</title>
-    <style>
-        .app>.title {
-            width: 100%;
-            height: .90rem;
-            background: #3e3e3e;
-            color: #ffffff;
-            font-weight: bold;
-            text-align: center;
-            line-height: .90rem;
-            font-size: .32rem;
-        }
-    </style>
+
 </head>
 
 <body>
     <div class="app">
-        <div class="title">账号登录</div>
-        <div class="loginWrap">
+        <header class="title">
+            账号登录
+        </header>
+
+        <main class="loginWrap">
             <input type="text" class="inp username" name="username" placeholder="&nbsp;&nbsp;&nbsp;&nbsp;请输入账号">
             <input type="password" class="inp password" name="password" placeholder="&nbsp;&nbsp;&nbsp;请输入密码">
             <button class="inp login">登录</button>
-        </div>
+        </main>
+        <main class="itemWrap">
+            
+            <div class="content">
+                <dl class="item border-1px EverylastBorderDone">
+                    <dd class="taskIcon">
+                        <img alt="">
+                    </dd>
+                    <dd class="taskContent">
+                        <div class="taskName">可爱</div>
+                        <div class="taskContext">
+                            <span class="message"> 38|asi|jksa|</span>
+                        </div>
+                    </dd>
+                    <dd class="contentWrap">
+                        <div class="redIcon">
+                            <div class="dian"></div>
+                            99条未读
+                        </div>
+                        <div class="plusMoney">
+                            积分 : <span class="num">20</span>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+            <div class="loadMore"></div>
+        </main>
     </div>
 </body>
 
