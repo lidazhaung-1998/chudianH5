@@ -289,6 +289,7 @@ $(function () {
                         userIds: userid
                     },
                     success: function (data) {
+                        console.log(data)
                         self.userContentSelf.push(data.content[userid])
                     }
                 })
@@ -321,27 +322,29 @@ $(function () {
             $.each(this.userContentSelf, function (index, item) {
                 accountHtml += ` <dl class="item border-1px EverylastBorderDone">
                 <dd class="hiddenUserid" style="display:none;">${item.userId}</dd>
-            <dd class="taskIcon" style="background-image:url(${item.head});"></dd>
+                <dd class="taskIcon" style="background-image:url(${item.head});">
+                    <div class="hiddenHead" style="display:none;">${item.head}</div>
+                </dd>
     
-            <dd class="taskContent">
-                <div class="taskName">${item.nickname}</div>
-                <!-- taskName -->
-                <div class="taskContext">
-                    <span class="message">${item.age} | ${item.job} | 北京朝阳区</span>
-                </div>
-                <!-- taskContent -->
-            </dd>
-            <dd class="contentWrap">
-                <div class="redIcon">
-                    ${self.haveWeidu(item)}
-                    ${99}条未读
+                <dd class="taskContent">
+                    <div class="taskName">${item.nickname}</div>
+                    <!-- taskName -->
+                    <div class="taskContext">
+                        <span class="message">${item.age} | ${item.job ? item.job : '暂无信息'} | 北京朝阳区</span>
                     </div>
-                <div class="plusMoney">
-                    积分 : <span class="num">${0}</span>
-                </div>
-                
-            </dd>
-        </dl>`
+                    <!-- taskContent -->
+                </dd>
+                <dd class="contentWrap">
+                    <div class="redIcon">
+                        ${self.haveWeidu(item)}
+                        ${99}条未读
+                        </div>
+                    <div class="plusMoney">
+                        积分 : <span class="num">${0}</span>
+                    </div>
+                    
+                </dd>
+            </dl>`
             })
             $('.itemWrap .content').html(accountHtml)
         }
@@ -351,7 +354,9 @@ $(function () {
             var self = this;
             $('.content .item').tap(function () {
                 var uid = $(this).find('.hiddenUserid').html()
-                console.log($(this).index())
+                var nickname = encodeURIComponent($(this).find('.taskName').html())
+                var myMSG = encodeURIComponent($(this).find('.message').html())
+                var myHead = encodeURIComponent($(this).find('.hiddenHead').html())
                 window.location.href = "http://192.168.25.126:8080/talk.html?uid=" + uid
                 cookie.set('uid', uid, {
                     expire: 8
@@ -359,32 +364,53 @@ $(function () {
                 cookie.set('mcheck', md5('123456'), {
                     expire: 8
                 })
+                cookie.set('nickname', nickname, {
+                    expire: 8
+                })
+                cookie.set('myMSG', myMSG, {
+                    expire: 8
+                })
+                cookie.set('myHead', myHead, {
+                    expire: 8
+                })
             })
         }
         this.Iscroll = function (el) {
+            var self = this;
             var bs = new BScroll(el)
             $('.itemWrap .content').on('touchmove', function () {
                 if (bs.y >= 50) {
                     $('.loadMore').text('松开刷新...').css({
                         'font-size': '.33rem',
-                        'height':(bs.y + 20) + 'px',
+                        'height': (bs.y + 20) + 'px',
                         'line-height': (bs.y + 20) + 'px'
                     })
+                } else {
+                    self.loadMoreStyle('松开刷新...', {
+                        "font-size": "0",
+                        "height": "0"
+                    }, 0)
                 }
             })
             bs.on('touchEnd', function (pos) {
                 if (pos.y >= 50) {
-                    //先把ul里面的所有li都干掉
-                    $('main .pos-con ul').html('');
-                    $('.loadMore').text('刷新成功').animate({
-                        'font-size': 0,
-                        'height': 0
-                    }, 500);
+                    $('.content').html('')
+                    self.userContentSelf = []
+                    self.getuserContet()
+                    self.renderList()
+                    self.clickListItem()
+                    self.loadMoreStyle('刷新成功', {
+                        "font-size": "0",
+                        "height": "0"
+                    }, 500)
+
                 }
             });
 
         }
-
+        this.loadMoreStyle = function (text, opt, time) {
+            $('.loadMore').text(text).animate(opt, time);
+        }
         this.haveWeidu = function (item) {
             var have = ""
             if (item.weihui != 0) {
