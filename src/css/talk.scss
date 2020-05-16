@@ -4,12 +4,46 @@
 
     .itemWrap {
         flex: 1;
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: hidden;
         padding-top: .2rem;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        &::selection {
+            background: none;
+        }
+
+        &::-moz-selection {
+            background: none;
+        }
+
+        &::-webkit-selection {
+            background: none;
+        }
 
         .content {
             padding-top: .4rem;
-            width: 101%;
+            height: 100%;
+            overflow: auto;
+            box-sizing: border-box;
+            &::-webkit-scrollbar {
+                display: none;
+            }
+    
+            &::selection {
+                background: none;
+            }
+    
+            &::-moz-selection {
+                background: none;
+            }
+    
+            &::-webkit-selection {
+                background: none;
+            }
             .contextBox {
                 box-sizing: border-box;
                 padding: 0 .24rem 0 .26rem;
@@ -51,29 +85,45 @@
 
                     .text {
                         color: #333333;
-                        font-size: .30rem;
-                        line-height: .36rem;
+                        font-size: 0;
 
                         img {
                             width: 100%;
                             height: 100%;
+                            border-radius: .18rem;
                         }
+
+                        span {
+                            font-size: .30rem;
+                        }
+
                         .yColor {
-                            color:#ffc02b;
+                            color: #ffc02b;
                             font-size: .26rem;
                             font-weight: bold;
                         }
+
+                        audio {
+                            visibility: hidden;
+                            height: .01rem;
+                            width: .9rem;
+                        }
+
+                        .video {
+                            width: 100%;
+                            border-radius: .15rem;
+                        }
+
+                        .audioTime {
+                            font-size: .33rem;
+                            position: absolute;
+                            left: .55rem;
+                            top: 50%;
+                            transform: translateY(-50%);
+                        }
                     }
-                    audio {
-                        // width: 0;
-                        // height: 0;
-                        // visibility: hidden;
-                        height: .32rem;
-                    }
-                    .video {
-                        width: 100%;
-                        border-radius: .15rem;
-                    }
+
+
                 }
 
             }
@@ -101,8 +151,8 @@
 
                     .jiantouRight {
                         border-right: 0;
-                        border-left: .15rem solid #7de8f2;
-                        left: 5rem;
+                        border-left: .15rem solid transparent;
+                        left: 0!important;
                     }
 
                     .pScorce {
@@ -112,6 +162,10 @@
                         bottom: -.27rem;
                         left: 0;
                     }
+                }
+
+                .mySendImg {
+                    padding: 0;
                 }
 
             }
@@ -137,7 +191,66 @@
     footer {
         width: 100%;
         background: #333;
-        padding-bottom: .37rem;
+        height: 2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        position: relative;
+
+        .huashu {
+            width: 100%;
+            height: 5rem;
+            position: absolute;
+            top: -5rem;
+            background: #ffff;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            display: none;
+
+            .huashu_textWrap {
+                flex: 1;
+                overflow: auto;
+
+                &::-webkit-scrollbar {
+                    display: none;
+                }
+
+                &::selection {
+                    background: none;
+                }
+
+                &::-moz-selection {
+                    background: none;
+                }
+
+                &::-webkit-selection {
+                    background: none;
+                }
+
+                .huashu_text {
+                    text-align: center;
+                    height: .6rem;
+                    border-bottom: 0.02rem solid #ccc;
+                    font-size: .33rem;
+                    line-height: .6rem;
+                }
+            }
+
+            .cancel {
+                width: 100%;
+                height: .66rem;
+                font-size: .33rem;
+                color: #999999;
+                text-align: center;
+                // position: absolute;
+                // bottom: 0;
+                border-top-left-radius: .1rem;
+                border-top-right-radius: .1rem;
+                line-height: 2;
+                box-shadow: 0 -.01rem .02rem .01rem #999;
+            }
+        }
 
         .inputBox {
             width: 6.94rem;
@@ -150,7 +263,7 @@
             overflow: hidden;
 
             .input {
-                width: 60%;
+                width: 75%;
                 height: .55rem;
                 position: absolute;
                 top: 50%;
@@ -186,17 +299,26 @@
 
                 }
             }
+        }
 
+        .fileBox {
+            font-size: .33rem;
+            display: flex;
+            justify-content: space-around;
+            color: #fff;
+            flex: 1;
+            align-items: center;
+
+            div {
+                display: flex;
+                align-items: center;
+                width: 50%;
+                height: 100%;
+                justify-content: center;
+            }
 
             .checkImg {
-                width: .42rem;
-                height: .42rem;
-                background: url(../img/seng.png)no-repeat;
-                background-size: cover;
-                position: absolute;
-                right: 2rem;
-                top: 50%;
-                margin-top: -.21rem;
+                position: relative;
 
                 .inputFile {
                     width: 100%;
@@ -210,5 +332,16 @@
         }
     }
 
-
+    .bigImg {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        background: rgba(10, 10, 15, .5);
+        z-index: 1001;
+        display: none;
+    }
 }

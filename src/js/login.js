@@ -1,10 +1,8 @@
 var $ = require('../libs/zepto')
 var backIcon = require('../img/back.png')
 var md5 = require('../libs/md5.js')
-var BScroll = require('../libs/bscroll')
 import "../css/login.scss"
 $(function () {
-
 
     var cookie = {
         set: function (cookieKey, cookieValue, cookieOpts) {
@@ -95,146 +93,8 @@ $(function () {
     }
 
 
-
     function LoginSuc() {
         this.flag = false;
-        this.arr = [{
-                name: "xiao",
-                text: "23-背景-背景",
-                score: 20,
-                weihui: 99
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 0
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 2
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 0
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 2
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 2
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 2
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 2
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 2
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 2
-            },
-            {
-                name: "xiao",
-                text: "23-背景-背景",
-                score: 20,
-                weihui: 99
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 2
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 2
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 2
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 2
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 2
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 2
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 2
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 2
-            },
-            {
-                name: "xiao挂",
-                text: "23-北京-背景",
-                score: 86,
-                weihui: 0
-            }
-        ];
-        this.arr1 = [{
-                userid: "430022416"
-            },
-            {
-                userid: "430159967"
-            },
-            {
-                userid: "430035129"
-            },
-            {
-                userid: "530035129"
-            },
-            {
-                userid: "134564654"
-            }
-        ];
         this.userAccount = [] // 该数组存储  20个账户和密码
         this.userids = [] // 该数组存储  20个账户的userid
         this.userContentSelf = []
@@ -244,7 +104,6 @@ $(function () {
             this.getuserContet()
             this.success()
             this.tapBack()
-            this.Iscroll('.itemWrap')
             this.clickListItem()
         }
         // 遍历循环登录20个账户和密码
@@ -289,7 +148,6 @@ $(function () {
                         userIds: userid
                     },
                     success: function (data) {
-                        console.log(data)
                         self.userContentSelf.push(data.content[userid])
                     }
                 })
@@ -316,7 +174,7 @@ $(function () {
         }
 
 
-        this.renderList = function () {
+        this.renderList = function (item) {
             var self = this;
             var accountHtml = "";
             $.each(this.userContentSelf, function (index, item) {
@@ -374,39 +232,6 @@ $(function () {
                     expire: 8
                 })
             })
-        }
-        this.Iscroll = function (el) {
-            var self = this;
-            var bs = new BScroll(el)
-            $('.itemWrap .content').on('touchmove', function () {
-                if (bs.y >= 50) {
-                    $('.loadMore').text('松开刷新...').css({
-                        'font-size': '.33rem',
-                        'height': (bs.y + 20) + 'px',
-                        'line-height': (bs.y + 20) + 'px'
-                    })
-                } else {
-                    self.loadMoreStyle('松开刷新...', {
-                        "font-size": "0",
-                        "height": "0"
-                    }, 0)
-                }
-            })
-            bs.on('touchEnd', function (pos) {
-                if (pos.y >= 50) {
-                    $('.content').html('')
-                    self.userContentSelf = []
-                    self.getuserContet()
-                    self.renderList()
-                    self.clickListItem()
-                    self.loadMoreStyle('刷新成功', {
-                        "font-size": "0",
-                        "height": "0"
-                    }, 500)
-
-                }
-            });
-
         }
         this.loadMoreStyle = function (text, opt, time) {
             $('.loadMore').text(text).animate(opt, time);

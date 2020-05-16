@@ -5,6 +5,7 @@
 html,
 body {
     height: 100%;
+    overflow: hidden;
 }
 
 .app>.title {
@@ -113,6 +114,7 @@ body {
                 margin-left: .32rem;
                 overflow: hidden;
                 background-size: cover;
+
             }
 
             .taskContent {
