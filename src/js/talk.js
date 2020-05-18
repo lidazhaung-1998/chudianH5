@@ -234,6 +234,24 @@ var falseData = [{
     {
         mysendmsg: false,
         text: "",
+        audio: "https://alibaba-resource.evkeji.cn/files/uservoice/20200509/430288131/430288131-1589002701_1260.mp3",
+        image: "",
+        video: "",
+        gift: "",
+        scorce: ""
+    },
+    {
+        mysendmsg: false,
+        text: "",
+        audio: "https://alibaba-resource.evkeji.cn/files/uservoice/20200509/430288131/430288131-1589002701_1260.mp3",
+        image: "",
+        video: "",
+        gift: "",
+        scorce: ""
+    },
+    {
+        mysendmsg: false,
+        text: "",
         audio: "https://alibaba-resource.evkeji.cn/files/uservoice/20200507/430392564/430392564-1588836917_1042.mp3",
         image: "",
         video: "",
@@ -245,6 +263,87 @@ var falseData = [{
         text: "",
         audio: "",
         video: "http://page.qxiu.com/ldz/static/test.mp4",
+        image: "",
+        gift: "",
+        scorce: ""
+    },
+    {
+        mysendmsg: false,
+        text: "",
+        audio: "",
+        video: "http://page.qxiu.com/ldz/static/test2.mp4",
+        image: "",
+        gift: "",
+        scorce: ""
+    },
+    {
+        mysendmsg: false,
+        text: "",
+        audio: "",
+        video: "http://page.qxiu.com/ldz/static/test2.mp4",
+        image: "",
+        gift: "",
+        scorce: ""
+    },
+    {
+        mysendmsg: false,
+        text: "",
+        audio: "",
+        video: "http://page.qxiu.com/ldz/static/test2.mp4",
+        image: "",
+        gift: "",
+        scorce: ""
+    },
+    {
+        mysendmsg: false,
+        text: "",
+        audio: "",
+        video: "http://page.qxiu.com/ldz/static/test2.mp4",
+        image: "",
+        gift: "",
+        scorce: ""
+    },
+    {
+        mysendmsg: false,
+        text: "",
+        audio: "",
+        video: "http://page.qxiu.com/ldz/static/test2.mp4",
+        image: "",
+        gift: "",
+        scorce: ""
+    },
+    {
+        mysendmsg: false,
+        text: "",
+        audio: "",
+        video: "http://page.qxiu.com/ldz/static/test2.mp4",
+        image: "",
+        gift: "",
+        scorce: ""
+    },
+    {
+        mysendmsg: false,
+        text: "",
+        audio: "",
+        video: "http://page.qxiu.com/ldz/static/test2.mp4",
+        image: "",
+        gift: "",
+        scorce: ""
+    },
+    {
+        mysendmsg: false,
+        text: "",
+        audio: "",
+        video: "http://page.qxiu.com/ldz/static/test2.mp4",
+        image: "",
+        gift: "",
+        scorce: ""
+    },
+    {
+        mysendmsg: false,
+        text: "",
+        audio: "",
+        video: "http://page.qxiu.com/ldz/static/test2.mp4",
         image: "",
         gift: "",
         scorce: ""
@@ -277,6 +376,7 @@ var falseData = [{
         scorce: "+10"
     },
 ]
+localStorage.setItem('1',JSON.stringify(falseData))
 isLoginOut()
 var talkList = new TalkList()
 talkList.init() //好友列表页
@@ -333,7 +433,7 @@ function TalkList() {
         this.scrollPosition()
     }
     this.scrollPosition = function () {
-        this.scrollT == 0 ? $('.content').scrollTop(0) : $('.content').scrollTop(this.scrollT)
+        this.scrollT == 0 ? $('.itemWrap').scrollTop(0) : $('.itemWrap').scrollTop(this.scrollT)
     }
     this.replaceTitleNicakName = function () {
 
@@ -409,6 +509,7 @@ function Intalk() {
     this.initLength = 0;
     this.nantou = "";
     this.nvtou = `style="background-image:url(${myHead});"`
+    this.nowMySendMsg = null;
     this.handleHtml = {
         textMsg: function (head, text, my) {
             var textHtml = `<li class="contextBox ${my.a}">
@@ -466,6 +567,7 @@ function Intalk() {
     }
     this.init = function () {
         $('.content').html('')
+        $('.app').css("background", '#333')
         this.falseData = falseData;
         this.getUserMsg() //获取用户信息
         this.goingTalk() //进入聊天页更改的页面样式已经title
@@ -484,7 +586,10 @@ function Intalk() {
             this.scroll()
             this.closeBigImg()
         }
-        $('.content').scrollTop($('.content .contextBox').get(this.initLength - 1).offsetTop)
+        setTimeout(function () {
+            $('.itemWrap').scrollTop($('.content').height() + 1000)
+        }, 2000)
+
 
         timer2 = setInterval(function () {
             console.log('timer2')
@@ -686,7 +791,26 @@ function Intalk() {
             $('.huashu').fadeOut(500)
         })
     }
+    this.msgError = function () {
+        if (window.confirm('消息发送失败，是否重新发送')) {
+            
+        } else {
+            $('.content').find('.contextBox').eq(this.nowMySendMsg).remove()
 
+        }
+
+
+    }
+    this.sendMyMsg = function () {
+        var state = 0
+        var _this = this
+        setTimeout(function () {
+            if (!state) {
+                _this.msgError()
+            }
+        }, 1000)
+
+    }
     this.tapSendMsg = function () {
         var _this = this;
         $('.sendmsgbox').tap(function () {
@@ -703,9 +827,11 @@ function Intalk() {
             }))
             inp.val('')
             var len = $('.content .contextBox').length;
-            $('.content').scrollTop($('.content .contextBox').get(len - 1).offsetTop)
+            
+            $('.itemWrap').scrollTop($('.content .contextBox').get(len - 1).offsetTop)
             //发起请求
-            set
+            _this.nowMySendMsg = len - 1
+            _this.sendMyMsg()
         })
         $('.inputFile').on('change', function () {
             var imgMaxSize = 1024 * 1024 * 10 //图片最大限制
@@ -713,7 +839,6 @@ function Intalk() {
             var fileName = file.name //文件昵称
             var srcc = window.URL.createObjectURL(file); //图片回显
             var suffix = fileName.substring(fileName.lastIndexOf('.'), fileName.length)
-            console.log(file)
             if (['.jpeg', '.png', '.jpg'].indexOf(suffix) == -1) { //不支持图片leixing 
                 // 定义报错
                 return;
@@ -728,18 +853,17 @@ function Intalk() {
             formData.append('name', file.name)
             formData.append('lastModifiedDate', file.lastModifiedDate)
             formData.append('file', file)
-            var addImgHtml = $(`
-                    <li class="contextBox myContentBox">
-                        <div class="head myhead" ${_this.nvtou}></div>
-                        <div class="textBox mytextBox mySendImg">
-                            <div class="text">
-                                <img src="${srcc}" alt="">
-                            </div>
-                        </div>
-                    </li>`)
-            $('.content').append(addImgHtml)
+            $('.content').append(_this.handleHtml.imgMsg(_this.nvtou, srcc, {
+                a: "myContentBox",
+                b: "myhead",
+                c: "mytextBox",
+                d: "jiantouRight",
+            }))
             var len = $('.content .contextBox').length;
-            $('.content').scrollTop($('.content .contextBox').get(len - 1).offsetTop)
+            _this.nowMySendMsg = len - 1
+            $('.itemWrap').scrollTop($('.content .contextBox').get(len - 1).offsetTop)
+            _this.sendMyMsg()
+            $(this).val('')
         })
 
     }
@@ -801,21 +925,21 @@ function Intalk() {
         })
         $('.itemWrap').on('touchmove', function (e) {
             _touch = e.touches[0].clientY
-            _scroll = $('.content').scrollTop()
+            _scroll = $('.itemWrap').scrollTop()
             if (_scroll <= 0) {
-                $('.content').css({
-                    "transform": "transLateY(" + (_touch - x) / 3 + "px)",
+                $('.itemWrap').css({
+                    "transform": "transLateY(" + (_touch - x) / 3.5 + "px)",
                     "transition": "transform linear"
                 })
             }
-            var scrollHiddenTop = $('.content').css('transform').substr(11, 2)
+            var scrollHiddenTop = $('.itemWrap').css('transform').substr(11, 2)
             if (scrollHiddenTop > 50) {
 
             }
         })
         $('.itemWrap').on('touchend', function (e) {
             if (_scroll <= 0) {
-                $('.content').css({
+                $('.itemWrap').css({
                     "transform": "transLateY(0px)",
                     "transition": "transform .3s linear"
                 })
@@ -827,10 +951,12 @@ function Intalk() {
     this.newMsgHandle = function (len) {
         var num = $('.content .contextBox').eq(this.initLength - 1).offset().top;
         if (num < 560 && num > 0) {
-            $('.content').scrollTop($('.content .contextBox').get(len - 1).offsetTop)
+            $('.itemWrap').scrollTop($('.content .contextBox').get(len - 1).offsetTop)
         }
         this.audioLength()
         this.initLength = len
+
+
     }
 }
 
@@ -848,6 +974,7 @@ $('.ListBack').tap(function () {
         talkList.init()
         getNowTime()
         istalk = false
+        $('.app').removeAttr('style')
     } else {
         window.location.href = "http://192.168.25.126:8080/login.html"
     }
@@ -882,7 +1009,7 @@ function isLoginOut() {
 // var size = file.size > 1024 ? file.size / 1024 > 1024 ? file.size / (1024 * 1024) > 1024 ? (file.size / (1024 * 1024 * 1024)).toFixed(2) + 'GB' : (file.size /
 //     (1024 * 1024)).toFixed(2) + 'MB' : (file.size /
 //     1024).toFixed(2) + 'KB' : (file.size).toFixed(2) + 'B'; //文件上传大小
-// //七牛云上传
+
 // $.ajax({
 //     type: 'post',
 //     url: "/QiniuUpToken",
