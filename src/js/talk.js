@@ -69,319 +69,18 @@ var enCodeHead = decodeURIComponent(cookie.get('myHead')) //虚拟女账户头�
 var myHead = decodeURIComponent(enCodeHead)
 var uid = cookie.get('uid') //虚拟女账号id
 var mcheck = cookie.get('mcheck')
-var menId = ""; //男性账号
+var token = cookie.get('token')
+var menId, menName, menHead = ""; //男性账号
 var istalk = false; //判断是否在聊天页
-var arr1 = [{
-        name: "猕猴桃",
-        text: "见个面约一下吗？",
-        time: new Date().getTime() - 90000000,
-        is: true,
-        weidu: 88,
-        sendUserid: 430110954
-    },
-    {
-        name: "猕猴桃",
-        text: "见个面约一下吗？",
-        time: new Date().getTime() - 270000000,
-        weidu: 8,
-        sendUserid: 430133037
-    },
-    {
-        name: "猕猴桃",
-        text: "见个面约一下吗？",
-        time: new Date().getTime() - 2040000,
-        is: true,
-        weidu: 888,
-        sendUserid: 430136338
-    },
-    {
-        name: "猕猴桃",
-        text: "见个面约一下吗？",
-        time: new Date('2019/5/14').getTime(),
-        is: true,
-        weidu: 88
-    },
-    {
-        name: "猕猴桃",
-        text: "见个面约一下吗？",
-        time: new Date().getTime() - 60000,
-        weidu: 8
-    },
-    {
-        name: "猕猴桃",
-        text: "见个面约一下吗？",
-        time: new Date().getTime() - 600000,
-        is: true,
-        weidu: 888
-    },
-    {
-        name: "猕猴桃",
-        text: "见个面约一下吗？",
-        time: new Date().getTime() - 300000,
-        is: true,
-        weidu: 88
-    },
-    {
-        name: "猕猴桃",
-        text: "见个面约一下吗？",
-        time: new Date().getTime() - 60000,
-        weidu: 8
-    },
-    {
-        name: "猕猴桃",
-        text: "见个面约一下吗？",
-        time: new Date().getTime() - 300000,
-        is: true,
-        weidu: 888
-    },
-    {
-        name: "猕猴桃",
-        text: "见个面约一下吗？",
-        time: new Date().getTime() - 100000,
-        is: true,
-        weidu: 88
-    },
-    {
-        name: "芒果",
-        text: "见个面约一下吗？",
-        time: new Date().getTime() - 60000,
-        weidu: 8
-    },
-    {
-        name: "猕猴桃",
-        text: "见个面约一下吗？",
-        time: new Date().getTime() - 300000,
-        is: true,
-        weidu: 888
-    },
-    {
-        name: "猕猴桃",
-        text: "见个面约一下吗？",
-        time: new Date().getTime() - 300000,
-        is: true,
-        weidu: 88
-    },
-    {
-        name: "猕猴桃",
-        text: "见个面约一下吗？",
-        time: new Date().getTime() - 60000,
-        weidu: 8
-    },
-    {
-        name: "猕猴桃",
-        text: "见个面约一下吗？",
-        time: new Date().getTime() - 300000,
-        is: true,
-        weidu: 888
-    },
-    {
-        name: "猕猴桃",
-        text: "见个面约一下吗？",
-        time: new Date().getTime() - 300000,
-        is: true,
-        weidu: 88
-    },
-    {
-        name: "猕猴桃",
-        text: "见个面约一下吗？",
-        time: new Date().getTime() - 60000,
-        weidu: 8
-    },
-    {
-        name: "猕猴桃",
-        text: "见个面约一下吗？",
-        time: new Date().getTime() - 3540000,
-        is: true,
-        weidu: 888
-    }
-]
 
-var falseData = [{
-        mysendmsg: false,
-        text: "hello，小姐姐",
-        audio: "",
-        video: "",
-        image: "",
-        gift: "",
-        scorce: ""
-    }, {
-        mysendmsg: false,
-        text: "",
-        audio: "",
-        image: "",
-        video: "",
-        gift: "玫瑰花",
-        num: "1",
-        scorce: "+1"
-    }, {
-        mysendmsg: true,
-        text: "帅哥，你好",
-        audio: "",
-        video: "",
-        image: "",
-        gift: "",
-        scorce: "+0.4"
-    },
-    {
-        mysendmsg: false,
-        text: "",
-        audio: "https://alibaba-resource.evkeji.cn/files/uservoice/20200509/430288131/430288131-1589002701_1260.mp3",
-        image: "",
-        video: "",
-        gift: "",
-        scorce: ""
-    },
-    {
-        mysendmsg: false,
-        text: "",
-        audio: "https://alibaba-resource.evkeji.cn/files/uservoice/20200509/430288131/430288131-1589002701_1260.mp3",
-        image: "",
-        video: "",
-        gift: "",
-        scorce: ""
-    },
-    {
-        mysendmsg: false,
-        text: "",
-        audio: "https://alibaba-resource.evkeji.cn/files/uservoice/20200509/430288131/430288131-1589002701_1260.mp3",
-        image: "",
-        video: "",
-        gift: "",
-        scorce: ""
-    },
-    {
-        mysendmsg: false,
-        text: "",
-        audio: "https://alibaba-resource.evkeji.cn/files/uservoice/20200507/430392564/430392564-1588836917_1042.mp3",
-        image: "",
-        video: "",
-        gift: "",
-        scorce: ""
-    },
-    {
-        mysendmsg: false,
-        text: "",
-        audio: "",
-        video: "http://page.qxiu.com/ldz/static/test.mp4",
-        image: "",
-        gift: "",
-        scorce: ""
-    },
-    {
-        mysendmsg: false,
-        text: "",
-        audio: "",
-        video: "http://page.qxiu.com/ldz/static/test2.mp4",
-        image: "",
-        gift: "",
-        scorce: ""
-    },
-    {
-        mysendmsg: false,
-        text: "",
-        audio: "",
-        video: "http://page.qxiu.com/ldz/static/test2.mp4",
-        image: "",
-        gift: "",
-        scorce: ""
-    },
-    {
-        mysendmsg: false,
-        text: "",
-        audio: "",
-        video: "http://page.qxiu.com/ldz/static/test2.mp4",
-        image: "",
-        gift: "",
-        scorce: ""
-    },
-    {
-        mysendmsg: false,
-        text: "",
-        audio: "",
-        video: "http://page.qxiu.com/ldz/static/test2.mp4",
-        image: "",
-        gift: "",
-        scorce: ""
-    },
-    {
-        mysendmsg: false,
-        text: "",
-        audio: "",
-        video: "http://page.qxiu.com/ldz/static/test2.mp4",
-        image: "",
-        gift: "",
-        scorce: ""
-    },
-    {
-        mysendmsg: false,
-        text: "",
-        audio: "",
-        video: "http://page.qxiu.com/ldz/static/test2.mp4",
-        image: "",
-        gift: "",
-        scorce: ""
-    },
-    {
-        mysendmsg: false,
-        text: "",
-        audio: "",
-        video: "http://page.qxiu.com/ldz/static/test2.mp4",
-        image: "",
-        gift: "",
-        scorce: ""
-    },
-    {
-        mysendmsg: false,
-        text: "",
-        audio: "",
-        video: "http://page.qxiu.com/ldz/static/test2.mp4",
-        image: "",
-        gift: "",
-        scorce: ""
-    },
-    {
-        mysendmsg: false,
-        text: "",
-        audio: "",
-        video: "http://page.qxiu.com/ldz/static/test2.mp4",
-        image: "",
-        gift: "",
-        scorce: ""
-    },
-    {
-        mysendmsg: false,
-        text: "",
-        audio: "",
-        video: "http://page.qxiu.com/ldz/static/test2.mp4",
-        image: "",
-        gift: "",
-        scorce: ""
-    },
-    {
-        mysendmsg: true,
-        text: "帅哥，你好酷",
-        audio: "",
-        video: "",
-        image: "",
-        gift: "",
-        scorce: "+0.6"
-    },
-    {
-        mysendmsg: true,
-        text: "",
-        audio: "",
-        video: "",
-        image: bbb,
-        gift: "",
-        scorce: "+10"
-    },
-]
-localStorage.setItem('1',JSON.stringify(falseData))
+
 isLoginOut()
-var talkList = new TalkList()
-talkList.init() //好友列表页
+
 var intalk = new Intalk()
 var inTalk = false
+var maxid, lastmsg, lasttext, obj, menAllId, msgLength, lastMsgTime, loop, msgArr, arr = null
+var timer2 = "";
+var timerGetData = "";
 
 function getNowTime() {
     var nowDate = timeFormat('yyyy-MM-dd hh:mm:ss', new Date().getTime())
@@ -423,46 +122,139 @@ function compileTime(time) {
         return msgYear + "-" + msgMonth + '-' + msgDay
     }
 }
-
+var talkList = new TalkList()
+talkList.init() //好友列表页
 function TalkList() {
     this.scrollT = 0;
     this.init = function () {
-        this.renderUserList(arr1)
+        maxid = 0; //目前最大消息
+        lastmsg = []; //最后一条信息
+        lasttext = []
+        obj = {} //男性用户id，和发送了几条消息
+        menAllId = [] //发送消息的所有男用户id
+        msgLength = []; //发消息的所有男用户的消息条数
+        lastMsgTime = []; //发消息的所有男用户的最后一条消息时间
+        loop = [];
+        var _this = this;
+        $.ajax({
+            url: "http://121.201.62.233:13888/delegate/msg/refresh/" + uid,
+            type: "POST",
+            async: false,
+            data: {
+                limit: "",
+                targetId: "",
+                lastId: 0,
+                token: token
+            },
+            success: function (data) {
+                _this.handleArray(data.content)
+                _this.renderUserList()
+            }
+        })
         this.outTalkHtml()
         this.clickListItem()
         this.scrollPosition()
+
+
+    }
+    this.handleArray = function (arr) {
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i].id > maxid) {
+                maxid = arr[i].id
+            }
+            // 发送者消息接收者是当前虚拟女号得id才是正确未读消息
+            if (obj[arr[i].content.int64_user_id]) {
+                obj[arr[i].content.int64_user_id]++
+            } else {
+                obj[arr[i].content.int64_user_id] = 1
+            }
+            if (uid != arr[i].content.int64_user_id) {
+                if (loop.indexOf(arr[i].content.int64_user_id) == -1) {
+                    loop.push(arr[i].content.int64_user_id)
+                    lastMsgTime.push(arr[i].content.int64_time)
+                }
+
+            }
+        }
+        for (var at in obj) {
+            if (at != uid) {
+                menAllId.push(at)
+                msgLength.push(obj[at])
+            }
+        }
+        for (var i = 0; i < menAllId.length; i++) {
+            $.ajax({
+                url: "http://121.201.62.233:13888/delegate/msg/refresh/" + uid,
+                type: "POST",
+                async: false,
+                data: {
+                    limit: 1,
+                    targetId: menAllId[i],
+                    lastId: 0,
+                    token: token
+                },
+                success: function (data) {
+
+                    if (data.content[0].content.string_tp == "QI:FlatterMsg") {
+                        lastmsg[i] = '搭讪消息'
+                    } else if (data.content[0].content.string_tp == "RC:VcMsg") {
+                        lastmsg[i] = "语音消息"
+                    } else if (data.content[0].content.string_tp == "RC:ImgMsg") {
+                        lastmsg[i] = "图片"
+                    } else if (data.content[0].content.string_tp == "RC:SightMsg") {
+                        lastmsg[i] = "视频消息"
+                    } else if (data.content[0].content.string_tp == "RC:TxtMsg") {
+                        lastmsg[i] = data.content[0].content.msg_user_private.string_content
+                    }
+                    if (data.content[0].content.int64_user_id == uid) {
+                        lastmsg[i] = '已回复'
+                    }
+                }
+            })
+        }
     }
     this.scrollPosition = function () {
         this.scrollT == 0 ? $('.itemWrap').scrollTop(0) : $('.itemWrap').scrollTop(this.scrollT)
     }
-    this.replaceTitleNicakName = function () {
-
-    }
-    this.renderUserList = function (data) {
+    this.renderUserList = function () {
         var html = '';
-        $.each(data, function (index, item) {
-            html += ` <li class="item border-1px EverylastBorderDone">
-                <div class="hiddenUserid" style="display:none;">${item.sendUserid}</div>
-                <div class="taskIcon">
-                    <img src="" alt="">
-                </div>
-                <div class="taskContent">
-                    <div class="taskName">${item.name}</div>
-                    <div class="taskContext">
-                        <span class="message">
-                        ${item.is ? "[已回复]" :item.text }</span>
-                    </div>
-                </div>
-                <div class="contentWrap">
-                    <div class="redIcon">
-                        ${compileTime(item.time)}
+        $.each(menAllId, function (index, item) {
+            $.ajax({
+                url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
+                type: "POST",
+                dataType: "json",
+                async: false,
+                cache: true,
+                data: {
+                    userIds: item
+                },
+                success: function (data) {
+                    html += ` <li class="item border-1px EverylastBorderDone">
+                        <div class="hiddenUserid" style="display:none;">${item}</div>
+                        <div class="taskIcon" style="background-image:url(${data.content[item].head});"></div>
+                        <div class="hiddenHead" style="display:none;">${data.content[item].head}</div>
+                        <div class="hiddenName" style="display:none;">${data.content[item].nickname}</div>
+                        <div class="taskContent">
+                            <div class="taskName">${data.content[item].nickname}</div>
+                            
+                            <div class="taskContext">
+                                <span class="message">
+                               ${lastmsg[index]} <span>
+                            </div>
                         </div>
-                    <div class="plusMoney">
-                        <span class="xiaoxi">${item.weidu}</span>
-                    </div>
-                    
-                </div>
-            </li>`
+                        <div class="contentWrap">
+                            <div class="redIcon">
+                                 ${compileTime(lastMsgTime[index])}
+                                </div>
+                            <div class="plusMoney">
+                                <span class="${msgLength[index] != 1 ? "xiaoxi" : ""}">${msgLength[index] !=1 ? msgLength[index] : ""}</span>
+                            </div>
+
+                        </div>
+                    </li>`
+                }
+            })
+
         })
         $('.content').html(html)
     }
@@ -482,6 +274,8 @@ function TalkList() {
         $('.item').tap(function () {
             istalk = true //区分是退出到好友列表页or退出好友列表页
             menId = $(this).find('.hiddenUserid').html()
+            menName = $(this).find('.hiddenName').html()
+            menHead = `style="background-image:url(${$(this).find('.hiddenHead').html()})"`
             _this.scrollT = $('.content').scrollTop()
             intalk.init() //进入聊天界面构造函数
             inTalk = true
@@ -489,18 +283,7 @@ function TalkList() {
     }
 
 }
-var newmsg = [{
-    mysendmsg: false,
-    text: "Can i sleep with you tonight?",
-    audio: "",
-    video: "",
-    image: "",
-    gift: "",
-    scorce: ""
-}]
 
-var timer = "";
-var timer2 = "";
 
 
 // 聊天界面
@@ -510,6 +293,7 @@ function Intalk() {
     this.nantou = "";
     this.nvtou = `style="background-image:url(${myHead});"`
     this.nowMySendMsg = null;
+    this.max = 0;
     this.handleHtml = {
         textMsg: function (head, text, my) {
             var textHtml = `<li class="contextBox ${my.a}">
@@ -522,12 +306,12 @@ function Intalk() {
                             </li>`
             return textHtml
         },
-        audioMsg: function (head, audio, my) {
+        audioMsg: function (head, audio, my, time) {
             var audioHtml = `<li class="contextBox ${my.a}">
                                 <div class="head ${my.b}" ${head}></div>
                                 <div class="textBox ${my.c}">
                                     <div class="jiantouLeft ${my.d}"></div>
-                                    <div class="text"> <div class="audioTime"></div> <audio src="${audio}" controls></audio></div>
+                                    <div class="text"> <div class="audioTime">${time}s</div> <audio src="${audio}" controls></audio></div>
                                 </div>
                             </li>`
             return audioHtml
@@ -562,20 +346,28 @@ function Intalk() {
                                 </div>
                             </li>`
             return giftHtml
+        },
+        giftTMsg: function (head, gift, num, scorce, my) {
+            var giftHtml = `<li class="contextBox ${my.a}">
+                                <div class="head ${my.b}" ${head}></div>
+                                <div class="textBox ${my.c}">
+                                <div class="jiantouLeft"></div>
+                                <div class="text">送你礼物 <span>${gift + "x" + num}</span><span class="yColor">  ${scorce}积分</span></div>
+                                </div>
+                            </li>`
+            return giftHtml
         }
 
     }
     this.init = function () {
         $('.content').html('')
         $('.app').css("background", '#333')
-        this.falseData = falseData;
-        this.getUserMsg() //获取用户信息
+
+        this.getTalkMsg() //获取聊天记录并渲染聊天记录
         this.goingTalk() //进入聊天页更改的页面样式已经title
-        this.renderTalkHtml() //渲染聊天记录
         this.initLength = $('.content .contextBox').length
-        this.handleVideo()
         this.getHuashu() //获取话术
-        this.audioLength() // 
+
         var _this = this
         if (!inTalk) {
             this.isAudio() //是音频做出相应处理
@@ -588,60 +380,37 @@ function Intalk() {
         }
         setTimeout(function () {
             $('.itemWrap').scrollTop($('.content').height() + 1000)
-        }, 2000)
-
+        }, 1000)
 
         timer2 = setInterval(function () {
-            console.log('timer2')
-            //     var tpl = _this.whoMsg(newmsg);
-            //     $('.itemWrap .content').append(tpl)
-            //     var newLength = $('.content .contextBox').length;
-            //     if (newLength > _this.initLength) {
-            //         _this.newMsgHandle(newLength)
-            //     }
+            _this.appendNewMsg()
         }, 3000)
-        timer = setTimeout(function () {
-            console.log('timer')
-            //     newmsg.push({
-            //         mysendmsg: false,
-            //         text: "",
-            //         audio: "",
-            //         video: "http://page.qxiu.com/ldz/static/test2.mp4",
-            //         image: "",
-            //         gift: "",
-            //         scorce: ""
-            //     }, {
-            //         mysendmsg: true,
-            //         text: "sure, But can you let me fly feel?",
-            //         audio: "",
-            //         video: "",
-            //         image: "",
-            //         gift: "",
-            //         scorce: "+0.6"
-            //     }, {
-            //         mysendmsg: false,
-            //         text: "",
-            //         audio: "https://alibaba-resource.evkeji.cn/files/uservoice/20200509/430288131/430288131-1589002701_1260.mp3",
-            //         video: "",
-            //         image: "",
-            //         gift: "",
-            //         scorce: ""
-            //     })
-        }, 6000)
+
     }
-    this.getUserMsg = function () {
-        var _this = this
+    this.getTalkMsg = function () {
+        var self = this;
         $.ajax({
-            url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
+            url: "http://121.201.62.233:13888/delegate/msg/refresh/" + uid + "?",
             type: "POST",
-            dataType: "json",
             async: false,
+            cache: true,
+            dataType: "json",
             data: {
-                userIds: menId
+                limit: "",
+                targetId: menId,
+                token: token,
+                lastId: 0
             },
             success: function (data) {
-                _this.nantou = `style="background-image:url(${data.content[menId].head});"`
-                _this.menNickName = data.content[menId].nickname
+                console.log(data)
+                for (var i = 0; i < data.content.length; i++) {
+                    if (data.content[i].id > self.max) {
+                        self.max = data.content[i].id
+                    }
+                }
+                console.log(data)
+                console.log(self.max)
+                self.renderTalkHtml(data.content.reverse())
             }
         })
     }
@@ -651,54 +420,72 @@ function Intalk() {
         $('.title').addClass('istalk')
         $('footer').css('display', 'flex')
         $('.itemWrap').addClass('talkPage')
-        $('.title .accountDefaultStyle').addClass("accountName").html(this.menNickName)
+        $('.title .accountDefaultStyle').addClass("accountName").html(menName)
         $('.title .mymessage').html("我的资料 : " + myMSG)
     }
-    this.renderTalkHtml = function () {
-        $('.itemWrap .content').html($('.itemWrap .content').html() + this.whoMsg(this.falseData))
+    this.renderTalkHtml = function (Data) {
+        $('.itemWrap .content').html($('.itemWrap .content').html() + this.whoMsg(Data))
     }
     this.whoMsg = function (falseData) {
         var _this = this;
         var html = "";
         $.each(falseData, function (index, item) {
-            if (!item.mysendmsg) { //接收的消息
-                if (item.text) { //文本消息
-                    html += _this.handleHtml.textMsg(_this.nantou, item.text, {})
-                } else if (item.audio) { //语音消息
-                    html += _this.handleHtml.audioMsg(_this.nantou, item.audio, {})
-                } else if (item.video) { //视频消息
-                    html += _this.handleHtml.videoMsg(_this.nantou, item.video, {})
-                } else if (item.image) { //图片
-                    html += _this.handleHtml.imgMsg(_this.nantou, item.image, {})
-                } else { //送出礼物
-                    html += _this.handleHtml.giftMsg(_this.nantou, item.gift, item.num, item.scorce, {})
+            var targetid = item.content.int64_target_user_id
+            var sendid = item.content.int64_user_id
+            var loway = item.content
+            if (targetid == uid) { //接收的消息      targetid 等于 uid   接受消息得是我
+                if (loway.string_tp == "RC:TxtMsg") { //文本消息
+                    html += _this.handleHtml.textMsg(menHead, loway.msg_user_private.string_content, {})
+                } else if (loway.string_tp == "RC:VcMsg") { //语音消息
+                    html += _this.handleHtml.audioMsg(menHead, loway.msg_user_audio.string_content, {}, loway.msg_user_audio.uint32_auido_duration)
+                } else if (loway.string_tp == "RC:SightMsg") { //视频消息
+                    html += _this.handleHtml.videoMsg(menHead, loway.msg_user_small_video.string_video_url, {})
+                } else if (loway.string_tp == "RC:ImgMsg") { //图片
+                    html += _this.handleHtml.imgMsg(menHead, loway.msg_user_image.string_image_url, {})
+                } else if (loway.string_tp == "QI:FlatterMsg") { //搭讪礼物
+                    html += _this.handleHtml.giftMsg(menHead, loway.msg_user_flatter.string_content, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.uint32_goods_num, {})
+                } else if (loway.string_tp == "QI:GiftMsg") {
+                    html += _this.handleHtml.giftTMsg(menHead, loway.msg_user_goods.int64_goods_id, loway.msg_user_goods.uint32_goods_num, loway.msg_user_goods.uint32_goods_num, {})
                 }
-            } else { //我发送的消息
-                if (item.text) {
-                    html += _this.handleHtml.textMsg(_this.nvtou, item.text, {
+
+            }
+            if (sendid == uid) { //我发送的消息               sendid 等于 uid  发送消息的是我
+                if (loway.string_tp == "RC:TxtMsg") {
+                    html += _this.handleHtml.textMsg(_this.nvtou, loway.msg_user_private.string_content, {
                         a: "myContentBox",
                         b: "myhead",
                         c: "mytextBox",
                         d: "jiantouRight",
-                        e: item.scorce
+                        e: 1
                     })
-                } else if (item.image) {
-                    html += _this.handleHtml.imgMsg(_this.nvtou, item.image, {
+                } else if (loway.string_tp == "RC:ImgMsg") {
+                    html += _this.handleHtml.imgMsg(_this.nvtou, loway.msg_user_image.string_image_url, {
                         a: "myContentBox",
                         b: "myhead",
                         c: "mytextBox",
                         d: "jiantouRight",
-                        e: item.scorce
+                        e: 1
                     })
+                } else if (loway.string_tp == "RC:VcMsg") {
+                    html += _this.handleHtml.audioMsg(_this.nvtou, loway.msg_user_audio.string_content, {
+                        a: "myContentBox",
+                        b: "myhead",
+                        c: "mytextBox",
+                        d: "jiantouRight",
+                        e: 1
+                    }, loway.msg_user_audio.uint32_auido_duration)
                 }
             }
         })
+        // console.log(html)
         return html
     }
+
     this.isAudio = function () {
         //播放音频按下事件
         $('.content').delegate('.textBox', 'touchstart', function () {
             var item = $(this).find('.text audio')[0]
+
             if (!item) {
                 return;
             }
@@ -733,6 +520,7 @@ function Intalk() {
     }
     this.audioLength = function () {
         $('.text audio').on('durationchange', function () {
+            console.log('???')
             var duration = parseInt($(this)[0].duration)
             $(this).prev('.audioTime').html(duration + "s")
             if (duration >= 0 && duration <= 3) {
@@ -774,7 +562,18 @@ function Intalk() {
     }
     //获取话术
     this.getHuashu = function () {
-
+        var huashuHtml = "";
+        $.ajax({
+            url: "http://121.201.62.233:13888/delegate/res/quickreplylist/" + uid,
+            type: "POST",
+            cache: false,
+            success: function (data) {
+                for (var i = 0; i < data.content.length; i++) {
+                    huashuHtml += `<li class="huashu_text">${data.content[i]}</li>`
+                }
+                $('.huashu_textWrap').html(huashuHtml)
+            }
+        })
     }
     //点击快捷话语输入框中展现选中语句
     this.tapHuashu = function () {
@@ -791,48 +590,24 @@ function Intalk() {
             $('.huashu').fadeOut(500)
         })
     }
-    this.msgError = function () {
-        if (window.confirm('消息发送失败，是否重新发送')) {
-            
-        } else {
-            $('.content').find('.contextBox').eq(this.nowMySendMsg).remove()
 
-        }
-
-
-    }
-    this.sendMyMsg = function () {
-        var state = 0
-        var _this = this
-        setTimeout(function () {
-            if (!state) {
-                _this.msgError()
-            }
-        }, 1000)
-
-    }
     this.tapSendMsg = function () {
         var _this = this;
         $('.sendmsgbox').tap(function () {
             //请求发送消息前先停止掉消息获取
             clearInterval(timer2)
-            clearTimeout(timer)
             var inp = $('.input')
             var val = inp.val()
-            $('.content').append(_this.handleHtml.textMsg(_this.nvtou, val, {
-                a: "myContentBox",
-                b: "myhead",
-                c: "mytextBox",
-                d: "jiantouRight",
-            }))
+            _this.sendMsg(encodeURIComponent(val))
+
             inp.val('')
             var len = $('.content .contextBox').length;
-            
             $('.itemWrap').scrollTop($('.content .contextBox').get(len - 1).offsetTop)
             //发起请求
             _this.nowMySendMsg = len - 1
-            _this.sendMyMsg()
         })
+
+
         $('.inputFile').on('change', function () {
             var imgMaxSize = 1024 * 1024 * 10 //图片最大限制
             var file = $(this).get(0).files[0] //文件对象
@@ -862,12 +637,122 @@ function Intalk() {
             var len = $('.content .contextBox').length;
             _this.nowMySendMsg = len - 1
             $('.itemWrap').scrollTop($('.content .contextBox').get(len - 1).offsetTop)
-            _this.sendMyMsg()
+            _this.sendMsg()
             $(this).val('')
         })
 
     }
+    this.appendNewMsg = function () {
+        var _this = this;
+        $.ajax({
+            url: "http://121.201.62.233:13888/delegate/msg/refresh/" + uid + "?",
+            type: "POST",
+            async: false,
+            cache: true,
+            dataType: "json",
+            data: {
+                limit: "",
+                targetId: menId,
+                token: token,
+                lastId: _this.max
+            },
+            success: function (data) {
+                var html = "";
+                console.log(data)
+                for (var i = 0; i < data.content.length; i++) {
+                    if (data.content[i].id > _this.max) {
+                        if(data.content[i].id > _this.max) {
+                            _this.max = data.content[i].id 
+                        }
+                        
+                        var loway = data.content[i].content
+                        var tarid = data.content[i].content.int64_target_user_id
+                        var senid = data.content[i].content.int64_user_id
+                        if (tarid == uid) { //接收的消息      targetid 等于 uid   接受消息得是我
+                            if (loway.string_tp == "RC:TxtMsg") { //文本消息
+                                html += _this.handleHtml.textMsg(menHead, loway.msg_user_private.string_content, {})
+                            } else if (loway.string_tp == "RC:VcMsg") { //语音消息
+                                html += _this.handleHtml.audioMsg(menHead, loway.msg_user_audio.string_content, {}, loway.msg_user_audio.uint32_auido_duration)
+                            } else if (loway.string_tp == "RC:SightMsg") { //视频消息
+                                html += _this.handleHtml.videoMsg(menHead, loway.msg_user_small_video.string_video_url, {})
+                            } else if (loway.string_tp == "RC:ImgMsg") { //图片
+                                html += _this.handleHtml.imgMsg(menHead, loway.msg_user_image.string_image_url, {})
+                            } else if (loway.string_tp == "QI:FlatterMsg") { //送出礼物
+                                html += _this.handleHtml.giftMsg(menHead, loway.msg_user_flatter.string_content, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.uint32_goods_num, {}, )
+                            } else if (loway.string_tp == "QI:GiftMsg") {
+                                html += _this.handleHtml.giftTMsg(menHead, loway.msg_user_goods.int64_goods_id, loway.msg_user_goods.uint32_goods_num, loway.msg_user_goods.uint32_goods_num, {})
+                            }
+                        }
+                        if (senid == uid) { // 我发送消息
+                            if (loway.string_tp == "RC:TxtMsg") {
+                                html += _this.handleHtml.textMsg(_this.nvtou, loway.msg_user_private.string_content, {
+                                    a: "myContentBox",
+                                    b: "myhead",
+                                    c: "mytextBox",
+                                    d: "jiantouRight",
+                                    e: 1
+                                })
+                            } else if (loway.string_tp == "RC:ImgMsg") {
+                                html += _this.handleHtml.imgMsg(_this.nvtou, loway.msg_user_image.string_image_url, {
+                                    a: "myContentBox",
+                                    b: "myhead",
+                                    c: "mytextBox",
+                                    d: "jiantouRight",
+                                    e: 1
+                                })
+                            } else if (loway.string_tp == "RC:VcMsg") {
+                                html += _this.handleHtml.audioMsg(_this.nvtou, loway.msg_user_audio.string_content, {
+                                    a: "myContentBox",
+                                    b: "myhead",
+                                    c: "mytextBox",
+                                    d: "jiantouRight",
+                                    e: 1
+                                }, loway.msg_user_audio.uint32_auido_duration)
+                            } else if (loway.string_tp == "RC:SightMsg") {
+                                html += _this.handleHtml.videoMsg(_this.nvtou, loway.msg_user_small_video.string_video_url, {
+                                    a: "myContentBox",
+                                    b: "myhead",
+                                    c: "mytextBox",
+                                    d: "jiantouRight",
+                                    e: 1
+                                })
+                            }
+                        }
+                    }
+                }
+                $('.content').append(html)
 
+                // self.renderTalkHtml(data.content.reverse())
+            }
+        })
+    }
+    this.sendMsg = function (val) {
+        var _this = this;
+        $.ajax({
+            url: "http://121.201.62.233:13888/delegate/msg/send/private/" + uid,
+            type: "POST",
+            dataType: "jsonp",
+            cache: false,
+            data: {
+                mcheck: "64f712eff44e63453cbfdc8bb4936a586d95ced6e6a400a4d2602b14d0677f39",
+                content: val,
+                targetId: menId
+            },
+            success: function (data) {
+                console.log(data)
+                _this.appendNewMsg()
+                if (data.state == 0) {
+
+                } else {
+                    alert('发送失败')
+                    $('.input').val(decodeURIComponent(val))
+                }
+            },
+            error: function () {
+                alert('服务器出了点小意外~')
+            }
+        })
+    }
     //点击图片放大图片
     this.tapImg = function () {
         $('.content').delegate('.text img', 'tap', function () {
@@ -906,13 +791,6 @@ function Intalk() {
         $('.bigImg').tap(function () {
             $(this).fadeOut(500)
         })
-    }
-    this.handleVideo = function () {
-
-        $('.content .text video').on('loadeddata', function () {
-
-        })
-
     }
     //滚动条
     this.scroll = function () {
@@ -955,8 +833,6 @@ function Intalk() {
         }
         this.audioLength()
         this.initLength = len
-
-
     }
 }
 
@@ -969,8 +845,8 @@ function Intalk() {
 //点击back按钮
 $('.ListBack').tap(function () {
     if (istalk) {
-        clearTimeout(timer)
         clearInterval(timer2)
+        clearInterval(timerGetData)
         talkList.init()
         getNowTime()
         istalk = false
@@ -1053,79 +929,3 @@ function isLoginOut() {
 //         alert("服务器繁忙");
 //     }
 // });
-
-
-
-
-
-
-
-//     var html = `<li class="contextBox">
-//     <div class="head" ${nantou}></div>
-//     <div class="textBox">
-//         <div class="jiantouLeft"></div>
-//         <div class="text"><span>和代好爱上大搜爱神的箭你扫地哈斯迪欧hi殴打扫黄按属地欧萨哄你集的京东is啊</span></div>
-//     </div>
-// </li>
-// <li class="contextBox">
-//     <div class="head"></div>
-//     <div class="textBox">
-//         <div class="jiantouLeft"></div>
-//         <div class="text">送你礼物 <span>玫瑰花x1</span><span class="yColor">  +1积分</span></div>
-//     </div>
-// </li>
-// <li class="contextBox myContentBox">
-//     <div class="head myhead" style="background-image:url(${myHead});"></div>
-//     <div class="textBox mytextBox">
-//         <div class="jiantouLeft jiantouRight"></div>
-//         <div class="text"><span>和代好爱上大搜爱神的箭你扫地哈斯迪欧hi殴打扫黄按属地欧萨哄你集的京东is啊</span></div>
-//         <div class="pScorce">+0.4积分</div>
-//     </div>
-// </li>
-
-// <li class="talkTime">
-//     <div class="date">今天 下午 05:34</div>
-// </li>
-
-// <li class="contextBox">
-//     <div class="head"></div>
-//     <div class="textBox">
-//         <div class="jiantouLeft"></div>
-//         <div class="text"> <div class="audioTime"></div> <audio src="https://alibaba-resource.evkeji.cn/files/uservoice/20200509/430288131/430288131-1589002701_1260.mp3" controls></audio></div>
-//     </div>
-// </li>
-
-
-// <li class="contextBox">
-//     <div class="head"></div>
-//     <div class="textBox">
-//         <div class="jiantouLeft"></div>
-//         <div class="text"> <div class="audioTime"></div> <audio src="https://alibaba-resource.evkeji.cn/files/uservoice/20200507/430392564/430392564-1588836917_1042.mp3" controls></audio></div>
-//     </div>
-// </li>
-
-// <li class="contextBox">
-//     <div class="head"></div>
-//     <div class="textBox">
-//         <div class="jiantouLeft"></div>
-//         <div class="text">  <video class="video" src="http://page.qxiu.com/ldz/static/test.mp4" webkit-playsinline="allow" playsinline="allow" x5-playsinline="allow" x-webkit-airplay="allow" controls></video></div>
-//     </div>
-// </li>
-
-// <li class="contextBox">
-//     <div class="head"></div>
-//     <div class="textBox">
-//         <div class="jiantouLeft"></div>
-//         <div class="text"><video class="video" src="http://page.qxiu.com/ldz/static/test2.mp4" webkit-playsinline="allow" playsinline="allow" x5-playsinline="allow" x-webkit-airplay="allow"  controls></video></div>
-//     </div>
-// </li>
-
-// <li class="contextBox">
-//     <div class="head"></div>
-//     <div class="textBox">
-//         <div class="jiantouLeft"></div>
-//         <div class="text">
-//             <img src="${bbb}" alt="">
-//         </div>
-//     </div>
-// </li>`

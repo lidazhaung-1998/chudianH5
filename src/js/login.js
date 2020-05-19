@@ -98,7 +98,7 @@ $(function () {
                 password: md5String || cookie.get('pwd')
             },
             success: function (response) {
-                console.log(response)
+                // console.log(response)
                 if (response.content) {
                     token = response.content.token;
                 }
@@ -137,48 +137,77 @@ $(function () {
         this.userids = [] // 该数组存储  20个账户的userid
         this.userContentSelf = []
         this.init = function (arr) {
+            var _this = this;
             this.userAccount = arr
             // 接受到传过来的20个账户密码并赋值
             this.getUserId()
-            this.getuserContet()
-            this.success()
-            this.tapBack()
-            this.clickListItem()
-            this.getMsg()
+            setTimeout(function () {
+                _this.getuserContet()
+                _this.success()
+                _this.tapBack()
+                _this.clickListItem()
+                _this.getMsg()
+            }, 1500)
+
         }
         // 遍历循环登录20个账户和密码
         this.getUserId = function () {
             var self = this;
+
+            function getSign(params) {
+                var arr = [];
+                for (var i in params) {
+                    arr.push((i + "=" + params[i]));
+                }
+                arr.push('qiqiMobile!)5865#$%^7');
+                return paramsStrSort(arr.join(("&")));
+            }
+
+            function paramsStrSort(paramsStr) {
+                var urlStr = paramsStr.split("&").sort().join('&');
+                var newUrl = urlStr;
+                return sha1(newUrl).toUpperCase();
+            }
+
             // 调用此处拿到20个账户id和meckeck
             $.each(this.userAccount, function (index, item) {
-                // $.ajax({
-                //     url: "http://cgi-user.evkeji.cn/mobileuser/user/phonelogin?", // 登录接口
-                //     type: "POST",
-                //     dataType: 'jsonp',
-                //     async: false,
-                //     data: {
-                //         phone: 13716156938,
-                //         password: 123456,
-                //         _expire: new Date().getTime().toString(),
-                //         sign: "39bf77e8305dd53ec145b84a38121dc75a9dda64",
-                //         logintype: "1",
-                //         code: "",
-                //     },
-                //     success: function (data) {
-                //         console.log(data)
-                //         self.userids.push(data.content.userid)
-                //         // 拿到20个账号的“id”
-                //     }
-                // })
+                var paramsObj = {
+                    phone: item.phoneNumber,
+                    password: item.password,
+                    logintype: '1',
+                    _expire: new Date().getTime(),
+                }; //要传的参数（测试数据）
+                var sign = getSign(paramsObj);
+                paramsObj.sign = sign;
+                var obj = paramsObj;
+                obj.code = ""
+
+
+
+                $.ajax({
+                    url: "http://cgi-user.evkeji.cn/mobileuser/user/phonelogin?", // 登录接口
+                    type: "GET",
+                    dataType: 'jsonp',
+                    async: false,
+                    data: obj,
+                    headers: {
+                        ss: "",
+                        ss1: "",
+                        oemid: 82,
+                    },
+                    success: function (data) {
+                        // console.log(obj)
+                        // console.log(data)
+                        // self.userids.push(430136233)
+                        self.userids = [430136233, 430052485, 430192972, 430021931, 430036321, 430122129]
+                    }
+                })
             })
-            //http://cgi-user.evkeji.cn/mobileuser/user/phonelogin?phone=&logintype=1&password=123456&code=&_expire=1589358921956&sign=69B82F63757725E52EEE972A3C1A69C95341F9CA
-            this.userids = [430022123, 430455137, 430014598, 430392564, 431294739, 431418282, 431820761, 430932358, 430699640, 430288131, 430325806, 430003799, 431448474,
-                430890595, 430015571, 431685336, 431423069, 430895562, 431276446, 430392564
-            ]
+
         }
 
         // 拿到userid后调用查询用户资料，查询20个用户资料
-        this.getuserContet = function () {
+        this.getuserContet = function (userid) {
             var self = this;
             $.each(this.userids, function (index, userid) {
                 $.ajax({
@@ -186,7 +215,6 @@ $(function () {
                     type: "POST",
                     dataType: "json",
                     async: false,
-                    cache: true,
                     data: {
                         userIds: userid
                     },
@@ -201,7 +229,7 @@ $(function () {
             $('.title').html(` <div class="ListBack"><img src="${backIcon}" alt=""></div>
         账号列表`), $('.loginWrap').css('display', 'none');
             $('.itemWrap').css('display', 'block');
-            this.renderList() //渲染账户列表html
+            this.renderList()
         }
         this.tapBack = function () {
             var self = this
@@ -218,10 +246,11 @@ $(function () {
         }
 
 
-        this.renderList = function () {
+        this.renderList = function (item) {
             var self = this;
             var accountHtml = "";
             $.each(this.userContentSelf, function (index, item) {
+                console.log(item)
                 accountHtml += ` <dl class="item border-1px EverylastBorderDone">
                         <dd class="hiddenUserid" style="display:none;">${item.userId}</dd>
                         <dd class="taskIcon" style="background-image:url(${item.head});">
@@ -253,30 +282,38 @@ $(function () {
 
         this.getMsg = function () {
             var flag = true;
+            var arr = [];
+            var _this = this
             $.each(this.userids, function (idx, item) {
                 $.ajax({
-                    url: "http://121.201.62.233:13888/delegate/msg/refresh/430032850?",
+                    url: "http://121.201.62.233:13888/delegate/msg/refresh/" + _this.userids[idx] + "?",
                     type: "POST",
                     async: false,
                     cache: true,
                     dataType: "json",
                     data: {
                         limit: "",
-                        targetId:"",
+                        targetId: "",
                         token: token,
                         lastId: 0
                     },
                     success: function (data) {
-                        console.log(data)
+                        // console.log(data)
+                        arr.push(data.content)
+                        // 
                         if (idx < 1) {
                             flag = false
                         }
                         if (!flag) {
-                            $('.weiduMsg').eq(idx).html(data.content.length)
+                            var weiduNum = data.content.length
+                            weiduNum > 99 ? weiduNum = 99 + "+" : weiduNum
+                            $('.weiduMsg').eq(idx).html(weiduNum)
                         }
                     }
                 })
             })
+            localStorage.setItem('msg', JSON.stringify(arr))
+            console.log()
 
         }
 
@@ -303,6 +340,7 @@ $(function () {
                 cookie.set('myHead', myHead, {
                     expire: 8
                 })
+                localStorage.setItem('num', $(this).index())
             })
         }
         this.loadMoreStyle = function (text, opt, time) {
@@ -334,30 +372,30 @@ $(function () {
 })
 
 
-getSign({
-    phone: 13716156938,
-    password: "123456789",
-    _expire: "1589358921956",
-    logintype: "1"
-})
+// getSign({
+//     phone: 13716156938,
+//     password: "123456789",
+//     _expire: "1589358921956",
+//     logintype: "1"
+// })
 
-function getSign(param) { // 获取签名   返回一个包含"?"的参数串
-    var phone = param.phone;
-    var password = param.password;
-    var timeStamp = new Date().getTime();
-    // 判断是否有参数
-    if (param != null && param.length > 0) {
-        param = "phone=" + phone + "&password=" + password + "&" + param;
-    } else {
-        param = "phone=" + phone + "&password=" + password
-    }
-    return "?phone=" + phone + "&logintype=1&password=" + password + "&code=&_expire=" + timeStamp + "&sign=" + calculateSign(param, phone);
-}
+// function getSign(param) { // 获取签名   返回一个包含"?"的参数串
+//     var phone = param.phone;
+//     var password = param.password;
+//     var timeStamp = new Date().getTime();
+//     // 判断是否有参数
+//     if (param != null && param.length > 0) {
+//         param = "phone=" + phone + "&password=" + password + "&" + param;
+//     } else {
+//         param = "phone=" + phone + "&password=" + password
+//     }
+//     return "?phone=" + phone + "&logintype=1&password=" + password + "&code=&_expire=" + timeStamp + "&sign=" + calculateSign(param, phone);
+// }
 
-// 生成sign
-function calculateSign(param, securityKey) {
-    var params = param.split("&");
-    param = params.sort().join("").replace(/=/g, "");
-    console.info(param);
-    return sha1(param + securityKey).toUpperCase();
-}
+// // 生成sign
+// function calculateSign(param, securityKey) {
+//     var params = param.split("&");
+//     param = params.sort().join("").replace(/=/g, "");
+//     console.info(param);
+//     return sha1(param + securityKey).toUpperCase();
+// }
