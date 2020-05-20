@@ -181,12 +181,10 @@ $(function () {
                 paramsObj.sign = sign;
                 var obj = paramsObj;
                 obj.code = ""
-
-
-
                 $.ajax({
-                    url: "http://cgi-user.evkeji.cn/mobileuser/user/phonelogin?", // 登录接口
-                    type: "GET",
+
+                    url: "https://cgi-user.evkeji.cn/mobileuser/user/phonelogin?", // 登录接口
+                    type: "POST",
                     dataType: 'jsonp',
                     async: false,
                     data: obj,
@@ -195,17 +193,22 @@ $(function () {
                         ss1: "",
                         oemid: 82,
                     },
+                    beforeSend: function (xhr) {
+                        // xhr.setRequestHeader("oemid", "82")
+                        // console.log(xhr)
+                    },
                     success: function (data) {
-                        // console.log(obj)
-                        // console.log(data)
+                        console.log(obj)
+                        console.log(data)
                         // self.userids.push(430136233)
                         self.userids = [430136233, 430052485, 430192972, 430021931, 430036321, 430122129]
-                    }
+                    },
+
                 })
             })
 
         }
-
+        // code=&logintype=1&password=cdu2020x&phone=11120200002&sign=29E3C91C45DDD4DB5283D3873F8788EFB2208671&_expire=1589956476470
         // 拿到userid后调用查询用户资料，查询20个用户资料
         this.getuserContet = function (userid) {
             var self = this;
@@ -261,7 +264,7 @@ $(function () {
                             <div class="taskName">${item.nickname}</div>
                             <!-- taskName -->
                             <div class="taskContext">
-                                <span class="message">${item.age} | ${item.job ? item.job : '暂无信息'} | 北京朝阳区</span>
+                                <span class="message">${item.age} | ${item.job ? item.job : '暂无信息'}</span>
                             </div>
                             <!-- taskContent -->
                         </dd>
@@ -305,16 +308,35 @@ $(function () {
                             flag = false
                         }
                         if (!flag) {
+                            // console.log(data)
                             var weiduNum = data.content.length
                             weiduNum > 99 ? weiduNum = 99 + "+" : weiduNum
                             $('.weiduMsg').eq(idx).html(weiduNum)
                         }
                     }
+
                 })
+
             })
             localStorage.setItem('msg', JSON.stringify(arr))
-            console.log()
+            var obj = {}
+            for (var i = 0; i < arr.length; i++) {
+                for (var j = 0; j < arr[i].length; j++) {
+                    if (obj[arr[i][j].content.int64_target_user_id]) {
+                        obj[arr[i][j].content.int64_target_user_id]++
+                    } else {
+                        obj[arr[i][j].content.int64_target_user_id] = 1
+                    }
+                }
 
+            }
+            var idx = 0;
+            for (var ar in obj) {
+                if (obj[this.userids[idx]] != undefined) {
+                    $('.weiduMsg').eq(idx).html(obj[this.userids[idx]])
+                }
+                idx++
+            }
         }
 
         this.clickListItem = function () {

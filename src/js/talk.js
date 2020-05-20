@@ -78,9 +78,10 @@ isLoginOut()
 
 var intalk = new Intalk()
 var inTalk = false
-var maxid, lastmsg, lasttext, obj, menAllId, msgLength, lastMsgTime, loop, msgArr, arr = null
+var maxid, lastmsg, lasttext, obj, menAllId, msgLength, oldid, lastMsgTime, loop = null
 var timer2 = "";
-var timerGetData = "";
+var bl = true;
+var timerUpdata = "";
 
 function getNowTime() {
     var nowDate = timeFormat('yyyy-MM-dd hh:mm:ss', new Date().getTime())
@@ -125,8 +126,10 @@ function compileTime(time) {
 var talkList = new TalkList()
 talkList.init() //好友列表页
 function TalkList() {
+    this.flag = true
     this.scrollT = 0;
     this.init = function () {
+        this.flag = true
         maxid = 0; //目前最大消息
         lastmsg = []; //最后一条信息
         lasttext = []
@@ -135,6 +138,18 @@ function TalkList() {
         msgLength = []; //发消息的所有男用户的消息条数
         lastMsgTime = []; //发消息的所有男用户的最后一条消息时间
         loop = [];
+        oldid = 0;
+        var _this = this;
+        this.upData()
+        timerUpdata = setInterval(function () {
+            _this.upData()
+        }, 2000)
+        this.outTalkHtml()
+        this.scrollPosition()
+        this.dashanhuifu()
+
+    }
+    this.upData = function () {
         var _this = this;
         $.ajax({
             url: "http://121.201.62.233:13888/delegate/msg/refresh/" + uid,
@@ -143,49 +158,58 @@ function TalkList() {
             data: {
                 limit: "",
                 targetId: "",
-                lastId: 0,
+                lastId: maxid,
                 token: token
             },
             success: function (data) {
-                _this.handleArray(data.content)
-                _this.renderUserList()
+                bl = true
+                for (var i = 0; i < data.content.length; i++) {
+                    if (data.content[i].id > maxid) {
+                        maxid = data.content[i].id
+                        if (_this.flag) {
+                            _this.handleArray(data.content)
+                            _this.renderUserList()
+                            _this.clickListItem()
+                            _this.flag = false
+                        } else {
+                            if (bl) {
+                                _this.newMsg(data.content)
+                                _this.renderUserList()
+                                _this.clickListItem()
+                            }
+                        }
+                    }
+                }
+
             }
         })
-        this.outTalkHtml()
-        this.clickListItem()
-        this.scrollPosition()
-
-
     }
     this.handleArray = function (arr) {
         for (var i = 0; i < arr.length; i++) {
-            if (arr[i].id > maxid) {
-                maxid = arr[i].id
-            }
             // 发送者消息接收者是当前虚拟女号得id才是正确未读消息
             if (obj[arr[i].content.int64_user_id]) {
                 obj[arr[i].content.int64_user_id]++
             } else {
                 obj[arr[i].content.int64_user_id] = 1
             }
-            if (uid != arr[i].content.int64_user_id) {
-                if (loop.indexOf(arr[i].content.int64_user_id) == -1) {
-                    loop.push(arr[i].content.int64_user_id)
-                    lastMsgTime.push(arr[i].content.int64_time)
-                }
-
-            }
         }
+
         for (var at in obj) {
             if (at != uid) {
                 menAllId.push(at)
                 msgLength.push(obj[at])
             }
         }
+        this.lastMSGData()
+        menAllId = menAllId.reverse()
+        msgLength = msgLength.reverse()
+
+    }
+    this.lastMSGData = function () {
         for (var i = 0; i < menAllId.length; i++) {
             $.ajax({
                 url: "http://121.201.62.233:13888/delegate/msg/refresh/" + uid,
-                type: "POST",
+                type: "GET",
                 async: false,
                 data: {
                     limit: 1,
@@ -194,7 +218,7 @@ function TalkList() {
                     token: token
                 },
                 success: function (data) {
-
+                    lastMsgTime.push(data.content[0].content.int64_time)
                     if (data.content[0].content.string_tp == "QI:FlatterMsg") {
                         lastmsg[i] = '搭讪消息'
                     } else if (data.content[0].content.string_tp == "RC:VcMsg") {
@@ -212,50 +236,80 @@ function TalkList() {
                 }
             })
         }
+        lastmsg = lastmsg.reverse()
     }
-    this.scrollPosition = function () {
-        this.scrollT == 0 ? $('.itemWrap').scrollTop(0) : $('.itemWrap').scrollTop(this.scrollT)
+    this.newMsg = function (newArr) {
+        menAllId = []
+        msgLength = []
+        loop = []
+        lastMsgTime = []
+        console.log(newArr)
+        for (var i = 0; i < newArr.length; i++) {
+            if (obj[newArr[i].content.int64_user_id]) {
+                obj[newArr[i].content.int64_user_id]++
+            } else {
+                obj[newArr[i].content.int64_user_id] = 1
+            }
+        }
+        for (var ar in obj) {
+            if (ar != uid) {
+                menAllId.push(ar)
+                msgLength.push(obj[ar])
+            }
+        }
+        console.log(obj)
+        this.lastMSGData()
+        msgLength = msgLength.reverse()
+        menAllId = menAllId.reverse()
+        lastMsgTime = lastMsgTime.reverse()
+        // console.log(menAllId)
+        // console.log(msgLength)
+        // console.log(lastMsgTime)
+        bl = false
+
     }
     this.renderUserList = function () {
         var html = '';
-        $.each(menAllId, function (index, item) {
-            $.ajax({
-                url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
-                type: "POST",
-                dataType: "json",
-                async: false,
-                cache: true,
-                data: {
-                    userIds: item
-                },
-                success: function (data) {
-                    html += ` <li class="item border-1px EverylastBorderDone">
-                        <div class="hiddenUserid" style="display:none;">${item}</div>
-                        <div class="taskIcon" style="background-image:url(${data.content[item].head});"></div>
-                        <div class="hiddenHead" style="display:none;">${data.content[item].head}</div>
-                        <div class="hiddenName" style="display:none;">${data.content[item].nickname}</div>
-                        <div class="taskContent">
-                            <div class="taskName">${data.content[item].nickname}</div>
-                            
-                            <div class="taskContext">
-                                <span class="message">
-                               ${lastmsg[index]} <span>
-                            </div>
-                        </div>
-                        <div class="contentWrap">
-                            <div class="redIcon">
-                                 ${compileTime(lastMsgTime[index])}
+        if (maxid > oldid) {
+            $.each(menAllId, function (index, item) {
+                $.ajax({
+                    url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    cache: true,
+                    data: {
+                        userIds: item
+                    },
+                    success: function (data) {
+                        html += ` <li class="item border-1px EverylastBorderDone">
+                            <div class="hiddenUserid" style="display:none;">${item}</div>
+                            <div class="taskIcon" style="background-image:url(${data.content[item].head});"></div>
+                            <div class="hiddenHead" style="display:none;">${data.content[item].head}</div>
+                            <div class="hiddenName" style="display:none;">${data.content[item].nickname}</div>
+                            <div class="taskContent">
+                                <div class="taskName">${data.content[item].nickname}</div>
+                                
+                                <div class="taskContext">
+                                    <span class="message">
+                                   ${lastmsg[index]} <span>
                                 </div>
-                            <div class="plusMoney">
-                                <span class="${msgLength[index] != 1 ? "xiaoxi" : ""}">${msgLength[index] !=1 ? msgLength[index] : ""}</span>
                             </div>
+                            <div class="contentWrap">
+                                <div class="redIcon">
+                                     ${compileTime(lastMsgTime[index])}
+                                    </div>
+                                <div class="plusMoney">
+                                    <span class="xiaoxi">${msgLength[index]}</span>
+                                </div>
+    
+                            </div>
+                        </li>`
+                    }
+                })
 
-                        </div>
-                    </li>`
-                }
             })
-
-        })
+        }
         $('.content').html(html)
     }
     this.outTalkHtml = function () {
@@ -267,7 +321,38 @@ function TalkList() {
         $('.itemWrap').removeClass('talkPage')
         $('.title .accountDefaultStyle').html("账号【" + nickname + "】")
     }
+    this.dashanhuifu = function () {
+        $.each($('.message'), function (index, item) {
+            if (item.innerText == "搭讪消息") {
+                var needSengID = $('.hiddenUserid').eq(index).html()
+                console.log(needSengID)
+                $.ajax({
+                    url: "http://121.201.62.233:13888/delegate/res/quickreplylist/" + uid,
+                    type: "POST",
+                    dataType: "json",
+                    async: true,
+                    success: function (req) {
+                        // console.log(req)
+                        var val = req.content[0]
+                        // $.ajax({
+                        //     url: "http://121.201.62.233:13888/delegate/msg/send/private/" + uid,
+                        //     async: true,
+                        //     dataType: "jsonp",
+                        //     data: {
+                        //         mcheck: "",
+                        //         content: encodeURIComponent(val),
+                        //         targetId: needSengID
+                        //     },
+                        //     success: function () {
 
+                        //     }
+
+                        // })
+                    }
+                })
+            }
+        })
+    }
     //点击好友列表项
     this.clickListItem = function () {
         var _this = this;
@@ -277,11 +362,14 @@ function TalkList() {
             menName = $(this).find('.hiddenName').html()
             menHead = `style="background-image:url(${$(this).find('.hiddenHead').html()})"`
             _this.scrollT = $('.content').scrollTop()
+            clearInterval(timerUpdata)
             intalk.init() //进入聊天界面构造函数
             inTalk = true
         })
     }
-
+    this.scrollPosition = function () {
+        this.scrollT == 0 ? $('.itemWrap').scrollTop(0) : $('.itemWrap').scrollTop(this.scrollT)
+    }
 }
 
 
@@ -311,7 +399,9 @@ function Intalk() {
                                 <div class="head ${my.b}" ${head}></div>
                                 <div class="textBox ${my.c}">
                                     <div class="jiantouLeft ${my.d}"></div>
-                                    <div class="text"> <div class="audioTime">${time}s</div> <audio src="${audio}" controls></audio></div>
+                                    <div class="text"> <div class="audioTime">${time}s</div> <audio src="${audio}" controls></audio>
+                                        <source src="" type="audio/mpeg">
+                                    </div>
                                 </div>
                             </li>`
             return audioHtml
@@ -356,6 +446,12 @@ function Intalk() {
                                 </div>
                             </li>`
             return giftHtml
+        },
+        apdTime: function (date) {
+            var dateHtml = `<li class="talkTime">
+                                <div class="date">${date}</div>
+                            </li>`
+            return dateHtml
         }
 
     }
@@ -402,7 +498,6 @@ function Intalk() {
                 lastId: 0
             },
             success: function (data) {
-                console.log(data)
                 for (var i = 0; i < data.content.length; i++) {
                     if (data.content[i].id > self.max) {
                         self.max = data.content[i].id
@@ -413,6 +508,30 @@ function Intalk() {
                 self.renderTalkHtml(data.content.reverse())
             }
         })
+    }
+    this.talkTime = function (time) {
+        var msgAcceptTime = timeFormat('yyyy-MM-dd hh:mm:ss', time) //消息接收时间
+        var msgYear = msgAcceptTime.substr(0, 4)
+        var msgMonth = msgAcceptTime.substr(5, 2)
+        var msgDay = msgAcceptTime.substr(8, 2)
+        var msgHours = msgAcceptTime.substr(11, 2)
+        var msgMinute = msgAcceptTime.substr(14, 2)
+        var msgSeconds = msgAcceptTime.substr(17, 2)
+        if (year == msgYear && month == msgMonth && day == msgDay) {
+            return "今天" + msgHours + ":" + msgMinute
+        } else if (year == msgYear && month == msgMonth) {
+            if (day - msgDay == 1) {
+                return "昨天&nbsp;" + msgHours + ":" + msgMinute
+            } else if (day - msgDay == 2) {
+                return "前天&nbsp;" + msgHours + ":" + msgMinute
+            } else {
+                return msgMonth + '-' + msgDay + "&nbsp;" + msgHours + ":" + msgMinute
+            }
+        } else if (year == msgYear) {
+            return msgMonth + '-' + msgDay
+        } else {
+            return msgYear + "-" + msgMonth + '-' + msgDay
+        }
     }
     this.goingTalk = function () {
         $('.accountDefaultStyle').addClass('accountName');
@@ -433,6 +552,18 @@ function Intalk() {
             var targetid = item.content.int64_target_user_id
             var sendid = item.content.int64_user_id
             var loway = item.content
+            if(index <= 0) {
+                html += _this.handleHtml.apdTime(_this.talkTime(item.content.int64_time))
+            }
+            
+            if (index < falseData.length - 2) {
+                if (falseData[index + 1].content.int64_time - falseData[index].content.int64_time > 600000) {
+                    html += _this.handleHtml.apdTime(_this.talkTime(falseData[index].content.int64_time))
+                } //600000
+            }
+            // if (falseData.length < 5) {
+            //     html = _this.handleHtml.apdTime(_this.talkTime(falseData[index].content.int64_time))
+            // }
             if (targetid == uid) { //接收的消息      targetid 等于 uid   接受消息得是我
                 if (loway.string_tp == "RC:TxtMsg") { //文本消息
                     html += _this.handleHtml.textMsg(menHead, loway.msg_user_private.string_content, {})
@@ -489,19 +620,22 @@ function Intalk() {
             if (!item) {
                 return;
             }
+            let audio = new Audio;
+            audio.src = item.getAttribute('src')
+            audio.play()
             $(this).css("background", '#ccc')
             $(this).find('.jiantouLeft').css({
                 "border-right": ".15rem solid #ccc"
             })
-            if (item.paused) { //没播放
-                $('.text').find('audio').each(function (index, list) {
-                    list.pause()
-                    list.currentTime = 0
-                })
-                item.play()
-            } else { //播放中
-                item.pause()
-            }
+            // if (item.paused) { //没播放
+            //     $('.text').find('audio').each(function (index, list) {
+            //         list.pause()
+            //         list.currentTime = 0
+            //     })
+            //     item.play()
+            // } else { //播放中
+            //     item.pause()
+            // }
         })
         //播放音频抬起事件
         $('.content').delegate('.textBox', 'touchend', function () {
@@ -511,10 +645,18 @@ function Intalk() {
             }
             var _this = $(this)
             setTimeout(function () {
-                _this.css("background", '#fff')
-                _this.find('.jiantouLeft').css({
-                    "border-right": ".15rem solid #fff"
-                })
+                if (_this.hasClass('mytextBox')) {
+                    _this.css("background", '#7de8f2')
+                    _this.find('.jiantouRight').css({
+                        "border-right": ".15rem solid #7de8f2"
+                    })
+                } else {
+                    _this.css("background", '#fff')
+                    _this.find('.jiantouLeft').css({
+                        "border-right": ".15rem solid #fff"
+                    })
+                }
+
             }, 300)
         })
     }
@@ -661,10 +803,10 @@ function Intalk() {
                 console.log(data)
                 for (var i = 0; i < data.content.length; i++) {
                     if (data.content[i].id > _this.max) {
-                        if(data.content[i].id > _this.max) {
-                            _this.max = data.content[i].id 
+                        if (data.content[i].id > _this.max) {
+                            _this.max = data.content[i].id
                         }
-                        
+
                         var loway = data.content[i].content
                         var tarid = data.content[i].content.int64_target_user_id
                         var senid = data.content[i].content.int64_user_id
@@ -777,7 +919,6 @@ function Intalk() {
                 imgWidth = realWidth;
                 imgHeight = realHeight;
             }
-            console.log(imgWidth)
             $('#bigImg').css("width", imgWidth * 1.1); //以最终的宽度对图片缩放
             $('.innerDiv').css({
                 "top": '50%',
@@ -846,7 +987,6 @@ function Intalk() {
 $('.ListBack').tap(function () {
     if (istalk) {
         clearInterval(timer2)
-        clearInterval(timerGetData)
         talkList.init()
         getNowTime()
         istalk = false
