@@ -28,21 +28,23 @@ body {
 
 .app>.title>.ListBack {
     width: .22rem;
-    height: .36rem;
+    height: 100%;
     position: absolute;
     left: .23rem;
-    top: 50%;
-    margin-top: -.18rem;
+    top: 0;
+    -webkit-box-sizing: border-box;
     box-sizing: border-box;
-    padding: .30rem;
+    padding: .50rem;
 }
 
 .app>.title>.ListBack>img {
     width: .22rem;
     height: .36rem;
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: .22rem;
+    margin-left: -.11rem;
+    margin-top: -.19rem;
 }
 
 .app>.title>.accountName {

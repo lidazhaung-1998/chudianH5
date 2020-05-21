@@ -98,7 +98,7 @@ $(function () {
                 password: md5String || cookie.get('pwd')
             },
             success: function (response) {
-                // console.log(response)
+                console.log(response)
                 if (response.content) {
                     token = response.content.token;
                 }
@@ -136,94 +136,31 @@ $(function () {
         this.userAccount = [] // 该数组存储  20个账户和密码
         this.userids = [] // 该数组存储  20个账户的userid
         this.userContentSelf = []
+        this.mcheckArr = []
         this.init = function (arr) {
-            var _this = this;
             this.userAccount = arr
-            // 接受到传过来的20个账户密码并赋值
-            this.getUserId()
-            setTimeout(function () {
-                _this.getuserContet()
-                _this.success()
-                _this.tapBack()
-                _this.clickListItem()
-                _this.getMsg()
-            }, 1500)
+            this.getuserContet()
+            this.success()
+            this.tapBack()
+            this.clickListItem()
+            this.getMsg()
+            this.mySort()
 
         }
-        // 遍历循环登录20个账户和密码
-        this.getUserId = function () {
-            var self = this;
-
-            function getSign(params) {
-                var arr = [];
-                for (var i in params) {
-                    arr.push((i + "=" + params[i]));
-                }
-                arr.push('qiqiMobile!)5865#$%^7');
-                return paramsStrSort(arr.join(("&")));
-            }
-
-            function paramsStrSort(paramsStr) {
-                var urlStr = paramsStr.split("&").sort().join('&');
-                var newUrl = urlStr;
-                return sha1(newUrl).toUpperCase();
-            }
-
-            // 调用此处拿到20个账户id和meckeck
-            $.each(this.userAccount, function (index, item) {
-                var paramsObj = {
-                    phone: item.phoneNumber,
-                    password: item.password,
-                    logintype: '1',
-                    _expire: new Date().getTime(),
-                }; //要传的参数（测试数据）
-                var sign = getSign(paramsObj);
-                paramsObj.sign = sign;
-                var obj = paramsObj;
-                obj.code = ""
-                $.ajax({
-
-                    url: "https://cgi-user.evkeji.cn/mobileuser/user/phonelogin?", // 登录接口
-                    type: "POST",
-                    dataType: 'jsonp',
-                    async: false,
-                    data: obj,
-                    headers: {
-                        ss: "",
-                        ss1: "",
-                        oemid: 82,
-                    },
-                    beforeSend: function (xhr) {
-                        // xhr.setRequestHeader("oemid", "82")
-                        // console.log(xhr)
-                    },
-                    success: function (data) {
-                        console.log(obj)
-                        console.log(data)
-                        // self.userids.push(430136233)
-                        self.userids = [430136233, 430052485, 430192972, 430021931, 430036321, 430122129]
-                    },
-
-                })
-            })
-
-        }
-        // code=&logintype=1&password=cdu2020x&phone=11120200002&sign=29E3C91C45DDD4DB5283D3873F8788EFB2208671&_expire=1589956476470
-        // 拿到userid后调用查询用户资料，查询20个用户资料
         this.getuserContet = function (userid) {
             var self = this;
-            $.each(this.userids, function (index, userid) {
+            $.each(this.userAccount, function (index, userContent) {
+                self.mcheckArr.push(userContent.userMCheck)
                 $.ajax({
                     url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
                     type: "POST",
                     dataType: "json",
                     async: false,
                     data: {
-                        userIds: userid
+                        userIds: userContent.userId
                     },
                     success: function (data) {
-                        console.log(data)
-                        self.userContentSelf.push(data.content[userid])
+                        self.userContentSelf.push(data.content[userContent.userId])
                     }
                 })
             })
@@ -240,20 +177,13 @@ $(function () {
                 self.reloadLogin()
             })
         }
-        // 退出登录
-        this.reloadLogin = function () {
-            $('.title').html('账号登录'), $('.loginWrap').css('display', 'block');
-            $('.itemWrap').css('display', 'none')
-            cookie.remove('pwd')
-            cookie.remove('account')
-        }
+
 
 
         this.renderList = function (item) {
             var self = this;
             var accountHtml = "";
             $.each(this.userContentSelf, function (index, item) {
-                console.log(item)
                 accountHtml += ` <dl class="item border-1px EverylastBorderDone">
                         <dd class="hiddenUserid" style="display:none;">${item.userId}</dd>
                         <dd class="taskIcon" style="background-image:url(${item.head});">
@@ -270,26 +200,44 @@ $(function () {
                         </dd>
                         <dd class="contentWrap">
                             <div class="redIcon">
-                                ${self.haveWeidu(item)}
-                                <span class="weiduMsg">${99}条未读</span>
+                                <span class="weiduMsg">${0}条信息</span>
                                 </div>
                             <div class="plusMoney">
                                 积分 : <span class="num">${null}</span>
                             </div>
                             
                         </dd>
+                        <div class="hiddenMcheck" style="display:none;">${self.mcheckArr[index]}</div>
                     </dl>`
             })
             $('.itemWrap .content').html(accountHtml)
         }
+        this.mySort = function () {
+            var parent = Array.apply(Array, document.querySelectorAll('.content .item'))
+            parent.sort(function (num1, num2) {
+                if (num1.querySelectorAll('.item')[0]) {
+                    var td = num1.querySelectorAll('.time')[0].innerText
+                    var td2 = num2.querySelectorAll('.time')[0].innerText
+                    if (td < td2) {
+                        return 1
+                    } else if (td == td2) {
+                        return 0
+                    } else {
+                        return -1
+                    }
+                }
 
+            })
+            $('.content').html('')
+            $('.content').html(parent)
+        }
         this.getMsg = function () {
             var flag = true;
             var arr = [];
             var _this = this
-            $.each(this.userids, function (idx, item) {
+            $.each(this.userAccount, function (idx, item) {
                 $.ajax({
-                    url: "http://121.201.62.233:13888/delegate/msg/refresh/" + _this.userids[idx] + "?",
+                    url: "http://121.201.62.233:13888/delegate/msg/refresh/" + item.userId + "?",
                     type: "POST",
                     async: false,
                     cache: true,
@@ -301,26 +249,29 @@ $(function () {
                         lastId: 0
                     },
                     success: function (data) {
-                        // console.log(data)
-                        arr.push(data.content)
-                        // 
-                        if (idx < 1) {
-                            flag = false
+                        console.log(data)
+                        if (data.content.length) {
+                            arr.push(data.content)
                         }
-                        if (!flag) {
-                            // console.log(data)
-                            var weiduNum = data.content.length
-                            weiduNum > 99 ? weiduNum = 99 + "+" : weiduNum
-                            $('.weiduMsg').eq(idx).html(weiduNum)
-                        }
+                        // if (idx < 1) {
+                        //     flag = false
+                        // }
+                        // if (!flag) {
+                        //     // 
+                        //     var weiduNum = data.content.length
+                        //     weiduNum > 99 ? weiduNum = 99 + "+" : weiduNum
+                        //     $('.weiduMsg').eq(idx).html(weiduNum)
+                        // }
                     }
 
                 })
 
             })
-            localStorage.setItem('msg', JSON.stringify(arr))
+            // localStorage.setItem('msg', JSON.stringify(arr))
             var obj = {}
             for (var i = 0; i < arr.length; i++) {
+                $('.content .item').eq(i).append(`<div class="time" style="display:none;">${arr[i][0].content.int64_time}</div>`)
+                $('.content .item').eq(i).find('.redIcon').prepend(this.haveWeidu(arr[i].length))
                 for (var j = 0; j < arr[i].length; j++) {
                     if (obj[arr[i][j].content.int64_target_user_id]) {
                         obj[arr[i][j].content.int64_target_user_id]++
@@ -340,17 +291,17 @@ $(function () {
         }
 
         this.clickListItem = function () {
-            var self = this;
             $('.content .item').tap(function () {
                 var uid = $(this).find('.hiddenUserid').html()
                 var nickname = encodeURIComponent($(this).find('.taskName').html())
                 var myMSG = encodeURIComponent($(this).find('.message').html())
                 var myHead = encodeURIComponent($(this).find('.hiddenHead').html())
+                var myMcheck = $(this).find('.hiddenMcheck').html()
                 window.location.href = "http://192.168.25.126:8080/talk.html?uid=" + uid
                 cookie.set('uid', uid, {
                     expire: 8
                 })
-                cookie.set('mcheck', md5('123456'), {
+                cookie.set('mcheck', myMcheck, {
                     expire: 8
                 })
                 cookie.set('nickname', nickname, {
@@ -369,15 +320,21 @@ $(function () {
             $('.loadMore').text(text).animate(opt, time);
         }
         this.haveWeidu = function (item) {
-            var have = ""
-            if (item.weihui != 0) {
+            var have = "";
+            if (item != 0) {
                 have = '<div class="dian"></div>'
             } else {
                 have = ""
             }
             return have
         }
-
+        // 退出登录
+        this.reloadLogin = function () {
+            $('.title').html('账号登录'), $('.loginWrap').css('display', 'block');
+            $('.itemWrap').css('display', 'none')
+            cookie.remove('pwd')
+            cookie.remove('account')
+        }
     }
 
     function storageLoginStatus() {
@@ -392,32 +349,3 @@ $(function () {
         })
     }
 })
-
-
-// getSign({
-//     phone: 13716156938,
-//     password: "123456789",
-//     _expire: "1589358921956",
-//     logintype: "1"
-// })
-
-// function getSign(param) { // 获取签名   返回一个包含"?"的参数串
-//     var phone = param.phone;
-//     var password = param.password;
-//     var timeStamp = new Date().getTime();
-//     // 判断是否有参数
-//     if (param != null && param.length > 0) {
-//         param = "phone=" + phone + "&password=" + password + "&" + param;
-//     } else {
-//         param = "phone=" + phone + "&password=" + password
-//     }
-//     return "?phone=" + phone + "&logintype=1&password=" + password + "&code=&_expire=" + timeStamp + "&sign=" + calculateSign(param, phone);
-// }
-
-// // 生成sign
-// function calculateSign(param, securityKey) {
-//     var params = param.split("&");
-//     param = params.sort().join("").replace(/=/g, "");
-//     console.info(param);
-//     return sha1(param + securityKey).toUpperCase();
-// }

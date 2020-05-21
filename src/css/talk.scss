@@ -48,7 +48,7 @@
             .contextBox {
                 box-sizing: border-box;
                 padding: 0 .24rem 0 .26rem;
-                margin-bottom: .5rem;
+                margin-bottom: .27rem;
 
                 .head {
                     width: .9rem;
@@ -176,11 +176,27 @@
         .talkTime {
             box-sizing: border-box;
             padding: .1rem .2rem;
-            background: #242424;
+            // background: #242424;
             border-radius: .2rem;
             display: table;
-            margin: .2rem auto;
+            // margin: .2rem auto;
+            position: relative;
+            left: 1.2rem;
 
+            .date {
+                color: #6a6a6a;
+                font-size: .22rem;
+            }
+        }
+        .mytalkTime {
+            box-sizing: border-box;
+            padding: .1rem .2rem;
+            // background: #242424;
+            border-radius: .2rem;
+            display: table;
+            // margin: .2rem auto;
+            position: relative;
+            left: 4.6rem;
             .date {
                 color: #6a6a6a;
                 font-size: .22rem;
