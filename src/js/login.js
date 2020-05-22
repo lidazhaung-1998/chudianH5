@@ -15,6 +15,7 @@ function completeLoading() {
 }
 completeLoading()
 $(function () {
+    var oldM = oldM = JSON.parse(localStorage.getItem('oldM'));
 
     var cookie = {
         set: function (cookieKey, cookieValue, cookieOpts) {
@@ -82,8 +83,6 @@ $(function () {
         md5String = md5(passWord);
         isLoginSucc()
         storageLoginStatus()
-        // $('.loading').css('display','none')
-
     })
 
     function loginController() {
@@ -130,6 +129,7 @@ $(function () {
             alert(response.message)
         }
     }
+    var a = [];
 
     function LoginSuc() {
         this.flag = false;
@@ -137,39 +137,92 @@ $(function () {
         this.userids = [] // 该数组存储  20个账户的userid
         this.userContentSelf = []
         this.mcheckArr = []
+        this.scorce = []
+        this.city = []
         this.init = function (arr) {
+            var _this = this;
             this.userAccount = arr
             this.getuserContet()
             this.success()
+            this.renderList()
             this.tapBack()
             this.clickListItem()
             this.getMsg()
             this.mySort()
-
+            setInterval(function () {
+                _this.getuserContet()
+                _this.renderList()
+                _this.getMsg()
+                _this.clickListItem()
+                _this.mySort()
+            }, 4000)
         }
+
+        //存储账号id 和mcheck
         this.getuserContet = function (userid) {
             var self = this;
+            var isUpDatapj = this.userAccount.length
+            var isUpData = 0
+            if (JSON.parse(localStorage.getItem('userContent')) != null) {
+                isUpData = JSON.parse(localStorage.getItem('userContent')).length;
+            }
+            // console.log(this.userAccount)
+            // 获取用户信息
             $.each(this.userAccount, function (index, userContent) {
                 self.mcheckArr.push(userContent.userMCheck)
+                if (isUpDatapj > isUpData) {
+                    $.ajax({
+                        url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
+                        type: "POST",
+                        dataType: "json",
+                        async: false,
+                        cache: true,
+                        data: {
+                            userIds: userContent.userId
+                        },
+                        success: function (data) {
+                            console.log(data)
+                            self.userContentSelf.push(data.content[userContent.userId])
+                        }
+                    })
+                }
                 $.ajax({
-                    url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
+                    url: "http://cgi-vas.evkeji.cn/sns/cash/userpoint/get?",
                     type: "POST",
                     dataType: "json",
                     async: false,
                     data: {
-                        userIds: userContent.userId
+                        userId: userContent.userId,
+                        meck: userContent.userMCheck
                     },
-                    success: function (data) {
-                        self.userContentSelf.push(data.content[userContent.userId])
+                    success: function (req) {
+                        self.scorce.push(req.content.balance)
+                    }
+                })
+                $.ajax({
+                    url: "http://cgi-base.evkeji.cn/sns/base/location/getLocation?",
+                    type: "GET",
+                    async: false,
+                    data: {
+                        userId: userContent.userId,
+                        fromUserId: userContent.userId
+                    },
+                    success(data) {
+                        self.city.push(data.content)
                     }
                 })
             })
+            if (self.userContentSelf == false) {
+                self.userContentSelf = JSON.parse(localStorage.getItem('userContent'))
+            } else {
+                localStorage.setItem('userContent', JSON.stringify(self.userContentSelf))
+            }
+
         }
         this.success = function () {
-            $('.title').html(` <div class="ListBack"><img src="${backIcon}" alt=""></div>
-        账号列表`), $('.loginWrap').css('display', 'none');
+            $('.title').html(` <div class="ListBack"><img src="${backIcon}" alt=""></div>账号列表`)
+            $('.loginWrap').css('display', 'none');
             $('.itemWrap').css('display', 'block');
-            this.renderList()
         }
         this.tapBack = function () {
             var self = this
@@ -194,46 +247,52 @@ $(function () {
                             <div class="taskName">${item.nickname}</div>
                             <!-- taskName -->
                             <div class="taskContext">
-                                <span class="message">${item.age} | ${item.job ? item.job : '暂无信息'}</span>
+                                <span class="message">${item.age} | ${item.job ? item.job : '暂无信息'} | ${self.city[index].province+self.city[index].city}</span>
                             </div>
                             <!-- taskContent -->
                         </dd>
                         <dd class="contentWrap">
                             <div class="redIcon">
-                                <span class="weiduMsg">${0}条信息</span>
+                                <span class="weiduMsg"></span>
                                 </div>
                             <div class="plusMoney">
-                                积分 : <span class="num">${null}</span>
+                                积分 : <span class="num">${self.scorce[index]}</span>
                             </div>
                             
                         </dd>
                         <div class="hiddenMcheck" style="display:none;">${self.mcheckArr[index]}</div>
+                        <div class="time" style="display:none;">0</div>
                     </dl>`
             })
+            this.scorce = []
             $('.itemWrap .content').html(accountHtml)
         }
         this.mySort = function () {
-            var parent = Array.apply(Array, document.querySelectorAll('.content .item'))
+            var parent = $('.content .item')
             parent.sort(function (num1, num2) {
-                if (num1.querySelectorAll('.item')[0]) {
-                    var td = num1.querySelectorAll('.time')[0].innerText
-                    var td2 = num2.querySelectorAll('.time')[0].innerText
-                    if (td < td2) {
-                        return 1
-                    } else if (td == td2) {
-                        return 0
-                    } else {
-                        return -1
-                    }
+                // if (num1.querySelectorAll('.item')[0]) {
+                var td = num1.querySelectorAll('.time')[0].innerText
+                console.log(td)
+                var td2 = num2.querySelectorAll('.time')[0].innerText
+                if (td < td2) {
+                    return 1
+                } else if (td == td2) {
+                    return 0
+                } else {
+                    return -1
                 }
+                // }
 
             })
             $('.content').html('')
             $('.content').html(parent)
         }
+
         this.getMsg = function () {
             var flag = true;
             var arr = [];
+            var obj = {}
+            var t = {}
             var _this = this
             $.each(this.userAccount, function (idx, item) {
                 $.ajax({
@@ -249,47 +308,56 @@ $(function () {
                         lastId: 0
                     },
                     success: function (data) {
-                        console.log(data)
+                        // console.log(data)
+                        if (data.state != 0) {
+                            alert('出错了~' + idx)
+                        }
                         if (data.content.length) {
                             arr.push(data.content)
                         }
-                        // if (idx < 1) {
-                        //     flag = false
-                        // }
-                        // if (!flag) {
-                        //     // 
-                        //     var weiduNum = data.content.length
-                        //     weiduNum > 99 ? weiduNum = 99 + "+" : weiduNum
-                        //     $('.weiduMsg').eq(idx).html(weiduNum)
-                        // }
                     }
 
                 })
-
             })
-            // localStorage.setItem('msg', JSON.stringify(arr))
-            var obj = {}
-            for (var i = 0; i < arr.length; i++) {
-                $('.content .item').eq(i).append(`<div class="time" style="display:none;">${arr[i][0].content.int64_time}</div>`)
-                $('.content .item').eq(i).find('.redIcon').prepend(this.haveWeidu(arr[i].length))
-                for (var j = 0; j < arr[i].length; j++) {
-                    if (obj[arr[i][j].content.int64_target_user_id]) {
-                        obj[arr[i][j].content.int64_target_user_id]++
-                    } else {
-                        obj[arr[i][j].content.int64_target_user_id] = 1
-                    }
-                }
 
+            for (var i = 0; i < arr.length; i++) {
+                $('.content .item .time').eq(i).html(arr[i][0].content.int64_time)
+                t[_this.userAccount[i].userId] = arr[i]
+                for (var j = 0; j < arr[i].length; j++) {
+                    if (arr[i][j].content.int64_target_user_id == _this.userAccount[i].userId) {
+                        if (obj[arr[i][j].content.int64_target_user_id]) {
+                            obj[arr[i][j].content.int64_target_user_id]++
+                        } else {
+                            obj[arr[i][j].content.int64_target_user_id] = 1
+                        }
+                    }
+                    // if (t[arr[i][j].content.int64_user_id] == this.userAccount[i].userId) {
+
+                    // }
+
+                }
+            }
+            for (var a in t) {
+                for (var i = 0; i < t[a].length; i++) {
+
+
+                }
             }
             var idx = 0;
             for (var ar in obj) {
-                if (obj[this.userids[idx]] != undefined) {
-                    $('.weiduMsg').eq(idx).html(obj[this.userids[idx]])
+                if (obj[this.userAccount[idx].userId] != undefined) {
+                    if (obj[this.userAccount[idx].userId] > oldM[this.userAccount[idx].userId]) {
+                        $('.content .item').eq(idx).find('.redIcon').prepend(`<div class="dian"></div>`)
+                    } else if (obj[this.userAccount[idx].userId] == oldM[this.userAccount[idx].userId]) {
+                        $('.content .item').eq(idx).find('.redIcon').prepend(`<div class="dian"></div>`)
+                    }
                 }
                 idx++
             }
+            console.log(oldM)
+            console.log(obj)
+            localStorage.setItem("oldM", JSON.stringify(obj))
         }
-
         this.clickListItem = function () {
             $('.content .item').tap(function () {
                 var uid = $(this).find('.hiddenUserid').html()
@@ -297,7 +365,9 @@ $(function () {
                 var myMSG = encodeURIComponent($(this).find('.message').html())
                 var myHead = encodeURIComponent($(this).find('.hiddenHead').html())
                 var myMcheck = $(this).find('.hiddenMcheck').html()
+                // window.location.href = "http://page.qxiu.com/ldz/chudianh5/talk.html?uid=" + uid
                 window.location.href = "http://192.168.25.126:8080/talk.html?uid=" + uid
+
                 cookie.set('uid', uid, {
                     expire: 8
                 })
@@ -318,15 +388,6 @@ $(function () {
         }
         this.loadMoreStyle = function (text, opt, time) {
             $('.loadMore').text(text).animate(opt, time);
-        }
-        this.haveWeidu = function (item) {
-            var have = "";
-            if (item != 0) {
-                have = '<div class="dian"></div>'
-            } else {
-                have = ""
-            }
-            return have
         }
         // 退出登录
         this.reloadLogin = function () {

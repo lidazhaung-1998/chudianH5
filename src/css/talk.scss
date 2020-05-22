@@ -1,6 +1,7 @@
 .app {
     display: flex;
     flex-direction: column;
+
     .itemWrap {
         flex: 1;
         overflow-x: hidden;
@@ -188,6 +189,7 @@
                 font-size: .22rem;
             }
         }
+
         .mytalkTime {
             box-sizing: border-box;
             padding: .1rem .2rem;
@@ -197,6 +199,7 @@
             // margin: .2rem auto;
             position: relative;
             left: 4.6rem;
+
             .date {
                 color: #6a6a6a;
                 font-size: .22rem;
@@ -249,7 +252,7 @@
                     text-align: center;
                     height: .6rem;
                     border-bottom: 0.02rem solid #ccc;
-                    font-size: .33rem;
+                    font-size: .24rem;
                     line-height: .6rem;
                 }
             }
@@ -360,5 +363,21 @@
         background: rgba(10, 10, 15, .5);
         z-index: 1001;
         display: none;
+    }
+
+    .showScorce {
+        position: absolute;
+        font-size: .28rem;
+        color: #333;
+        top: 0%;
+        background: #999;
+        right: 0;
+        /* width: 2rem; */
+        line-height: .9rem;
+        height: .9rem;
+        border-radius: .2rem;
+        text-align: center;
+        z-index: 99999;
+        /* width: .3rem;*/
     }
 }
