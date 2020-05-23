@@ -1,5 +1,14 @@
 import "../css/index.scss";
+// import BenzAMRRecorder from "benz-amr-recorder"
+import BenzAMRRecorder from "../libs/BenzAMRRecorder"
+
 var $ = require('../libs/zepto');
+$('.play').click(function () {
+    var amr = new BenzAMRRecorder()
+    amr.initWithUrl('/api/ldz/chudianh5/11.amr').then(function () {
+        amr.play();
+    })
+})
 var timeFormat = require('../libs/timeFormat')
 var cookie = {
     set: function (cookieKey, cookieValue, cookieOpts) {

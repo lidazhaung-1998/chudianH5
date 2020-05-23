@@ -231,18 +231,6 @@ $(function () {
             // 获取用户信息
             $.each(this.userAccount, function (index, userContent) {
                 self.mcheckArr.push(userContent.userMCheck)
-                $.ajax({
-                    url: "http://cgi-base.evkeji.cn/sns/base/location/getLocation?",
-                    type: "GET",
-                    async: false,
-                    data: {
-                        userId: userContent.userId,
-                        fromUserId: userContent.userId
-                    },
-                    success(data) {
-                        self.city.push(data.content)
-                    }
-                })
                 if (isUpDatapj > isUpData) {
                     $.ajax({
                         url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
@@ -253,7 +241,7 @@ $(function () {
                             userIds: userContent.userId
                         },
                         success: function (data) {
-                            console.log(data)
+                            
                             self.userContentSelf.push(data.content[userContent.userId])
                         }
                     })
@@ -269,6 +257,18 @@ $(function () {
                     },
                     success: function (req) {
                         self.scorce.push(req.content.balance)
+                    }
+                })
+                $.ajax({
+                    url: "http://cgi-base.evkeji.cn/sns/base/location/getLocation?",
+                    type: "GET",
+                    async: false,
+                    data: {
+                        userId: userContent.userId,
+                        fromUserId: userContent.userId
+                    },
+                    success(data) {
+                        self.city.push(data.content)
                     }
                 })
 
@@ -308,7 +308,7 @@ $(function () {
                             <div class="taskName">${item.nickname}</div>
                             <!-- taskName -->
                             <div class="taskContext">
-                                <span class="message">${item.age} | ${item.job ? item.job : '暂无信息'} | ${self.city[index].province+self.city[index].city}</span>
+                                <span class="message">${item.age} | ${item.job ? item.job : '暂无信息'} | ${self.city[index].province}${ self.city[index].city}</span>
                             </div>
                             <!-- taskContent -->
                         </dd>

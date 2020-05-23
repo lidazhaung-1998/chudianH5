@@ -53,6 +53,16 @@ module.exports = function (env) {
 			hot: true, //热更新
 			compress: true, //启用gzip压缩
 			disableHostCheck: true, //绕过主机检查
+			proxy: {
+				'/api': {
+					target: 'http://page.qxiu.com/',
+					pathRewrite: {
+						'^/api': ''
+					},
+					changeOrigin: true, // target是域名的话，需要这个参数，
+					secure: false, // 设置支持https协议的代理
+				}
+			}
 		},
 		mode: env.dev ? 'development' : 'production',
 		entry: {
