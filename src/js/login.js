@@ -3,8 +3,11 @@ var backIcon = require('../img/back.png')
 var md5 = require('../libs/md5.js')
 import "../css/login.scss"
 import sha1 from "../libs/sha1"
-
+var zuixin = []
 document.onreadystatechange = completeLoading;
+var la = JSON.parse(localStorage.getItem('la')) || []
+
+
 
 function completeLoading() {
     if (document.readyState == "complete") {
@@ -15,6 +18,10 @@ function completeLoading() {
 }
 completeLoading()
 $(function () {
+    localStorage.setItem('isFirst', true)
+    if (JSON.parse(localStorage.getItem('bb'))) {
+        localStorage.setItem('isFirst', false)
+    }
     var oldM = oldM = JSON.parse(localStorage.getItem('oldM'));
 
     var cookie = {
@@ -139,6 +146,8 @@ $(function () {
         this.mcheckArr = []
         this.scorce = []
         this.city = []
+        this.auto = []
+        this.bb = JSON.parse(localStorage.getItem('bb')) || []
         this.init = function (arr) {
             var _this = this;
             this.userAccount = arr
@@ -147,17 +156,69 @@ $(function () {
             this.renderList()
             this.tapBack()
             this.clickListItem()
+            _this.abab()
             this.getMsg()
+            // this.autoMsg()
+            _this.removeDian()
             this.mySort()
+            setTimeout(function () {
+                _this.getuserContet()
+                _this.renderList()
+                _this.getMsg()
+                _this.clickListItem()
+                _this.mySort()
+                _this.removeDian()
+            }, 100)
             setInterval(function () {
                 _this.getuserContet()
                 _this.renderList()
                 _this.getMsg()
                 _this.clickListItem()
                 _this.mySort()
-            }, 4000)
+                _this.removeDian()
+            }, 3000)
         }
-
+        this.abab = function () {
+            var _this = this
+            $.each($('.content .item'), function (index, item) {
+                if (localStorage.getItem('isFirst') != "false") {
+                    _this.bb.push({
+                        text: $(this).find('.taskName').html(),
+                        state: false,
+                        id: 0
+                    })
+                } else {
+                    if (_this.bb[index].text.indexOf($(this).find('.taskName').html()) == -1) {
+                        _this.bb.push({
+                            text: $(this).find('.taskName').html(),
+                            state: false,
+                            id: $(this).find('.newId').html()
+                        })
+                    }
+                }
+            })
+            // console.log(_this.bb)
+            localStorage.setItem('isFirst', false)
+            localStorage.setItem('bb', JSON.stringify(_this.bb))
+        }
+        this.removeDian = function () {
+            var _this = this
+            for (var i = 0; i < this.bb.length; i++) {
+                if (this.bb[i].state == true) {
+                    $('.content .item').each(function (id, item) {
+                        if ($(this).find('.taskName').html() == _this.bb[i].text) {
+                            $(this).find('.dian').css('display', 'none')
+                        }
+                    })
+                } else {
+                    $('.content .item').each(function (id, item) {
+                        if ($(this).find('.taskName').html() == _this.bb[i].text) {
+                            $(this).find('.dian').css('display', 'block')
+                        }
+                    })
+                }
+            }
+        }
         //存储账号id 和mcheck
         this.getuserContet = function (userid) {
             var self = this;
@@ -170,13 +231,24 @@ $(function () {
             // 获取用户信息
             $.each(this.userAccount, function (index, userContent) {
                 self.mcheckArr.push(userContent.userMCheck)
+                $.ajax({
+                    url: "http://cgi-base.evkeji.cn/sns/base/location/getLocation?",
+                    type: "GET",
+                    async: false,
+                    data: {
+                        userId: userContent.userId,
+                        fromUserId: userContent.userId
+                    },
+                    success(data) {
+                        self.city.push(data.content)
+                    }
+                })
                 if (isUpDatapj > isUpData) {
                     $.ajax({
                         url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
                         type: "POST",
                         dataType: "json",
                         async: false,
-                        cache: true,
                         data: {
                             userIds: userContent.userId
                         },
@@ -199,18 +271,7 @@ $(function () {
                         self.scorce.push(req.content.balance)
                     }
                 })
-                $.ajax({
-                    url: "http://cgi-base.evkeji.cn/sns/base/location/getLocation?",
-                    type: "GET",
-                    async: false,
-                    data: {
-                        userId: userContent.userId,
-                        fromUserId: userContent.userId
-                    },
-                    success(data) {
-                        self.city.push(data.content)
-                    }
-                })
+
             })
             if (self.userContentSelf == false) {
                 self.userContentSelf = JSON.parse(localStorage.getItem('userContent'))
@@ -253,6 +314,7 @@ $(function () {
                         </dd>
                         <dd class="contentWrap">
                             <div class="redIcon">
+                            <div class="dian"></div>
                                 <span class="weiduMsg"></span>
                                 </div>
                             <div class="plusMoney">
@@ -262,6 +324,7 @@ $(function () {
                         </dd>
                         <div class="hiddenMcheck" style="display:none;">${self.mcheckArr[index]}</div>
                         <div class="time" style="display:none;">0</div>
+                        <div class="newId" style="display:none;">${zuixin[index] ? zuixin[index] : 0}</div>
                     </dl>`
             })
             this.scorce = []
@@ -270,9 +333,7 @@ $(function () {
         this.mySort = function () {
             var parent = $('.content .item')
             parent.sort(function (num1, num2) {
-                // if (num1.querySelectorAll('.item')[0]) {
                 var td = num1.querySelectorAll('.time')[0].innerText
-                console.log(td)
                 var td2 = num2.querySelectorAll('.time')[0].innerText
                 if (td < td2) {
                     return 1
@@ -281,25 +342,75 @@ $(function () {
                 } else {
                     return -1
                 }
-                // }
 
             })
             $('.content').html('')
             $('.content').html(parent)
         }
-
+        this.autoMsg = function () {
+            var _this = this;
+            var arr = this.auto
+            var all = []
+            for (var i = 0; i < this.auto.length; i++) {
+                for (var j = 0; j < arr[i].length; j++) {
+                    if (arr[i][j].content.string_tp == "QI:FlatterMsg") {
+                        console.log(arr[i][j])
+                        all.push({
+                            sendId: arr[i][j].content.int64_user_id,
+                            targetid: arr[i][j].content.int64_target_user_id
+                        })
+                    }
+                }
+            }
+            for (var i = 0; i < all.length; i++) {
+                for (var j = i + 1; j < all.length; j++) {
+                    if (all[i].sendId == all[j].sendId) {
+                        all.splice(j, 1)
+                    }
+                }
+            }
+            for (var k = 0; k < all.length; k++) {
+                $.ajax({
+                    url: "http://121.201.62.233:13888/delegate/res/quickreplylist/" + all[k].targetid,
+                    async: false,
+                    type: "GET",
+                    success: function (re) {
+                        var msg = re.content[0]
+                        var mcheck = ""
+                        for (var i = 0; i < _this.userAccount.length; i++) {
+                            if (_this.userAccount[i].userId == all[i].targetid) {
+                                mcheck = _this.userAccount[i].userMCheck
+                            }
+                        }
+                        if (msg) {
+                            $.ajax({
+                                url: "http://121.201.62.233:13888/delegate/msg/send/private/" + all[k].targetid,
+                                async: false,
+                                data: {
+                                    mcheck: mcheck,
+                                    content: msg,
+                                    targetId: all[k].sendId
+                                },
+                                success: function (a) {
+                                    console.log(a)
+                                }
+                            })
+                        }
+                    }
+                })
+            }
+        }
         this.getMsg = function () {
-            var flag = true;
             var arr = [];
+
             var obj = {}
-            var t = {}
+            zuixin = []
             var _this = this
             $.each(this.userAccount, function (idx, item) {
                 $.ajax({
                     url: "http://121.201.62.233:13888/delegate/msg/refresh/" + item.userId + "?",
                     type: "POST",
                     async: false,
-                    cache: true,
                     dataType: "json",
                     data: {
                         limit: "",
@@ -314,6 +425,7 @@ $(function () {
                         }
                         if (data.content.length) {
                             arr.push(data.content)
+                            _this.auto.push(data.content)
                         }
                     }
 
@@ -321,8 +433,33 @@ $(function () {
             })
 
             for (var i = 0; i < arr.length; i++) {
+                zuixin.push(arr[i][0].id)
                 $('.content .item .time').eq(i).html(arr[i][0].content.int64_time)
-                t[_this.userAccount[i].userId] = arr[i]
+                if (la[i] != undefined) {
+                    if (arr[i][0].id > la[i]) {
+                        la[i] = arr[i][0].id
+                        $('.content .item').each(function (index, item) {
+                            if ($(this).find('.hiddenUserid').html() == arr[i][0].content.int64_target_user_id) {
+                                var name = $(this).find('.taskName').html()
+                                for (var l = 0; l < _this.bb.length; l++) {
+                                    if (_this.bb[l].text.indexOf(name) != -1) {
+                                        _this.bb[l].state = false
+                                    }
+                                }
+                            }
+                        })
+                    }
+                } else {
+                    la.push(arr[i][0].id)
+                }
+                if ((arr[i][0].id - _this.bb[i].id) > 3) {
+                    $('.content .item').each(function (ind, item) {
+                        var name = $(this).find('.taskName').html()
+                        if (_this.bb[i].text == name) {
+                            _this.bb[i].state = false
+                        }
+                    })
+                }
                 for (var j = 0; j < arr[i].length; j++) {
                     if (arr[i][j].content.int64_target_user_id == _this.userAccount[i].userId) {
                         if (obj[arr[i][j].content.int64_target_user_id]) {
@@ -331,32 +468,11 @@ $(function () {
                             obj[arr[i][j].content.int64_target_user_id] = 1
                         }
                     }
-                    // if (t[arr[i][j].content.int64_user_id] == this.userAccount[i].userId) {
-
-                    // }
 
                 }
             }
-            for (var a in t) {
-                for (var i = 0; i < t[a].length; i++) {
-
-
-                }
-            }
-            var idx = 0;
-            for (var ar in obj) {
-                if (obj[this.userAccount[idx].userId] != undefined) {
-                    if (obj[this.userAccount[idx].userId] > oldM[this.userAccount[idx].userId]) {
-                        $('.content .item').eq(idx).find('.redIcon').prepend(`<div class="dian"></div>`)
-                    } else if (obj[this.userAccount[idx].userId] == oldM[this.userAccount[idx].userId]) {
-                        $('.content .item').eq(idx).find('.redIcon').prepend(`<div class="dian"></div>`)
-                    }
-                }
-                idx++
-            }
-            console.log(oldM)
-            console.log(obj)
-            localStorage.setItem("oldM", JSON.stringify(obj))
+            localStorage.setItem('bb', JSON.stringify(_this.bb))
+            // console.log(la)
         }
         this.clickListItem = function () {
             $('.content .item').tap(function () {
@@ -365,9 +481,17 @@ $(function () {
                 var myMSG = encodeURIComponent($(this).find('.message').html())
                 var myHead = encodeURIComponent($(this).find('.hiddenHead').html())
                 var myMcheck = $(this).find('.hiddenMcheck').html()
+                var clickWho = $(this).find('.taskName').html()
+                localStorage.setItem('clickWho', clickWho)
+                var aa = JSON.parse(localStorage.getItem('bb'))
+                for (var i = 0; i < aa.length; i++) {
+                    if (aa[i].text.indexOf(clickWho) != -1) {
+                        aa[i].id = parseInt($(this).find('.newId').html())
+                    }
+                }
+                localStorage.setItem('bb', JSON.stringify(aa))
                 // window.location.href = "http://page.qxiu.com/ldz/chudianh5/talk.html?uid=" + uid
                 window.location.href = "http://192.168.25.126:8080/talk.html?uid=" + uid
-
                 cookie.set('uid', uid, {
                     expire: 8
                 })

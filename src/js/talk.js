@@ -93,6 +93,18 @@ function getNowTime() {
     seconds = nowDate.substr(17, 2)
 }
 getScorce()
+removeRed()
+
+function removeRed() {
+    var arr = JSON.parse(localStorage.getItem('bb'))
+    var who = localStorage.getItem('clickWho')
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i].text.indexOf(who) != -1) {
+            arr[i].state = true
+        }
+    }
+    localStorage.setItem('bb', JSON.stringify(arr))
+}
 
 function getScorce() {
     $.ajax({
@@ -182,7 +194,7 @@ function TalkList() {
             },
             success: function (data) {
                 // console.log(maxid)
-                console.log(data)
+                // console.log(data)
                 bl = true
                 // if (data.state != 0) {
                 //     alert('出错啦~')
@@ -217,7 +229,6 @@ function TalkList() {
     this.state = function () {
         $('.message').each(function (index, item) {
             if ($(this).html() == "已回复") {
-                console.log($(this))
                 $(this).css("color", "green")
             } else {
                 $(this).css("color", "red")
@@ -315,8 +326,8 @@ function TalkList() {
     this.domSort = function () {
         var domArr = Array.apply(Array, document.querySelectorAll('.content .item'))
         domArr.sort(function (tr, tr1) {
-            var t1 = tr.querySelectorAll('.redIcon')[0].innerText
-            var t2 = tr1.querySelectorAll('.redIcon')[0].innerText
+            var t1 = tr.querySelectorAll('.time')[0].innerText
+            var t2 = tr1.querySelectorAll('.time')[0].innerText
             if (t1 < t2) {
                 return 1
             } else if (t1 == t2) {
@@ -355,9 +366,8 @@ function TalkList() {
                                 </div>
                             </div>
                             <div class="contentWrap">
-                                <div class="redIcon">
-                                     ${compileTime(lastMsgTime[index])}
-                                    </div>
+                                <div class="redIcon">${compileTime(lastMsgTime[index])}</div>
+                                <div class="time" style="display:none;">${lastMsgTime[index]}</div>
                                 <div class="plusMoney">
                                     
                                 </div>
@@ -368,7 +378,6 @@ function TalkList() {
                 })
 
             })
-            //<span class="xiaoxi">${msgLength[index]}</span>
         }
         $('.content').html(html)
     }
@@ -385,7 +394,7 @@ function TalkList() {
         $.each($('.message'), function (index, item) {
             if (item.innerText == "搭讪消息") {
                 var needSengID = $('.hiddenUserid').eq(index).html()
-                // console.log(needSengID)
+                console.log(needSengID)
                 $.ajax({
                     url: "http://121.201.62.233:13888/delegate/res/quickreplylist/" + uid,
                     type: "POST",
