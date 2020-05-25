@@ -1,9 +1,9 @@
 import "../css/index.scss";
-// import BenzAMRRecorder from "benz-amr-recorder"
-import BenzAMRRecorder from "../libs/BenzAMRRecorder"
+import BenzAMRRecorder from "benz-amr-recorder"
+// import BenzAMRRecorder from "../libs/BenzAMRRecorder"
 
 var $ = require('../libs/zepto');
-$('.play').click(function () {
+$('.goplay').click(function () {
     var amr = new BenzAMRRecorder()
     amr.initWithUrl('/api/ldz/chudianh5/11.amr').then(function () {
         amr.play();
@@ -102,18 +102,9 @@ function getNowTime() {
     seconds = nowDate.substr(17, 2)
 }
 getScorce()
-removeRed()
 
-function removeRed() {
-    var arr = JSON.parse(localStorage.getItem('bb'))
-    var who = localStorage.getItem('clickWho')
-    for (var i = 0; i < arr.length; i++) {
-        if (arr[i].text.indexOf(who) != -1) {
-            arr[i].state = true
-        }
-    }
-    localStorage.setItem('bb', JSON.stringify(arr))
-}
+
+
 
 function getScorce() {
     $.ajax({
@@ -126,7 +117,7 @@ function getScorce() {
             meck: mcheck
         },
         success: function (req) {
-            // console.log(req)
+            console.log(req)
             $('.showScorce').html("总积分:" + req.content.balance)
         }
     })
@@ -180,30 +171,47 @@ function TalkList() {
         loop = [];
         oldid = 0;
         var _this = this;
-        this.upData()
+        this.upData(100)
+        this.removeRed()
         timerUpdata = setInterval(function () {
-            _this.upData()
+            _this.upData("")
+            _this.removeRed()
         }, 2000)
         this.outTalkHtml()
         this.scrollPosition()
-        this.dashanhuifu()
+        // this.dashanhuifu()
 
     }
-    this.upData = function () {
+    this.removeRed = function () {
+        var items = $('.content .item');
+        var length = items.length;
+        var index = 0;
+        items.each(function (idx, item) {
+            if ($(item).find('.message').html() == "已回复") {
+                index++;
+            }
+        })
+        if (index >= length) {
+            // 全部已回复
+            // 获取最大的消息ID 进行存储
+            localStorage.setItem('readMaxMsgId-' + uid, maxid)
+        }
+    }
+    this.upData = function (num) {
         var _this = this;
         $.ajax({
             url: "http://121.201.62.233:13888/delegate/msg/refresh/" + uid,
             type: "POST",
             async: false,
             data: {
-                limit: "",
+                limit: num,
                 targetId: "",
                 lastId: maxid,
                 token: token
             },
             success: function (data) {
                 // console.log(maxid)
-                // console.log(data)
+                console.log(data)
                 bl = true
                 // if (data.state != 0) {
                 //     alert('出错啦~')
@@ -292,6 +300,8 @@ function TalkList() {
                         lastmsg[i] = "视频消息"
                     } else if (data.content[0].content.string_tp == "RC:TxtMsg") {
                         lastmsg[i] = data.content[0].content.msg_user_private.string_content
+                    } else if (data.content[0].content.string_tp == "QI:GiftMsg") {
+                        lastmsg[i] = "收到礼物"
                     }
                     if (data.content[0].content.int64_user_id == uid) {
                         lastmsg[i] = '已回复'
@@ -477,7 +487,7 @@ function Intalk() {
                                 <div class="textBox ${my.c}">
                                     <div class="jiantouLeft ${my.d}"></div>
                                     <div class="text">
-                                        <div class="audioTime">${time}s</div> 
+                                        <div class="audioTime">语音消息暂无法听取</div> 
                                         <audio src="${audio}" controls></audio>
                                         ${my.e ? `<div class='pScorce'>${my.e}积分</div>` : ""}
                                     </div>
@@ -977,7 +987,8 @@ function Intalk() {
                 targetId: menId
             },
             success: function (data) {
-                console.log(data)
+                // console.log(mcheck)
+                // console.log(data)
                 $('.content').append(_this.appendNewMsg())
                 if (data.state == 0) {
 

@@ -108,7 +108,7 @@
                         audio {
                             visibility: hidden;
                             height: .01rem;
-                            width: 1.5rem;
+                            width: 4rem;
                         }
 
                         .video {
@@ -122,6 +122,7 @@
                             left: .55rem;
                             top: 50%;
                             transform: translateY(-50%);
+                            color:red;
                         }
                     }
 

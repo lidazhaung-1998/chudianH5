@@ -2,7 +2,6 @@ var $ = require('../libs/zepto')
 var backIcon = require('../img/back.png')
 var md5 = require('../libs/md5.js')
 import "../css/login.scss"
-import sha1 from "../libs/sha1"
 var zuixin = []
 document.onreadystatechange = completeLoading;
 var la = JSON.parse(localStorage.getItem('la')) || []
@@ -18,11 +17,6 @@ function completeLoading() {
 }
 completeLoading()
 $(function () {
-    localStorage.setItem('isFirst', true)
-    if (JSON.parse(localStorage.getItem('bb'))) {
-        localStorage.setItem('isFirst', false)
-    }
-    var oldM = oldM = JSON.parse(localStorage.getItem('oldM'));
 
     var cookie = {
         set: function (cookieKey, cookieValue, cookieOpts) {
@@ -104,7 +98,7 @@ $(function () {
                 password: md5String || cookie.get('pwd')
             },
             success: function (response) {
-                console.log(response)
+                // console.log(response)
                 if (response.content) {
                     token = response.content.token;
                 }
@@ -136,7 +130,12 @@ $(function () {
             alert(response.message)
         }
     }
-    var a = [];
+    if (localStorage.getItem('isFirst') == "false") {
+        localStorage.setItem('isFirst', false)
+    } else {
+        localStorage.setItem('isFirst', true)
+    }
+
 
     function LoginSuc() {
         this.flag = false;
@@ -147,105 +146,113 @@ $(function () {
         this.scorce = []
         this.city = []
         this.auto = []
+        this.index = 0;
         this.bb = JSON.parse(localStorage.getItem('bb')) || []
         this.init = function (arr) {
             var _this = this;
             this.userAccount = arr
             this.getuserContet()
+            // this.getScorce()
+            this.getCity()
             this.success()
             this.renderList()
             this.tapBack()
             this.clickListItem()
-            _this.abab()
-            this.getMsg()
+            // _this.abab()
+            // this.getMsg()
             // this.autoMsg()
-            _this.removeDian()
-            this.mySort()
-            setTimeout(function () {
-                _this.getuserContet()
-                _this.renderList()
-                _this.getMsg()
-                _this.clickListItem()
-                _this.mySort()
-                _this.removeDian()
-            }, 100)
-            setInterval(function () {
-                _this.getuserContet()
-                _this.renderList()
-                _this.getMsg()
-                _this.clickListItem()
-                _this.mySort()
-                _this.removeDian()
-            }, 3000)
+            this.getData()
+            // _this.removeDian()
+            // this.mySort()
+            // setTimeout(function () {
+            //     _this.getuserContet()
+            //     _this.renderList()
+            //     _this.getMsg()
+            //     _this.clickListItem()
+            //     _this.mySort()
+            //     _this.removeDian()
+            // }, 100)
+            // setInterval(function () {
+            //     // _this.getScorce()
+            //     // _this.renderList()
+            //     // _this.getMsg()
+            //     _this.clickListItem()
+            //     _this.mySort()
+            //     // _this.removeDian()
+            //     _this.autoMsg()
+            // }, 10000)
         }
-        this.abab = function () {
-            var _this = this
-            $.each($('.content .item'), function (index, item) {
-                if (localStorage.getItem('isFirst') != "false") {
-                    _this.bb.push({
-                        text: $(this).find('.taskName').html(),
-                        state: false,
-                        id: 0
-                    })
-                } else {
-                    if (_this.bb[index].text.indexOf($(this).find('.taskName').html()) == -1) {
-                        _this.bb.push({
-                            text: $(this).find('.taskName').html(),
-                            state: false,
-                            id: $(this).find('.newId').html()
-                        })
+        // this.abab = function () {
+        //     var _this = this
+        //     $.each($('.content .item'), function (index, item) {
+        //         if (localStorage.getItem('isFirst') != "false") {
+        //             _this.bb.push({
+        //                 text: $(this).find('.taskName').html(),
+        //                 state: false,
+        //                 id: 0
+        //             })
+        //         } else {
+        //             if (_this.bb[index].text.indexOf($(this).find('.taskName').html()) == -1) {
+        //                 _this.bb.push({
+        //                     text: $(this).find('.taskName').html(),
+        //                     state: false,
+        //                     id: $(this).find('.newId').html()
+        //                 })
+        //             }
+        //         }
+        //     })
+
+        //     localStorage.setItem('isFirst', false)
+        //     localStorage.setItem('bb', JSON.stringify(_this.bb))
+        // }
+        // this.removeDian = function () {
+        //     var _this = this
+        //     for (var i = 0; i < this.bb.length; i++) {
+        //         if (this.bb[i].state == true) {
+        //             $('.content .item').each(function (id, item) {
+        //                 if ($(this).find('.taskName').html() == _this.bb[i].text) {
+        //                     $(this).find('.dian').css('display', 'none')
+        //                 }
+        //             })
+        //         } else {
+        //             $('.content .item').each(function (id, item) {
+        //                 if ($(this).find('.taskName').html() == _this.bb[i].text) {
+        //                     $(this).find('.dian').css('display', 'block')
+        //                 }
+        //             })
+        //         }
+        //     }
+        // }
+        //存储账号id 和mcheck
+        this.getuserContet = function (userid) {
+            var _this = this;
+            $.each(this.userAccount, function (idx, item) {
+                _this.userids.push(item.userId)
+            })
+            $.ajax({
+                url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
+                type: "POST",
+                dataType: "json",
+                async: false,
+                data: {
+                    userIds: _this.userids.join(',')
+                },
+                success: function (data) {
+                    for (var i = 0; i < _this.userAccount.length; i++) {
+                        var userId = _this.userAccount[i].userId;
+                        var userMCheck = _this.userAccount[i].userMCheck;
+                        var contentValue = data.content;
+                        var userInfo = contentValue[userId];
+                        _this.mcheckArr.push(userMCheck);
+                        _this.userContentSelf.push(userInfo);
+
                     }
                 }
             })
-            // console.log(_this.bb)
-            localStorage.setItem('isFirst', false)
-            localStorage.setItem('bb', JSON.stringify(_this.bb))
         }
-        this.removeDian = function () {
-            var _this = this
-            for (var i = 0; i < this.bb.length; i++) {
-                if (this.bb[i].state == true) {
-                    $('.content .item').each(function (id, item) {
-                        if ($(this).find('.taskName').html() == _this.bb[i].text) {
-                            $(this).find('.dian').css('display', 'none')
-                        }
-                    })
-                } else {
-                    $('.content .item').each(function (id, item) {
-                        if ($(this).find('.taskName').html() == _this.bb[i].text) {
-                            $(this).find('.dian').css('display', 'block')
-                        }
-                    })
-                }
-            }
-        }
-        //存储账号id 和mcheck
-        this.getuserContet = function (userid) {
+        this.getScorce = function () {
             var self = this;
-            var isUpDatapj = this.userAccount.length
-            var isUpData = 0
-            if (JSON.parse(localStorage.getItem('userContent')) != null) {
-                isUpData = JSON.parse(localStorage.getItem('userContent')).length;
-            }
-            // console.log(this.userAccount)
-            // 获取用户信息
             $.each(this.userAccount, function (index, userContent) {
-                self.mcheckArr.push(userContent.userMCheck)
-                if (isUpDatapj > isUpData) {
-                    $.ajax({
-                        url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
-                        type: "POST",
-                        dataType: "json",
-                        async: false,
-                        data: {
-                            userIds: userContent.userId
-                        },
-                        success: function (data) {
-                            
-                            self.userContentSelf.push(data.content[userContent.userId])
-                        }
-                    })
-                }
                 $.ajax({
                     url: "http://cgi-vas.evkeji.cn/sns/cash/userpoint/get?",
                     type: "POST",
@@ -256,9 +263,16 @@ $(function () {
                         meck: userContent.userMCheck
                     },
                     success: function (req) {
+                        console.log(req)
                         self.scorce.push(req.content.balance)
                     }
                 })
+            })
+
+        }
+        this.getCity = function () {
+            var self = this;
+            $.each(this.userAccount, function (index, userContent) {
                 $.ajax({
                     url: "http://cgi-base.evkeji.cn/sns/base/location/getLocation?",
                     type: "GET",
@@ -271,14 +285,7 @@ $(function () {
                         self.city.push(data.content)
                     }
                 })
-
             })
-            if (self.userContentSelf == false) {
-                self.userContentSelf = JSON.parse(localStorage.getItem('userContent'))
-            } else {
-                localStorage.setItem('userContent', JSON.stringify(self.userContentSelf))
-            }
-
         }
         this.success = function () {
             $('.title').html(` <div class="ListBack"><img src="${backIcon}" alt=""></div>账号列表`)
@@ -298,8 +305,8 @@ $(function () {
             var self = this;
             var accountHtml = "";
             $.each(this.userContentSelf, function (index, item) {
-                accountHtml += ` <dl class="item border-1px EverylastBorderDone">
-                        <dd class="hiddenUserid" style="display:none;">${item.userId}</dd>
+                accountHtml += ` <dl id="u${item.userId}" class="item border-1px EverylastBorderDone">
+                <dd class="hiddenUserid" style="display:none;">${item.userId}</dd>
                         <dd class="taskIcon" style="background-image:url(${item.head});">
                             <div class="hiddenHead" style="display:none;">${item.head}</div>
                         </dd>
@@ -308,7 +315,7 @@ $(function () {
                             <div class="taskName">${item.nickname}</div>
                             <!-- taskName -->
                             <div class="taskContext">
-                                <span class="message">${item.age} | ${item.job ? item.job : '暂无信息'} | ${self.city[index].province}${ self.city[index].city}</span>
+                                <span class="message">${item.age} | ${item.job ? item.job : '暂无信息'} | ${self.city[index].province}${self.city[index].city}</span>
                             </div>
                             <!-- taskContent -->
                         </dd>
@@ -318,7 +325,7 @@ $(function () {
                                 <span class="weiduMsg"></span>
                                 </div>
                             <div class="plusMoney">
-                                积分 : <span class="num">${self.scorce[index]}</span>
+                                <!--积分 : <span class="num">${self.scorce[index]}</span>-->
                             </div>
                             
                         </dd>
@@ -347,49 +354,65 @@ $(function () {
             $('.content').html('')
             $('.content').html(parent)
         }
+        this.list = function (all) {
+            var cache = []
+            for (var ar of all) {
+                // console.log(ar)
+                if (cache.find(c => c.sendid == ar.sendid && c.targetid == ar.targetid)) {
+                    continue
+                }
+                cache.push(ar)
+            }
+            return cache
+        }
         this.autoMsg = function () {
             var _this = this;
             var arr = this.auto
-            var all = []
+            var all = [];
+            var userId = this.userAccount
+            var storage = JSON.parse(localStorage.getItem('list')) || [];
             for (var i = 0; i < this.auto.length; i++) {
                 for (var j = 0; j < arr[i].length; j++) {
                     if (arr[i][j].content.string_tp == "QI:FlatterMsg") {
-                        console.log(arr[i][j])
                         all.push({
-                            sendId: arr[i][j].content.int64_user_id,
-                            targetid: arr[i][j].content.int64_target_user_id
+                            targetid: arr[i][j].content.int64_user_id,
+                            sendid: arr[i][j].content.int64_target_user_id
                         })
                     }
                 }
             }
-            for (var i = 0; i < all.length; i++) {
-                for (var j = i + 1; j < all.length; j++) {
-                    if (all[i].sendId == all[j].sendId) {
-                        all.splice(j, 1)
-                    }
+            var list = _this.list(all)
+
+            var lastStep = []
+            for (var a of list) {
+                if (storage.find(c => c.sendid == a.sendid && a.targetid == c.targetid)) {
+                    continue
                 }
+                lastStep.push(a)
             }
-            for (var k = 0; k < all.length; k++) {
+            for (var k = 0; k < lastStep.length; k++) {
+                var index = k;
                 $.ajax({
-                    url: "http://121.201.62.233:13888/delegate/res/quickreplylist/" + all[k].targetid,
-                    async: false,
+                    url: "http://121.201.62.233:13888/delegate/res/quickreplylist/" + lastStep[index].sendid,
+                    async: true,
                     type: "GET",
                     success: function (re) {
                         var msg = re.content[0]
                         var mcheck = ""
                         for (var i = 0; i < _this.userAccount.length; i++) {
-                            if (_this.userAccount[i].userId == all[i].targetid) {
+                            if (_this.userAccount[i].userId == lastStep[index].sendid) {
                                 mcheck = _this.userAccount[i].userMCheck
                             }
                         }
                         if (msg) {
+                            console.log(mcheck)
                             $.ajax({
-                                url: "http://121.201.62.233:13888/delegate/msg/send/private/" + all[k].targetid,
-                                async: false,
+                                url: "http://121.201.62.233:13888/delegate/msg/send/private/" + lastStep[index].sendid,
+                                async: true,
                                 data: {
                                     mcheck: mcheck,
                                     content: msg,
-                                    targetId: all[k].sendId
+                                    targetId: lastStep[index].targetid
                                 },
                                 success: function (a) {
                                     console.log(a)
@@ -399,10 +422,81 @@ $(function () {
                     }
                 })
             }
+            localStorage.setItem('list', JSON.stringify(list.concat(lastStep)))
+        }
+        this.getData = function (t) {
+            var _this = t || this;
+            var id = _this.userids[_this.index]
+            $.ajax({
+                url: "http://121.201.62.233:13888/delegate/msg/refresh/" + id + "?",
+                type: "POST",
+                async: true,
+                dataType: "json",
+                data: {
+                    limit: 20,
+                    targetId: "",
+                    token: token,
+                    lastId: 0
+                },
+                success: function (data) {
+                    // console.log(data)
+                    var dataArr = data.content;
+                    var prevMsgId = localStorage.getItem("readMaxMsgId-" + id);
+                    if (!prevMsgId) {
+                        prevMsgId = 0;
+                    }
+
+                    // 红点
+                    var maxMsgId = prevMsgId;
+                    dataArr.forEach(function (item, index) {
+                        if (item.content.int64_target_user_id == id) {
+                            var currentMsgId = item.id;
+                            if (currentMsgId > maxMsgId) {
+                                maxMsgId = currentMsgId;
+                            }
+                        }
+                    });
+                    var dom = $("#u" + id);
+                    if (maxMsgId > prevMsgId) {
+                        // 有红点
+                        dom.remove()
+                        dom.find('.dian').attr("max-msg-id", maxMsgId).css('display', 'block')
+                        $('.content').prepend(dom)
+                    }
+                    // else if (maxMsgId < prevMsgId) {
+                    //     dom.find('.dian').attr("max-msg-id", maxMsgId).css('display', 'none')
+                    // }
+                    if (localStorage.getItem('isFirst') == "true") {
+                        localStorage.setItem('readMaxMsgId-' + id, maxMsgId)
+                    }
+
+                    // 自动回复
+
+                    _this.index++
+                    if (_this.index >= _this.userAccount.length) {
+
+                        _this.index = 0;
+                        var newUserIds = [];
+                        var items = $(".content .item");
+                        items.each(function (idx, listDom) {
+                            var cuid = $(listDom).attr('id').substr(1)
+                            newUserIds[idx] = cuid;
+                        })
+                        _this.userids = newUserIds
+                        localStorage.setItem('isFirst', false)
+                        // 延迟执行getData
+                        setTimeout(function () {
+                            _this.getData(_this);
+                        }, 3000);
+                    } else {
+                        _this.getData();
+                    }
+                }
+
+            })
         }
         this.getMsg = function () {
             var arr = [];
-
             var obj = {}
             zuixin = []
             var _this = this
@@ -410,10 +504,10 @@ $(function () {
                 $.ajax({
                     url: "http://121.201.62.233:13888/delegate/msg/refresh/" + item.userId + "?",
                     type: "POST",
-                    async: false,
+                    async: true,
                     dataType: "json",
                     data: {
-                        limit: "",
+                        limit: 20,
                         targetId: "",
                         token: token,
                         lastId: 0
@@ -427,6 +521,7 @@ $(function () {
                             arr.push(data.content)
                             _this.auto.push(data.content)
                         }
+
                     }
 
                 })
@@ -452,14 +547,17 @@ $(function () {
                 } else {
                     la.push(arr[i][0].id)
                 }
-                if ((arr[i][0].id - _this.bb[i].id) > 3) {
-                    $('.content .item').each(function (ind, item) {
-                        var name = $(this).find('.taskName').html()
-                        if (_this.bb[i].text == name) {
-                            _this.bb[i].state = false
-                        }
-                    })
+                if (arr[i][0].content.int64_user_id != _this.userAccount[i].userId) {
+                    if ((arr[i][0].id > _this.bb[i].id)) {
+                        $('.content .item').each(function (ind, item) {
+                            var name = $(this).find('.taskName').html()
+                            if (_this.bb[i].text == name) {
+                                _this.bb[i].state = false
+                            }
+                        })
+                    }
                 }
+
                 for (var j = 0; j < arr[i].length; j++) {
                     if (arr[i][j].content.int64_target_user_id == _this.userAccount[i].userId) {
                         if (obj[arr[i][j].content.int64_target_user_id]) {
@@ -481,32 +579,13 @@ $(function () {
                 var myMSG = encodeURIComponent($(this).find('.message').html())
                 var myHead = encodeURIComponent($(this).find('.hiddenHead').html())
                 var myMcheck = $(this).find('.hiddenMcheck').html()
-                var clickWho = $(this).find('.taskName').html()
-                localStorage.setItem('clickWho', clickWho)
-                var aa = JSON.parse(localStorage.getItem('bb'))
-                for (var i = 0; i < aa.length; i++) {
-                    if (aa[i].text.indexOf(clickWho) != -1) {
-                        aa[i].id = parseInt($(this).find('.newId').html())
-                    }
-                }
-                localStorage.setItem('bb', JSON.stringify(aa))
                 // window.location.href = "http://page.qxiu.com/ldz/chudianh5/talk.html?uid=" + uid
-                window.location.href = "http://192.168.25.126:8080/talk.html?uid=" + uid
-                cookie.set('uid', uid, {
-                    expire: 8
-                })
-                cookie.set('mcheck', myMcheck, {
-                    expire: 8
-                })
-                cookie.set('nickname', nickname, {
-                    expire: 8
-                })
-                cookie.set('myMSG', myMSG, {
-                    expire: 8
-                })
-                cookie.set('myHead', myHead, {
-                    expire: 8
-                })
+                window.location.href = `http://192.168.25.126:8080/talk.html?uid=${uid}`;
+                cookie.set('uid', uid)
+                cookie.set('mcheck', myMcheck)
+                cookie.set('nickname', nickname)
+                cookie.set('myMSG', myMSG)
+                cookie.set('myHead', myHead)
                 localStorage.setItem('num', $(this).index())
             })
         }
@@ -523,14 +602,8 @@ $(function () {
     }
 
     function storageLoginStatus() {
-        cookie.set('account', userName, {
-            expire: 8
-        })
-        cookie.set('pwd', md5String, {
-            expire: 8
-        })
-        cookie.set('token', token, {
-            expire: 8
-        })
+        cookie.set('account', userName)
+        cookie.set('pwd', md5String)
+        cookie.set('token', token)
     }
 })
