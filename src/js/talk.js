@@ -59,7 +59,7 @@ var cookie = {
 };
 var amr;
 
-var year, month, day, hours, minute, seconds = "" //记录现在时间
+var year, month, day, hours, minute, seconds, Base64Img = "" //记录现在时间
 getNowTime() //获取现在时间函数
 var enCodeNickName = decodeURIComponent(cookie.get('nickname')) //获取当前账号昵称
 var nickname = decodeURIComponent(enCodeNickName) //虚拟女账号昵称
@@ -166,7 +166,6 @@ function TalkList() {
         }, 2000)
         this.outTalkHtml()
         this.scrollPosition()
-        // this.dashanhuifu()
 
     }
     this.removeRed = function () {
@@ -187,7 +186,7 @@ function TalkList() {
     this.upData = function (num) {
         var _this = this;
         $.ajax({
-            url: "http://121.201.62.233:13888/delegate/msg/refresh/" + uid,
+            url: "http://121.46.195.211:13888/delegate/msg/refresh/" + uid,
             type: "POST",
             async: false,
             data: {
@@ -264,7 +263,7 @@ function TalkList() {
     this.lastMSGData = function () {
         for (var i = 0; i < menAllId.length; i++) {
             $.ajax({
-                url: "http://121.201.62.233:13888/delegate/msg/refresh/" + uid,
+                url: "http://121.46.195.211:13888/delegate/msg/refresh/" + uid,
                 type: "GET",
                 async: false,
                 data: {
@@ -346,7 +345,6 @@ function TalkList() {
     this.renderUserList = function () {
         var _this = this;
         var html = '';
-        console.log(menAllId)
         $.ajax({
             url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
             type: "POST",
@@ -356,7 +354,6 @@ function TalkList() {
                 userIds: menAllId.join(',')
             },
             success: function (data) {
-                console.log(data)
                 for (var i = 0; i < menAllId.length; i++) {
                     var userid = menAllId[i]
                     html += ` <li class="item border-1px EverylastBorderDone">
@@ -393,36 +390,7 @@ function TalkList() {
         $('.itemWrap').removeClass('talkPage')
         $('.title .accountDefaultStyle').html("账号【" + nickname + "】")
     }
-    this.dashanhuifu = function () {
-        $.each($('.message'), function (index, item) {
-            if (item.innerText == "搭讪消息") {
-                var needSengID = $('.hiddenUserid').eq(index).html()
-                // console.log(needSengID)
-                $.ajax({
-                    url: "http://121.201.62.233:13888/delegate/res/quickreplylist/" + uid,
-                    type: "POST",
-                    dataType: "json",
-                    async: true,
-                    success: function (req) {
-                        // console.log(req)
-                        var val = req.content[0]
-                        if (val) {
-                            $.ajax({
-                                url: "http://121.201.62.233:13888/delegate/msg/send/private/" + uid,
-                                dataType: "jsonp",
-                                data: {
-                                    mcheck: mcheck,
-                                    content: val,
-                                    targetId: needSengID
-                                },
-                                success: function () {}
-                            })
-                        }
-                    }
-                })
-            }
-        })
-    }
+    
     //点击好友列表项
     this.clickListItem = function () {
         var _this = this;
@@ -586,7 +554,7 @@ function Intalk() {
 
         var _this = this
         if (!inTalk) {
-            // this.isAudio() //是音频做出相应处理
+            this.isAudio() //是音频做出相应处理
             this.tapImg()
             this.choseImg() //点击选择图片
             this.tapHuashu() //点击选中话术
@@ -607,7 +575,7 @@ function Intalk() {
     this.getTalkMsg = function () {
         var self = this;
         $.ajax({
-            url: "http://121.201.62.233:13888/delegate/msg/refresh/" + uid + "?",
+            url: "http://121.46.195.211:13888/delegate/msg/refresh/" + uid + "?",
             type: "POST",
             async: false,
             cache: true,
@@ -750,7 +718,8 @@ function Intalk() {
             $(this).find('.jiantouLeft').css({
                 "border-right": ".15rem solid #ccc"
             })
-            var newSrc = "/api" + $(this).find('audio').attr('src').substr(34)
+            console.log($(this).find('audio').attr('src'))
+            var newSrc = $(this).find('audio').attr('src').substr(34)
             var src = $(this).find('audio').attr()
             amr = new BenzAMRRecorder()
             amr.initWithUrl(newSrc).then(function () {
@@ -760,7 +729,6 @@ function Intalk() {
                     amr.play();
                 }
             })
-
         })
         //播放音频抬起事件
         $('.content').delegate('.textBox', 'touchend', function () {
@@ -790,8 +758,7 @@ function Intalk() {
 
             $(this).css("background", "#ccc")
             if ($(this).hasClass('checkImg')) {
-                alert('暂无该功能')
-                return;
+                // return;
             } else {
                 //按下的是快捷话语
                 $('.huashu').show(500).css('display', 'flex')
@@ -808,7 +775,7 @@ function Intalk() {
     this.getHuashu = function () {
         var huashuHtml = "";
         $.ajax({
-            url: "http://121.201.62.233:13888/delegate/res/quickreplylist/" + uid,
+            url: "http://121.46.195.211:13888/delegate/res/quickreplylist/" + uid,
             type: "POST",
             cache: false,
             success: function (data) {
@@ -862,6 +829,7 @@ function Intalk() {
                 //文件太大
                 return;
             }
+            _this.imgBase64(file)
             _this.submitImg(file)
             var len = $('.content .contextBox').length;
             _this.nowMySendMsg = len - 1
@@ -876,7 +844,7 @@ function Intalk() {
         var html = "";
         // console.log(lastId)
         $.ajax({
-            url: "http://121.201.62.233:13888/delegate/msg/refresh/" + uid + "?",
+            url: "http://121.46.195.211:13888/delegate/msg/refresh/" + uid + "?",
             type: "POST",
             async: false,
             cache: true,
@@ -980,9 +948,9 @@ function Intalk() {
             contentType: false,
             data: formData,
             success: function (data) {
-                console.log(data)
+                // console.log(data)
                 if (data.state == 0) {
-                    _this.sendImgMsg(data.content.url, _this.imgBase64(file))
+                    _this.sendImgMsg(data.content.url)
                 } else {
                     alert(data.message)
                 }
@@ -994,7 +962,6 @@ function Intalk() {
     }
     //图片压缩转base64
     this.imgBase64 = function (file) {
-        var Base64Img = "";
         var reader = new FileReader()
         var img = new Image()
         reader.readAsDataURL(file)
@@ -1031,29 +998,28 @@ function Intalk() {
              * qualityArgument表示导出的图片质量，只有导出为jpeg和webp格式的时候此参数才有效，默认值是0.92*/
             Base64Img = canvas.toDataURL('image/jpeg', 0.92);
         }
-        return Base64Img
     }
     //发送图片消息请求
-    this.sendImgMsg = function (imgUrl, base64Image) {
+    this.sendImgMsg = function (imgUrl) {
         var _this = this;
         $.ajax({
-            url: "http://121.201.62.233:13888/delegate/msg/send/image/" + uid,
+            url: "http://121.46.195.211:13888/delegate/msg/send/image/" + uid,
             type: "POST",
             dataType: "json",
             async: true,
             data: {
                 mcheck: mcheck,
-                content: base64Image,
+                content: Base64Img,
                 imageUrl: imgUrl,
                 targetId: menId
             },
             success: function (data) {
+                // console.log(data)
                 $('.content').append(_this.appendNewMsg())
                 if (data.state == 0) {
-
+                    Base64Img = ""
                 } else {
-                    alert('发送失败')
-                    $('.input').val(val)
+                    // alert('发送失败')
                 }
             },
             error: function () {
@@ -1065,7 +1031,7 @@ function Intalk() {
     this.sendMsg = function (val) {
         var _this = this;
         $.ajax({
-            url: "http://121.201.62.233:13888/delegate/msg/send/private/" + uid,
+            url: "http://121.46.195.211:13888/delegate/msg/send/private/" + uid,
             type: "POST",
             dataType: "jsonp",
             cache: false,
@@ -1152,10 +1118,10 @@ function Intalk() {
             var scrollHiddenTop = $('.itemWrap').css('transform').substr(11, 2)
             if (scrollHiddenTop >= 50) {
                 if (flag) {
-                    //http://121.201.62.233:13888测试
+                    //https://121.201.62.233:138888测试
                     // http://121.46.195.211:13888线上
                     $.ajax({
-                        url: "http://121.201.62.233:13888/delegate/msg/history/" + uid + "?",
+                        url: "http://121.46.195.211:13888/delegate/msg/history/" + uid + "?",
                         type: "POST",
                         async: false,
                         cache: true,
@@ -1231,16 +1197,16 @@ $('.ListBack').tap(function () {
         istalk = false
         $('.app').removeAttr('style')
     } else {
-        // window.location.href = "http://123.57.87.160:80/cd/login.html"
-        window.location.href = "http://192.168.25.126:8080/login.html"
+        window.location.href = "http://123.57.87.160:80/cd/login.html"
+        // window.location.href = "http://192.168.25.126:8080/login.html"
 
     }
 })
 
 function isLoginOut() {
     if (!uid || !mcheck) {
-        // window.location.href = "http://123.57.87.160:80/cd/login.html"
-        window.location.href = "http://192.168.25.126:8080/login.html"
+        window.location.href = "http://123.57.87.160:80/cd/login.html"
+        // window.location.href = "http://192.168.25.126:8080/login.html"
     }
 }
 

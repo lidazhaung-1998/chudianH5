@@ -86,7 +86,7 @@ $(function () {
     function loginController() {
         var ControllerData = {}
         $.ajax({
-            url: "http://121.201.62.233:13888/delegate/login?",
+            url: "http://121.46.195.211:13888/delegate/login?",
             type: "POST",
             dataType: "json",
             async: false,
@@ -329,7 +329,7 @@ $(function () {
             for (var k = 0; k < lastStep.length; k++) {
                 var index = k;
                 $.ajax({
-                    url: "http://121.201.62.233:13888/delegate/res/quickreplylist/" + lastStep[index].sendid,
+                    url: "http://121.46.195.211:13888/delegate/res/quickreplylist/" + lastStep[index].sendid,
                     async: true,
                     type: "GET",
                     success: function (re) {
@@ -343,7 +343,7 @@ $(function () {
                         if (msg) {
                             // console.log(mcheck)
                             $.ajax({
-                                url: "http://121.201.62.233:13888/delegate/msg/send/private/" + lastStep[index].sendid,
+                                url: "http://121.46.195.211:13888/delegate/msg/send/private/" + lastStep[index].sendid,
                                 async: true,
                                 data: {
                                     mcheck: mcheck,
@@ -364,7 +364,7 @@ $(function () {
             var _this = t || this;
             var id = _this.userids[_this.index]
             $.ajax({
-                url: "http://121.201.62.233:13888/delegate/msg/refresh/" + id + "?",
+                url: "http://121.46.195.211:13888/delegate/msg/refresh/" + id + "?",
                 type: "POST",
                 async: true,
                 dataType: "json",
@@ -438,7 +438,7 @@ $(function () {
             var _this = this
             $.each(this.userAccount, function (idx, item) {
                 $.ajax({
-                    url: "http://121.201.62.233:13888/delegate/msg/refresh/" + item.userId + "?",
+                    url: "http://121.46.195.211:13888/delegate/msg/refresh/" + item.userId + "?",
                     type: "POST",
                     async: true,
                     dataType: "json",
@@ -515,8 +515,8 @@ $(function () {
                 var myMSG = encodeURIComponent($(this).find('.message').html())
                 var myHead = encodeURIComponent($(this).find('.hiddenHead').html())
                 var myMcheck = $(this).find('.hiddenMcheck').html()
-                // window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid
-                window.location.href = `http://192.168.25.126:8080/talk.html?uid=${uid}`;
+                window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid
+                // window.location.href = `http://192.168.25.126:8080/talk.html?uid=${uid}`;
                 cookie.set('uid', uid)
                 cookie.set('mcheck', myMcheck)
                 cookie.set('nickname', nickname)
