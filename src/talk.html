@@ -15,7 +15,7 @@
     <meta name="screen-orientation" content="portrait">
     <!-- uc全屏显示 -->
     <meta name="full-screen" content="yes">
-    <title>处电H5</title>
+    <title>Document</title>
 
 </head>
 
@@ -25,6 +25,8 @@
             style="position: fixed;top:0;left:0;bottom:0;right:0;width: 100%;height: 100%; background: #000;">
             <audio controls style="margin-top: 500px;"></audio>
             <source src="/api/ldz/chudianh5/11.amr">
+            <input type="file" id="amr-file" accept=".amr">
+            <button id="btn-play">播放</button>
         </div> -->
         <div class="showScorce">
             总积分:0
@@ -131,12 +133,13 @@
             </div>
             <div class="fileBox">
                 <div class="click checkImg">选择图片
-                    <input class="inputFile" type="file" accept=".jpg, .jpeg, .png">
+                    <input class="inputFile" type="file" accept=".jpg,.jpeg,.png">
                 </div>
                 <div class="click">快捷话术</div>
             </div>
         </footer>
     </div>
+    <script src="http://page.qxiu.com/ldz/chudianh5/libs/BenzAMRRecorder.js"></script>
 </body>
 
 </html>

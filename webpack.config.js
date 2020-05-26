@@ -11,7 +11,6 @@ var htmlPluginConfig = function (name, chunks, title, favicon) {
 		filename: `${name}.html`, //打包后文件名
 		hash: true, //开启hash
 		chunks: chunks,
-		favicon: favicon
 	}
 }
 //多页面配置
@@ -29,6 +28,7 @@ var htmlArray = [{
 	}
 ]
 module.exports = function (env) {
+
 	var plugins = [
 		new miniCssExtractPlugin({
 			filename: env.dev ? "css/[name].css" : "css/[name].[contenthash:8].css",
@@ -36,7 +36,7 @@ module.exports = function (env) {
 		}),
 		new copyWebpackPlugin([{
 			from: path.resolve(__dirname, "./src/libs"),
-			to: "./libs",
+			to: "libs",
 		}]),
 		new cleanWebpackPlugin(['dist']),
 
@@ -55,7 +55,7 @@ module.exports = function (env) {
 			disableHostCheck: true, //绕过主机检查
 			proxy: {
 				'/api': {
-					target: 'http://page.qxiu.com/',
+					target: 'https://alibaba-resource.evkeji.cn/',
 					pathRewrite: {
 						'^/api': ''
 					},

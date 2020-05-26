@@ -4,9 +4,6 @@ var md5 = require('../libs/md5.js')
 import "../css/login.scss"
 var zuixin = []
 document.onreadystatechange = completeLoading;
-var la = JSON.parse(localStorage.getItem('la')) || []
-
-
 
 function completeLoading() {
     if (document.readyState == "complete") {
@@ -158,71 +155,9 @@ $(function () {
             this.renderList()
             this.tapBack()
             this.clickListItem()
-            // _this.abab()
-            // this.getMsg()
-            // this.autoMsg()
             this.getData()
-            // _this.removeDian()
-            // this.mySort()
-            // setTimeout(function () {
-            //     _this.getuserContet()
-            //     _this.renderList()
-            //     _this.getMsg()
-            //     _this.clickListItem()
-            //     _this.mySort()
-            //     _this.removeDian()
-            // }, 100)
-            // setInterval(function () {
-            //     // _this.getScorce()
-            //     // _this.renderList()
-            //     // _this.getMsg()
-            //     _this.clickListItem()
-            //     _this.mySort()
-            //     // _this.removeDian()
-            //     _this.autoMsg()
-            // }, 10000)
         }
-        // this.abab = function () {
-        //     var _this = this
-        //     $.each($('.content .item'), function (index, item) {
-        //         if (localStorage.getItem('isFirst') != "false") {
-        //             _this.bb.push({
-        //                 text: $(this).find('.taskName').html(),
-        //                 state: false,
-        //                 id: 0
-        //             })
-        //         } else {
-        //             if (_this.bb[index].text.indexOf($(this).find('.taskName').html()) == -1) {
-        //                 _this.bb.push({
-        //                     text: $(this).find('.taskName').html(),
-        //                     state: false,
-        //                     id: $(this).find('.newId').html()
-        //                 })
-        //             }
-        //         }
-        //     })
-
-        //     localStorage.setItem('isFirst', false)
-        //     localStorage.setItem('bb', JSON.stringify(_this.bb))
-        // }
-        // this.removeDian = function () {
-        //     var _this = this
-        //     for (var i = 0; i < this.bb.length; i++) {
-        //         if (this.bb[i].state == true) {
-        //             $('.content .item').each(function (id, item) {
-        //                 if ($(this).find('.taskName').html() == _this.bb[i].text) {
-        //                     $(this).find('.dian').css('display', 'none')
-        //                 }
-        //             })
-        //         } else {
-        //             $('.content .item').each(function (id, item) {
-        //                 if ($(this).find('.taskName').html() == _this.bb[i].text) {
-        //                     $(this).find('.dian').css('display', 'block')
-        //                 }
-        //             })
-        //         }
-        //     }
-        // }
+        
         //存储账号id 和mcheck
         this.getuserContet = function (userid) {
             var _this = this;
@@ -238,6 +173,7 @@ $(function () {
                     userIds: _this.userids.join(',')
                 },
                 success: function (data) {
+
                     for (var i = 0; i < _this.userAccount.length; i++) {
                         var userId = _this.userAccount[i].userId;
                         var userMCheck = _this.userAccount[i].userMCheck;
@@ -263,7 +199,7 @@ $(function () {
                         meck: userContent.userMCheck
                     },
                     success: function (req) {
-                        console.log(req)
+                        // console.log(req)
                         self.scorce.push(req.content.balance)
                     }
                 })
@@ -405,7 +341,7 @@ $(function () {
                             }
                         }
                         if (msg) {
-                            console.log(mcheck)
+                            // console.log(mcheck)
                             $.ajax({
                                 url: "http://121.201.62.233:13888/delegate/msg/send/private/" + lastStep[index].sendid,
                                 async: true,
@@ -415,7 +351,7 @@ $(function () {
                                     targetId: lastStep[index].targetid
                                 },
                                 success: function (a) {
-                                    console.log(a)
+                                    // console.log(a)
                                 }
                             })
                         }
@@ -487,7 +423,7 @@ $(function () {
                         // 延迟执行getData
                         setTimeout(function () {
                             _this.getData(_this);
-                        }, 3000);
+                        }, 2000);
                     } else {
                         _this.getData();
                     }
@@ -579,7 +515,7 @@ $(function () {
                 var myMSG = encodeURIComponent($(this).find('.message').html())
                 var myHead = encodeURIComponent($(this).find('.hiddenHead').html())
                 var myMcheck = $(this).find('.hiddenMcheck').html()
-                // window.location.href = "http://page.qxiu.com/ldz/chudianh5/talk.html?uid=" + uid
+                // window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid
                 window.location.href = `http://192.168.25.126:8080/talk.html?uid=${uid}`;
                 cookie.set('uid', uid)
                 cookie.set('mcheck', myMcheck)

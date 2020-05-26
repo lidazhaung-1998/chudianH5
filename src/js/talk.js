@@ -1,14 +1,5 @@
 import "../css/index.scss";
-import BenzAMRRecorder from "benz-amr-recorder"
-// import BenzAMRRecorder from "../libs/BenzAMRRecorder"
-
 var $ = require('../libs/zepto');
-$('.goplay').click(function () {
-    var amr = new BenzAMRRecorder()
-    amr.initWithUrl('/api/ldz/chudianh5/11.amr').then(function () {
-        amr.play();
-    })
-})
 var timeFormat = require('../libs/timeFormat')
 var cookie = {
     set: function (cookieKey, cookieValue, cookieOpts) {
@@ -66,8 +57,8 @@ var cookie = {
         this.set(cookieKey, '', cookieOpts);
     }
 };
-var bbb = require('../img/bbb.png')
-var back = require('../img/back.png')
+var amr;
+
 var year, month, day, hours, minute, seconds = "" //记录现在时间
 getNowTime() //获取现在时间函数
 var enCodeNickName = decodeURIComponent(cookie.get('nickname')) //获取当前账号昵称
@@ -103,9 +94,6 @@ function getNowTime() {
 }
 getScorce()
 
-
-
-
 function getScorce() {
     $.ajax({
         url: "http://cgi-vas.evkeji.cn/sns/cash/userpoint/get?",
@@ -117,7 +105,6 @@ function getScorce() {
             meck: mcheck
         },
         success: function (req) {
-            console.log(req)
             $('.showScorce').html("总积分:" + req.content.balance)
         }
     })
@@ -211,7 +198,7 @@ function TalkList() {
             },
             success: function (data) {
                 // console.log(maxid)
-                console.log(data)
+                // console.log(data)
                 bl = true
                 // if (data.state != 0) {
                 //     alert('出错啦~')
@@ -224,7 +211,6 @@ function TalkList() {
                             _this.handleArray(data.content)
                             _this.renderUserList()
                             _this.domSort()
-                            _this.clickListItem()
                             _this.flag = false
                             _this.state()
 
@@ -232,7 +218,6 @@ function TalkList() {
                             if (bl) {
                                 _this.newMsg(data.content)
                                 _this.renderUserList()
-                                _this.clickListItem()
                                 _this.domSort()
                                 _this.state()
                             }
@@ -301,7 +286,7 @@ function TalkList() {
                     } else if (data.content[0].content.string_tp == "RC:TxtMsg") {
                         lastmsg[i] = data.content[0].content.msg_user_private.string_content
                     } else if (data.content[0].content.string_tp == "QI:GiftMsg") {
-                        lastmsg[i] = "收到礼物"
+                        lastmsg[i] = "收到了对方送出的礼物"
                     }
                     if (data.content[0].content.int64_user_id == uid) {
                         lastmsg[i] = '已回复'
@@ -334,7 +319,7 @@ function TalkList() {
                 msgLength.push(obj[ar])
             }
         }
-        console.log(obj)
+        // console.log(obj)
         this.lastMSGData()
         // msgLength = msgLength.reverse()
         // menAllId = menAllId.reverse()
@@ -359,46 +344,45 @@ function TalkList() {
         $('.content').append(domArr)
     }
     this.renderUserList = function () {
+        var _this = this;
         var html = '';
-        if (maxid > oldid) {
-            $.each(menAllId, function (index, item) {
-                $.ajax({
-                    url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
-                    type: "POST",
-                    dataType: "json",
-                    async: false,
-                    cache: true,
-                    data: {
-                        userIds: item
-                    },
-                    success: function (data) {
-                        html += ` <li class="item border-1px EverylastBorderDone">
-                            <div class="hiddenUserid" style="display:none;">${item}</div>
-                            <div class="taskIcon" style="background-image:url(${data.content[item].head});"></div>
-                            <div class="hiddenHead" style="display:none;">${data.content[item].head}</div>
-                            <div class="hiddenName" style="display:none;">${data.content[item].nickname}</div>
-                            <div class="taskContent">
-                                <div class="taskName">${data.content[item].nickname}</div>
-                                
-                                <div class="taskContext">
-                                    <span class="message">${lastmsg[index]}</span>
-                                </div>
+        console.log(menAllId)
+        $.ajax({
+            url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
+            type: "POST",
+            dataType: "json",
+            async: false,
+            data: {
+                userIds: menAllId.join(',')
+            },
+            success: function (data) {
+                console.log(data)
+                for (var i = 0; i < menAllId.length; i++) {
+                    var userid = menAllId[i]
+                    html += ` <li class="item border-1px EverylastBorderDone">
+                        <div class="hiddenUserid" style="display:none;">${userid}</div>
+                        <div class="taskIcon" style="background-image:url(${data.content[userid].head});"></div>
+                        <div class="hiddenHead" style="display:none;">${data.content[userid].head}</div>
+                        <div class="hiddenName" style="display:none;">${data.content[userid].nickname}</div>
+                        <div class="taskContent">
+                            <div class="taskName">${data.content[userid].nickname}</div>
+                            <div class="taskContext">
+                                <span class="message">${lastmsg[i]}</span>
                             </div>
-                            <div class="contentWrap">
-                                <div class="redIcon">${compileTime(lastMsgTime[index])}</div>
-                                <div class="time" style="display:none;">${lastMsgTime[index]}</div>
-                                <div class="plusMoney">
-                                    
-                                </div>
-    
+                        </div>
+                        <div class="contentWrap">
+                            <div class="redIcon">${compileTime(lastMsgTime[i])}</div>
+                            <div class="time" style="display:none;">${lastMsgTime[i]}</div>
+                            <div class="plusMoney">
                             </div>
-                        </li>`
-                    }
-                })
+                        </div>
+                    </li>`
+                }
+                $('.content').html(html)
+                _this.clickListItem()
+            }
+        })
 
-            })
-        }
-        $('.content').html(html)
     }
     this.outTalkHtml = function () {
         $('.content').removeClass('talkPage')
@@ -413,7 +397,7 @@ function TalkList() {
         $.each($('.message'), function (index, item) {
             if (item.innerText == "搭讪消息") {
                 var needSengID = $('.hiddenUserid').eq(index).html()
-                console.log(needSengID)
+                // console.log(needSengID)
                 $.ajax({
                     url: "http://121.201.62.233:13888/delegate/res/quickreplylist/" + uid,
                     type: "POST",
@@ -468,7 +452,7 @@ function Intalk() {
     this.nvtou = `style="background-image:url(${myHead});"`
     this.nowMySendMsg = null;
     this.max = 0;
-    this.min = 0;
+    this.min = 100000000;
     this.handleHtml = {
         textMsg: function (head, text, my) {
             var textHtml = `<li class="contextBox ${my.a}">
@@ -487,7 +471,7 @@ function Intalk() {
                                 <div class="textBox ${my.c}">
                                     <div class="jiantouLeft ${my.d}"></div>
                                     <div class="text">
-                                        <div class="audioTime">语音消息暂无法听取</div> 
+                                        <div class="audioTime">语音暂无法听取</div> 
                                         <audio src="${audio}" controls></audio>
                                         ${my.e ? `<div class='pScorce'>${my.e}积分</div>` : ""}
                                     </div>
@@ -526,12 +510,53 @@ function Intalk() {
                             </li>`
             return giftHtml
         },
-        giftTMsg: function (head, gift, num, scorce, my, target) {
+        giftTMsg: function (head, gift, num, my, target) {
+            // if (gift == 10036) {
+            //     gift = "玫瑰花"
+            // } else if (gift == 10001) {
+            //     gift = "爱心气球"
+            // } else if (gift == 10002) {
+            //     gift = "水晶球"
+            // } else if (gift == 10039) {
+            //     gift = "情侣对戒"
+            // } else if (gift == 10038) {
+            //     gift = "蛋糕"
+            // } else if (gift == 10035) {
+            //     gift = "冰淇淋"
+            // } else if (gift == 10007) {
+            //     gift = "一见钟情"
+            // } else if (gift == 10008) {
+            //     gift = "怦然心动"
+            // } else if (gift == 10043) {
+            //     gift = "甜蜜之旅"
+            // } else if (gift == 10037) {
+            //     gift = "强吻"
+            // } else if (gift == 10011) {
+            //     gift = "女王降临"
+            // } else if (gift == 10012) {
+            //     gift = "浪漫城堡"
+            // } else if (gift == 10015) {
+            //     gift = "比心"
+            // } else if (gift == 10044) {
+            //     gift = "一见钟情"
+            // } else if (gift == 10045) {
+            //     gift = "小黄瓜"
+            // } else if (gift == 10046) {
+            //     gift = "性感女神"
+            // } else if (gift == 10047) {
+            //     gift = "炫酷布加迪"
+            // } else if (gift == 10048) {
+            //     gift = "拉风超跑"
+            // } else if (gift == 10041) {
+            //     gift = "梦幻城堡"
+            // } else if (gift == 10042) {
+            //     gift = "水晶球"
+            // }
             var giftHtml = `<li class="contextBox ${my.a}">
                                 <div class="head ${my.b}" ${head}></div>
                                 <div class="textBox ${my.c}">
                                 <div class="jiantouLeft ${my.d}"></div>
-                                <div class="text">送你礼物 <span>${'“'+target+'”' + gift + "x" + num}</span><span class="yColor"></span></div>
+                                <div class="text">送你礼物 <span>${'“'+target+'”收到礼物“' + gift + "”x" + num}</span><span class="yColor"></span></div>
                                 </div>
                             </li>`
             return giftHtml
@@ -561,7 +586,7 @@ function Intalk() {
 
         var _this = this
         if (!inTalk) {
-            this.isAudio() //是音频做出相应处理
+            // this.isAudio() //是音频做出相应处理
             this.tapImg()
             this.choseImg() //点击选择图片
             this.tapHuashu() //点击选中话术
@@ -594,11 +619,14 @@ function Intalk() {
                 lastId: 0
             },
             success: function (data) {
+                // console.log(data)
                 for (var i = 0; i < data.content.length; i++) {
                     if (data.content[i].id > self.max) {
                         self.max = data.content[i].id
                     }
-                    self.min = Math.max(0, Math.min(self.max, data.content[i].id))
+                    if (data.content[i].id < self.min) {
+                        self.min = data.content[i].id
+                    }
                 }
                 // console.log(data)
                 self.renderTalkHtml(data.content.reverse())
@@ -665,7 +693,7 @@ function Intalk() {
                 } else if (loway.string_tp == "QI:FlatterMsg") { //搭讪礼物
                     html += _this.handleHtml.giftMsg(menHead, loway.msg_user_flatter.string_content, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.string_image_url, {}, '你')
                 } else if (loway.string_tp == "QI:GiftMsg") { //礼物
-                    html += _this.handleHtml.giftTMsg(menHead, loway.msg_user_goods.int64_goods_id, loway.msg_user_goods.uint32_goods_num, loway.msg_user_goods.uint32_goods_num, {}, '你')
+                    html += _this.handleHtml.giftTMsg(menHead, loway.msg_user_goods.string_goods_name, loway.msg_user_goods.uint32_goods_num, {}, '你')
                 }
             }
             if (sendid == uid) { //我发送的消息               sendid 等于 uid  发送消息的是我
@@ -716,24 +744,23 @@ function Intalk() {
         $('.content').delegate('.textBox', 'touchstart', function () {
             var item = $(this).find('.text audio')[0]
             if (!item) {
-                return;
+                return
             }
-            let audio = new Audio;
-            audio.src = item.getAttribute('src')
-            audio.play()
             $(this).css("background", '#ccc')
             $(this).find('.jiantouLeft').css({
                 "border-right": ".15rem solid #ccc"
             })
-            // if (item.paused) { //没播放
-            //     $('.text').find('audio').each(function (index, list) {
-            //         list.pause()
-            //         list.currentTime = 0
-            //     })
-            //     item.play()
-            // } else { //播放中
-            //     item.pause()
-            // }
+            var newSrc = "/api" + $(this).find('audio').attr('src').substr(34)
+            var src = $(this).find('audio').attr()
+            amr = new BenzAMRRecorder()
+            amr.initWithUrl(newSrc).then(function () {
+                if (amr.isPlaying()) {
+                    amr.stop();
+                } else {
+                    amr.play();
+                }
+            })
+
         })
         //播放音频抬起事件
         $('.content').delegate('.textBox', 'touchend', function () {
@@ -754,41 +781,16 @@ function Intalk() {
                         "border-right": ".15rem solid #fff"
                     })
                 }
-
             }, 300)
         })
     }
-    // this.audioLength = function () {
-    //     $('.text audio').on('durationchange', function () {
 
-    //         var duration = parseInt($(this)[0].duration)
-    //         $(this).prev('.audioTime').html(duration + "s")
-    //         if (duration >= 0 && duration <= 3) {
-    //             $(this).css('width', '1rem')
-    //         } else if (duration > 3 && duration <= 5) {
-    //             $(this).css('width', '1.2rem')
-    //         } else if (duration > 5 && duration <= 10) {
-    //             $(this).css('width', '1.5rem')
-    //         } else if (duration > 10 && duration <= 20) {
-    //             $(this).css('width', '1.9rem')
-    //         } else if (duration > 20 && duration <= 30) {
-    //             $(this).css('width', '2.5rem')
-    //         } else if (duration > 30 && duration <= 40) {
-    //             $(this).css('width', '3rem')
-    //         } else if (duration > 40 && duration <= 50) {
-    //             $(this).css('width', '4rem')
-    //         } else {
-    //             $(this).css('width', '4.5rem')
-    //         }
-    //     })
-    // }
     this.choseImg = function () {
         $('.click').on('touchstart', function () {
 
             $(this).css("background", "#ccc")
             if ($(this).hasClass('checkImg')) {
-                alert('暂无该功能');
-                $(this).css("background", "none")
+                alert('暂无该功能')
                 return;
             } else {
                 //按下的是快捷话语
@@ -831,15 +833,13 @@ function Intalk() {
             $('.huashu').hide(500)
         })
     }
-
+    //点击发送消息按钮
     this.tapSendMsg = function () {
         var _this = this;
         $('.sendmsgbox').tap(function () {
-            //请求发送消息前先停止掉消息获取
             var inp = $('.input')
             var val = inp.val()
             _this.sendMsg(val)
-
             inp.val('')
             var len = $('.content .contextBox').length;
             $('.itemWrap').scrollTop($('.content .contextBox').get(len - 1).offsetTop)
@@ -852,32 +852,21 @@ function Intalk() {
             var imgMaxSize = 1024 * 1024 * 10 //图片最大限制
             var file = $(this).get(0).files[0] //文件对象
             var fileName = file.name //文件昵称
-            var srcc = window.URL.createObjectURL(file); //图片回显
+            // var srcc = window.URL.createObjectURL(file); //图片回显
             var suffix = fileName.substring(fileName.lastIndexOf('.'), fileName.length)
             if (['.jpeg', '.png', '.jpg'].indexOf(suffix) == -1) { //不支持图片leixing 
-                // 定义报错
+                alert('请选择支持图片格式')
                 return;
             }
             if (file.size > imgMaxSize) {
                 //文件太大
                 return;
             }
-            var formData = new FormData();
-            formData.append('type', file.type)
-            formData.append('size', file.size)
-            formData.append('name', file.name)
-            formData.append('lastModifiedDate', file.lastModifiedDate)
-            formData.append('file', file)
-            $('.content').append(_this.handleHtml.imgMsg(_this.nvtou, srcc, {
-                a: "myContentBox",
-                b: "myhead",
-                c: "mytextBox",
-                d: "jiantouRight",
-            }))
+            _this.submitImg(file)
             var len = $('.content .contextBox').length;
             _this.nowMySendMsg = len - 1
             $('.itemWrap').scrollTop($('.content .contextBox').get(len - 1).offsetTop)
-            _this.sendMsg()
+            // _this.sendMsg()
             $(this).val('')
         })
 
@@ -935,9 +924,9 @@ function Intalk() {
             } else if (loway.string_tp == "RC:ImgMsg") { //图片
                 handleMSGhtml += _this.handleHtml.imgMsg(menHead, loway.msg_user_image.string_image_url, {})
             } else if (loway.string_tp == "QI:FlatterMsg") { //搭讪礼物
-                handleMSGhtml += _this.handleHtml.giftMsg(menHead, loway.msg_user_flatter.string_content, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.string_image_url, {}, )
+                handleMSGhtml += _this.handleHtml.giftMsg(menHead, loway.msg_user_flatter.string_content, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.string_image_url, {}, "你")
             } else if (loway.string_tp == "QI:GiftMsg") { //送出礼物
-                handleMSGhtml += _this.handleHtml.giftTMsg(menHead, loway.msg_user_goods.int64_goods_id, loway.msg_user_goods.uint32_goods_num, loway.msg_user_goods.uint32_goods_num, {})
+                handleMSGhtml += _this.handleHtml.giftTMsg(menHead, loway.msg_user_goods.string_goods_name, loway.msg_user_goods.uint32_goods_num, {}, "你")
             }
         }
         if (senid == uid) { // 我发送消息
@@ -974,6 +963,105 @@ function Intalk() {
         }
         return handleMSGhtml;
     }
+    //提交图片
+    this.submitImg = function (file) {
+        var _this = this;
+        var formData = new FormData();
+        formData.append('size', file.size)
+        formData.append('name', file.name)
+        formData.append('lastModifiedDate', file.lastModifiedDate)
+        formData.append('file', file)
+        formData.append('userId', uid)
+        $.ajax({
+            url: "http://files-upload.evkeji.cn/sns/files/upload/file/imvoice?",
+            type: "post",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            data: formData,
+            success: function (data) {
+                console.log(data)
+                if (data.state == 0) {
+                    _this.sendImgMsg(data.content.url, _this.imgBase64(file))
+                } else {
+                    alert(data.message)
+                }
+            },
+            error: function () {
+                alert('服务器出了点小意外~')
+            }
+        })
+    }
+    //图片压缩转base64
+    this.imgBase64 = function (file) {
+        var Base64Img = "";
+        var reader = new FileReader()
+        var img = new Image()
+        reader.readAsDataURL(file)
+        reader.onload = function (e) {
+            img.src = e.target.result
+        }
+        img.onload = function () {
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+            var originWidth = this.width;
+            var originHeight = this.height;
+            var maxWidth, maxHeight = 300;
+            var targetWidth = originWidth,
+                targetHeight = originHeight;
+            if (originWidth > maxWidth || originHeight > maxHeight) {
+                if (originWidth / originHeight > maxWidth / maxHeight) {
+                    // 更宽，按照宽度限定尺寸
+                    targetWidth = maxWidth;
+                    targetHeight = Math.round(maxWidth * (originHeight / originWidth));
+                } else {
+                    targetHeight = maxHeight;
+                    targetWidth = Math.round(maxHeight * (originWidth / originHeight));
+                }
+            }
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            // 清除画布
+            context.clearRect(0, 0, targetWidth, targetHeight);
+            // 图片压缩
+            context.drawImage(img, 0, 0, targetWidth, targetHeight);
+            /*第一个参数是创建的img对象；第二三个参数是左上角坐标，后面两个是画布区域宽高*/
+            //压缩后的图片转base64 url
+            /* canvas.toDataURL(mimeType, qualityArgument),mimeType 默认值是'image/png';
+             * qualityArgument表示导出的图片质量，只有导出为jpeg和webp格式的时候此参数才有效，默认值是0.92*/
+            Base64Img = canvas.toDataURL('image/jpeg', 0.92);
+        }
+        return Base64Img
+    }
+    //发送图片消息请求
+    this.sendImgMsg = function (imgUrl, base64Image) {
+        var _this = this;
+        $.ajax({
+            url: "http://121.201.62.233:13888/delegate/msg/send/image/" + uid,
+            type: "POST",
+            dataType: "json",
+            async: true,
+            data: {
+                mcheck: mcheck,
+                content: base64Image,
+                imageUrl: imgUrl,
+                targetId: menId
+            },
+            success: function (data) {
+                $('.content').append(_this.appendNewMsg())
+                if (data.state == 0) {
+
+                } else {
+                    alert('发送失败')
+                    $('.input').val(val)
+                }
+            },
+            error: function () {
+                alert('服务器出了点小意外~')
+            }
+        })
+    }
+    //发送普通消息请求
     this.sendMsg = function (val) {
         var _this = this;
         $.ajax({
@@ -987,14 +1075,13 @@ function Intalk() {
                 targetId: menId
             },
             success: function (data) {
-                // console.log(mcheck)
                 // console.log(data)
                 $('.content').append(_this.appendNewMsg())
                 if (data.state == 0) {
 
                 } else {
                     alert('发送失败')
-                    $('.input').val(decodeURIComponent(val))
+                    $('.input').val(val)
                 }
             },
             error: function () {
@@ -1035,6 +1122,7 @@ function Intalk() {
             $('.bigImg').show("500");
         })
     }
+    //点击关闭放大图片
     this.closeBigImg = function () {
         $('.bigImg').tap(function () {
             $(this).hide(500)
@@ -1064,6 +1152,8 @@ function Intalk() {
             var scrollHiddenTop = $('.itemWrap').css('transform').substr(11, 2)
             if (scrollHiddenTop >= 50) {
                 if (flag) {
+                    //http://121.201.62.233:13888测试
+                    // http://121.46.195.211:13888线上
                     $.ajax({
                         url: "http://121.201.62.233:13888/delegate/msg/history/" + uid + "?",
                         type: "POST",
@@ -1071,18 +1161,22 @@ function Intalk() {
                         cache: true,
                         dataType: "json",
                         data: {
-                            limit: 30,
+                            limit: 100,
                             targetId: menId,
                             token: token,
                             lastId: _this.min
                         },
                         success: function (data) {
+                            var min = 0;
+                            // console.log(_this.min)
+                            // console.log(data)
                             var handleMSGhtml = "";
                             data.content.reverse()
                             for (var i = 0; i < data.content.length; i++) {
                                 if (data.content[i].id < _this.min) {
-                                    _this.min = data.content[i].id
-                                    console.log(_this.min)
+                                    // console.log('？')
+                                    min = data.content[0].id
+                                    // console.log(_this.min)
                                     var loway = data.content[i].content
                                     var tarid = data.content[i].content.int64_target_user_id
                                     var senid = data.content[i].content.int64_user_id
@@ -1090,6 +1184,7 @@ function Intalk() {
                                 }
 
                             }
+                            _this.min = min
                             $('.content').prepend(handleMSGhtml)
                             flag = false
                         }
@@ -1136,7 +1231,7 @@ $('.ListBack').tap(function () {
         istalk = false
         $('.app').removeAttr('style')
     } else {
-        // window.location.href = "http://page.qxiu.com/ldz/chudianh5/login.html"
+        // window.location.href = "http://123.57.87.160:80/cd/login.html"
         window.location.href = "http://192.168.25.126:8080/login.html"
 
     }
@@ -1144,8 +1239,7 @@ $('.ListBack').tap(function () {
 
 function isLoginOut() {
     if (!uid || !mcheck) {
-        // window.location.href = "http://page.qxiu.com/ldz/chudianh5/login.html"
-
+        // window.location.href = "http://123.57.87.160:80/cd/login.html"
         window.location.href = "http://192.168.25.126:8080/login.html"
     }
 }
