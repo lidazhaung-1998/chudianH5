@@ -50,7 +50,7 @@
                 box-sizing: border-box;
                 padding: 0 .24rem 0 .26rem;
                 margin-bottom: .27rem;
-
+                position: relative;
                 .head {
                     width: .9rem;
                     height: .9rem;
@@ -63,7 +63,15 @@
                 }
 
 
-
+                .lineBar {
+                    position:absolute;
+                    display: flex;
+                    top: .53rem;
+                    left: 1.7rem;
+                    div {
+                        width: .03rem;
+                    }
+                }
                 .textBox {
                     box-sizing: border-box;
                     padding: .29rem .3rem;
@@ -119,10 +127,10 @@
                         .audioTime {
                             font-size: .33rem;
                             position: absolute;
-                            left: .55rem;
+                            right: .3rem;
                             top: 50%;
                             transform: translateY(-50%);
-                            color:red;
+                            // color:red;
                         }
                     }
 

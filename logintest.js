@@ -77,12 +77,8 @@ $(function () {
     var token = "";
     $('.login').tap(function () {
         userName = $('.username').val()
-        if (userName != cookie.get('account')) {
-            localStorage.setItem('isFirst', true)
-        }
         passWord = $('.password').val()
         md5String = md5(passWord);
-
         isLoginSucc()
         storageLoginStatus()
     })
@@ -90,7 +86,7 @@ $(function () {
     function loginController() {
         var ControllerData = {}
         $.ajax({
-            url: "http://121.46.195.211:13888/delegate/login?",
+            url: "http://121.201.62.233:13888/delegate/login?",
             type: "POST",
             dataType: "json",
             async: false,
@@ -148,7 +144,6 @@ $(function () {
         this.city = []
         this.auto = []
         this.index = 0;
-        this.upDataArr = []
         this.getCityIndex = 0
         this.bb = JSON.parse(localStorage.getItem('bb')) || []
         this.init = function (arr) {
@@ -156,6 +151,7 @@ $(function () {
             this.userAccount = arr
             this.getuserContet()
             // this.getScorce()
+
             this.success()
             this.renderList()
             this.tapBack()
@@ -229,11 +225,12 @@ $(function () {
             var self = this;
             var accountHtml = "";
             $.each(this.userContentSelf, function (index, item) {
-                accountHtml += `<dl id="u${item.userId}" class="item border-1px EverylastBorderDone">
+                accountHtml += ` <dl id="u${item.userId}" class="item border-1px EverylastBorderDone">
                 <dd class="hiddenUserid" style="display:none;">${item.userId}</dd>
                         <dd class="taskIcon" style="background-image:url(${item.head});">
                             <div class="hiddenHead" style="display:none;">${item.head}</div>
                         </dd>
+            
                         <dd class="taskContent">
                             <div class="taskName">${item.nickname}</div>
                             <!-- taskName -->
@@ -257,10 +254,11 @@ $(function () {
                         <div class="newId" style="display:none;">${zuixin[index] ? zuixin[index] : 0}</div>
                     </dl>`
             })
-            // this.scorce = []
+            this.scorce = []
             $('.itemWrap .content').html(accountHtml)
         }
-        this.mySort = function (parent) {
+        this.mySort = function () {
+            var parent = $('.content .item')
             parent.sort(function (num1, num2) {
                 var td = num1.querySelectorAll('.time')[0].innerText
                 var td2 = num2.querySelectorAll('.time')[0].innerText
@@ -315,7 +313,7 @@ $(function () {
             for (var k = 0; k < lastStep.length; k++) {
                 var index = k;
                 $.ajax({
-                    url: "http://121.46.195.211:13888/delegate/res/quickreplylist/" + lastStep[index].sendid,
+                    url: "http://121.201.62.233:13888/delegate/res/quickreplylist/" + lastStep[index].sendid,
                     async: true,
                     type: "GET",
                     success: function (re) {
@@ -329,7 +327,7 @@ $(function () {
                         if (msg) {
                             // console.log(mcheck)
                             $.ajax({
-                                url: "http://121.46.195.211:13888/delegate/msg/send/private/" + lastStep[index].sendid,
+                                url: "http://121.201.62.233:13888/delegate/msg/send/private/" + lastStep[index].sendid,
                                 async: true,
                                 data: {
                                     mcheck: mcheck,
@@ -349,9 +347,8 @@ $(function () {
         this.getData = function (t) {
             var _this = t || this;
             var id = _this.userids[_this.index]
-
             $.ajax({
-                url: "http://121.46.195.211:13888/delegate/msg/refresh/" + id + "?",
+                url: "http://121.201.62.233:13888/delegate/msg/refresh/" + id + "?",
                 type: "POST",
                 async: true,
                 dataType: "json",
@@ -362,23 +359,13 @@ $(function () {
                     lastId: 0
                 },
                 success: function (data) {
-                    var createTime;
-                    if (data.content.length >= 1) {
-                        if (data.content[0].content.int64_user_id != id) {
-                            createTime = data.content[0].content.int64_time
-                        } else {
-                            createTime = 0
-                        }
-
-                    } else {
-                        createTime = 0
-                    }
-                    $("#u" + id).find('.time').html(createTime)
+                    // console.log(data)
                     var dataArr = data.content;
                     var prevMsgId = localStorage.getItem("readMaxMsgId-" + id);
                     if (!prevMsgId) {
                         prevMsgId = 0;
                     }
+
                     // 红点
                     var maxMsgId = prevMsgId;
                     dataArr.forEach(function (item, index) {
@@ -392,12 +379,9 @@ $(function () {
                     var dom = $("#u" + id);
                     if (maxMsgId > prevMsgId) {
                         // 有红点
-                        var oArr = _this.userids;
-                        var ouserid = oArr.splice(_this.index, 1)
-                        oArr.unshift(ouserid[0])
-                        // dom.remove()
+                        dom.remove()
                         dom.find('.dian').attr("max-msg-id", maxMsgId).css('display', 'block')
-                        // $('.content').prepend(dom)
+                        $('.content').prepend(dom)
                     }
                     // else if (maxMsgId < prevMsgId) {
                     //     dom.find('.dian').attr("max-msg-id", maxMsgId).css('display', 'none')
@@ -411,7 +395,6 @@ $(function () {
                         _this.index = 0;
                         var newUserIds = [];
                         var items = $(".content .item");
-                        _this.mySort(items)
                         items.each(function (idx, listDom) {
                             var cuid = $(listDom).attr('id').substr(1)
                             newUserIds[idx] = cuid;
@@ -421,7 +404,7 @@ $(function () {
                         // 延迟执行getData
                         setTimeout(function () {
                             _this.getData(_this);
-                        }, 4000);
+                        }, 5000);
                     } else {
                         _this.getData();
                     }
@@ -466,7 +449,7 @@ $(function () {
             var _this = this
             $.each(this.userAccount, function (idx, item) {
                 $.ajax({
-                    url: "http://121.46.195.211:13888/delegate/msg/refresh/" + item.userId + "?",
+                    url: "http://121.201.62.233:13888/delegate/msg/refresh/" + item.userId + "?",
                     type: "POST",
                     async: true,
                     dataType: "json",
@@ -543,7 +526,7 @@ $(function () {
                 var myMSG = encodeURIComponent($(this).find('.message').html())
                 var myHead = encodeURIComponent($(this).find('.hiddenHead').html())
                 var myMcheck = $(this).find('.hiddenMcheck').html()
-                // window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid;
+                // window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid
                 window.location.href = `http://192.168.25.126:8080/talk.html?uid=${uid}`;
                 cookie.set('uid', uid)
                 cookie.set('mcheck', myMcheck)

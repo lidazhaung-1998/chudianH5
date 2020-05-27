@@ -148,6 +148,7 @@ function TalkList() {
     this.scrollT = 0;
     this.init = function () {
         this.flag = true
+        this.index = 0;
         maxid = 0; //目前最大消息
         lastmsg = []; //最后一条信息
         lasttext = []
@@ -159,11 +160,12 @@ function TalkList() {
         oldid = 0;
         var _this = this;
         this.upData(100)
-        setTimeout(() => {
+        setTimeout(function () {
             _this.removeRed()
-        }, 200);
+        }, 200)
+
         timerUpdata = setInterval(function () {
-            _this.upData(70)
+            _this.upData(100)
             _this.removeRed()
         }, 2000)
         this.outTalkHtml()
@@ -191,7 +193,7 @@ function TalkList() {
     this.upData = function (num) {
         var _this = this;
         $.ajax({
-            url: "http://121.46.195.211:13888/delegate/msg/refresh/" + uid,
+            url: "http://121.201.62.233:13888/delegate/msg/refresh/" + uid,
             type: "POST",
             async: false,
             data: {
@@ -201,7 +203,6 @@ function TalkList() {
                 token: token
             },
             success: function (data) {
-                console.log(data)
                 bl = true
                 for (var i = 0; i < data.content.length; i++) {
                     if (data.content[i].id > maxid) {
@@ -209,9 +210,12 @@ function TalkList() {
                         if (_this.flag) {
                             _this.handleArray(data.content)
                             _this.renderUserList()
+                            _this.lastMSGData()
+
                             _this.flag = false
                         } else {
                             if (bl) {
+                                console.log('执行')
                                 _this.newMsg(data.content)
                                 _this.renderUserList()
                                 _this.state()
@@ -250,44 +254,66 @@ function TalkList() {
             }
         }
 
-        this.lastMSGData()
         menAllId = menAllId.reverse()
         msgLength = msgLength.reverse()
     }
     this.lastMSGData = function () {
-        for (var i = 0; i < menAllId.length; i++) {
-            $.ajax({
-                url: "http://121.46.195.211:13888/delegate/msg/refresh/" + uid,
-                type: "GET",
-                async: false,
-                data: {
-                    limit: 1,
-                    targetId: menAllId[i],
-                    lastId: 0,
-                    token: token
-                },
-                success: function (data) {
-                    lastMsgTime.push(data.content[0].content.int64_time)
-                    if (data.content[0].content.string_tp == "QI:FlatterMsg") {
-                        lastmsg[i] = '搭讪消息'
-                    } else if (data.content[0].content.string_tp == "RC:VcMsg") {
-                        lastmsg[i] = "语音消息"
-                    } else if (data.content[0].content.string_tp == "RC:ImgMsg") {
-                        lastmsg[i] = "图片"
-                    } else if (data.content[0].content.string_tp == "RC:SightMsg") {
-                        lastmsg[i] = "视频消息"
-                    } else if (data.content[0].content.string_tp == "RC:TxtMsg") {
-                        lastmsg[i] = data.content[0].content.msg_user_private.string_content
-                    } else if (data.content[0].content.string_tp == "QI:GiftMsg") {
-                        lastmsg[i] = "收到了对方送出的礼物"
-                    }
-                    if (data.content[0].content.int64_user_id == uid) {
-                        lastmsg[i] = '已回复'
-                    }
+        var _this = this;
+        var nArr = [];
+        nArr.push(...menAllId);
+        nArr.reverse()
+        $.ajax({
+            url: "http://121.201.62.233:13888/delegate/msg/refresh/" + uid,
+            type: "POST",
+            async: true,
+            data: {
+                limit: 1,
+                targetId: nArr[_this.index],
+                lastId: 0,
+                token: token
+            },
+            success: function (data) {
+                var id = nArr[_this.index]
+                console.log(data)
+                lastMsgTime.push(data.content[0].content.int64_time)
+                if (data.content[0].content.string_tp == "QI:FlatterMsg") {
+                    lastmsg[_this.index] = '搭讪消息'
+                } else if (data.content[0].content.string_tp == "RC:VcMsg") {
+                    lastmsg[_this.index] = "语音消息"
+                } else if (data.content[0].content.string_tp == "RC:ImgMsg") {
+                    lastmsg[_this.index] = "图片"
+                } else if (data.content[0].content.string_tp == "RC:SightMsg") {
+                    lastmsg[_this.index] = "视频消息"
+                } else if (data.content[0].content.string_tp == "RC:TxtMsg") {
+                    lastmsg[_this.index] = data.content[0].content.msg_user_private.string_content
+                } else if (data.content[0].content.string_tp == "QI:GiftMsg") {
+                    lastmsg[_this.index] = "收到了对方送出的礼物"
+                }
+                if (data.content[0].content.int64_user_id == uid) {
+                    lastmsg[_this.index] = '已回复'
                 }
 
-            })
-        }
+                var dom = $("#" + id)
+                var message = dom.find('.message')
+                message.html(lastmsg[_this.index])
+                dom.find('.redIcon').html(compileTime(lastMsgTime[_this.index]))
+                dom.find('.time').html(lastMsgTime[_this.index])
+                if (message.html() == "已回复") {
+                    message.css('color', 'green')
+                } else {
+                    message.css('color', 'red')
+                }
+                _this.index++
+                if (_this.index >= nArr.length) {
+                    _this.domSort()
+                    _this.index = 0
+                } else {
+                    _this.lastMSGData()
+                }
+            }
+
+        })
+
         lastMsgTime.reverse()
         lastmsg = lastmsg.reverse()
 
@@ -325,8 +351,8 @@ function TalkList() {
         var domArr = Array.apply(Array, document.querySelectorAll('.content .item'))
         domArr.sort(function (tr, tr1) {
             var t1 = tr.querySelectorAll('.time')[0].innerText
-            var t1m = tr.querySelectorAll('.message')[0].innerText
             var t2 = tr1.querySelectorAll('.time')[0].innerText
+            var t1m = tr.querySelectorAll('.message')[0].innerText
             var t2m = tr.querySelectorAll('.message')[0].innerText
             if (t1m == "已回复" || t2m == "已回复") {
                 return
@@ -345,6 +371,7 @@ function TalkList() {
     this.renderUserList = function () {
         var _this = this;
         var html = '';
+        console.log(menAllId)
         $.ajax({
             url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
             type: "POST",
@@ -356,7 +383,7 @@ function TalkList() {
             success: function (data) {
                 for (var i = 0; i < menAllId.length; i++) {
                     var userid = menAllId[i]
-                    html += ` <li class="item border-1px EverylastBorderDone">
+                    html += ` <li class="item" id="${userid}" border-1px EverylastBorderDone">
                         <div class="hiddenUserid" style="display:none;">${userid}</div>
                         <div class="taskIcon" style="background-image:url(${data.content[userid].head});"></div>
                         <div class="hiddenHead" style="display:none;">${data.content[userid].head}</div>
@@ -368,17 +395,16 @@ function TalkList() {
                             </div>
                         </div>
                         <div class="contentWrap">
-                            <div class="redIcon">${compileTime(lastMsgTime[i])}</div>
-                            <div class="time" style="display:none;">${lastMsgTime[i]}</div>
+                            <div class="redIcon"></div>
+                            <div class="time" style="display:none;"></div>
                             <div class="plusMoney">
                             </div>
                         </div>
+                        <!--${compileTime(lastMsgTime[i])}    ${lastMsgTime[i]}-->
                     </li>`
                 }
                 $('.content').html(html)
                 _this.clickListItem()
-                _this.state()
-                _this.domSort()
             }
         })
 
@@ -590,7 +616,7 @@ function Intalk() {
     this.getTalkMsg = function () {
         var self = this;
         $.ajax({
-            url: "http://121.46.195.211:13888/delegate/msg/refresh/" + uid + "?",
+            url: "http://121.201.62.233:13888/delegate/msg/refresh/" + uid + "?",
             type: "POST",
             async: false,
             dataType: "json",
@@ -732,6 +758,7 @@ function Intalk() {
             $(this).find('.jiantouLeft').css({
                 "border-right": ".15rem solid #ccc"
             })
+            console.log($(this).find('audio').attr('src'))
             var newSrc = $(this).find('audio').attr('src').substr(34)
             var src = $(this).find('audio').attr()
             amr = new BenzAMRRecorder()
@@ -788,7 +815,7 @@ function Intalk() {
     this.getHuashu = function () {
         var huashuHtml = "";
         $.ajax({
-            url: "http://121.46.195.211:13888/delegate/res/quickreplylist/" + uid,
+            url: "http://121.201.62.233:13888/delegate/res/quickreplylist/" + uid,
             type: "POST",
             cache: false,
             success: function (data) {
@@ -826,13 +853,15 @@ function Intalk() {
             //发起请求
             _this.nowMySendMsg = len - 1
         })
+
+
         $('.inputFile').on('change', function () {
             var imgMaxSize = 1024 * 1024 * 10 //图片最大限制
             var file = $(this).get(0).files[0] //文件对象
             var fileName = file.name //文件昵称
             // var srcc = window.URL.createObjectURL(file); //图片回显
             var suffix = fileName.substring(fileName.lastIndexOf('.'), fileName.length)
-            if (['.jpeg', '.png', '.jpg', '.gif'].indexOf(suffix) == -1) { //不支持图片leixing 
+            if (['.jpeg', '.png', '.jpg'].indexOf(suffix) == -1) { //不支持图片leixing 
                 alert('请选择支持图片格式')
                 return;
             }
@@ -855,7 +884,7 @@ function Intalk() {
         var html = "";
         // console.log(lastId)
         $.ajax({
-            url: "http://121.46.195.211:13888/delegate/msg/refresh/" + uid + "?",
+            url: "http://121.201.62.233:13888/delegate/msg/refresh/" + uid + "?",
             type: "POST",
             async: false,
             cache: true,
@@ -1014,7 +1043,7 @@ function Intalk() {
     this.sendImgMsg = function (imgUrl) {
         var _this = this;
         $.ajax({
-            url: "http://121.46.195.211:13888/delegate/msg/send/image/" + uid,
+            url: "http://121.201.62.233:13888/delegate/msg/send/image/" + uid,
             type: "POST",
             dataType: "json",
             async: true,
@@ -1042,7 +1071,7 @@ function Intalk() {
     this.sendMsg = function (val) {
         var _this = this;
         $.ajax({
-            url: "http://121.46.195.211:13888/delegate/msg/send/private/" + uid,
+            url: "http://121.201.62.233:13888/delegate/msg/send/private/" + uid,
             type: "POST",
             dataType: "jsonp",
             cache: false,
@@ -1130,7 +1159,7 @@ function Intalk() {
             if (scrollHiddenTop >= 50) {
                 if (flag) {
                     $.ajax({
-                        url: "http://121.46.195.211:13888/delegate/msg/history/" + uid + "?",
+                        url: "http://121.201.62.233:13888/delegate/msg/history/" + uid + "?",
                         type: "POST",
                         async: false,
                         cache: true,
