@@ -201,7 +201,7 @@ function TalkList() {
                 token: token
             },
             success: function (data) {
-                console.log(data)
+                // console.log(data)
                 bl = true
                 for (var i = 0; i < data.content.length; i++) {
                     if (data.content[i].id > maxid) {
