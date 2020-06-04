@@ -261,7 +261,6 @@ function TalkList() {
         var _this = this;
         var nArr = [];
         nArr.push(...menAllId);
-        nArr.reverse()
         $.ajax({
             url: "http://121.201.62.233:13888/delegate/msg/refresh/" + uid,
             type: "POST",
@@ -383,7 +382,7 @@ function TalkList() {
             success: function (data) {
                 for (var i = 0; i < menAllId.length; i++) {
                     var userid = menAllId[i]
-                    html += ` <li class="item" id="${userid}" border-1px EverylastBorderDone">
+                    html += ` <li  id="${userid}" class="item  border-1px EverylastBorderDone">
                         <div class="hiddenUserid" style="display:none;">${userid}</div>
                         <div class="taskIcon" style="background-image:url(${data.content[userid].head});"></div>
                         <div class="hiddenHead" style="display:none;">${data.content[userid].head}</div>

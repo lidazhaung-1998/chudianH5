@@ -159,8 +159,8 @@ $(function () {
             this.success()
             this.renderList()
             this.tapBack()
-            this.getData()
             this.getCity()
+
             this.clickListItem()
         }
 
@@ -260,7 +260,28 @@ $(function () {
             // this.scorce = []
             $('.itemWrap .content').html(accountHtml)
         }
+        this.FunSort = function (arr) {
+            arr.sort(function (t1, t2) {
+                var one = t1.querySelectorAll('.time')[0].innerText;
+                var two = t2.querySelectorAll('.time')[0].innerText;
+                if (one < two) {
+                    return 1
+                } else if (one == two) {
+                    return 0
+                } else {
+                    return -1
+                }
+            })
+            return arr
+        }
         this.mySort = function (parent) {
+            var newArr = [];
+            var yepBack = [];
+            var lastArr = [];
+            parent.forEach(function (item, index) {
+                item.querySelectorAll('.dian')[0].getAttribute('style') == "display: block;" ? newArr.push(item) : yepBack.push(item);
+            })
+            var lastArr = this.FunSort(newArr).concat(this.FunSort(yepBack))
             parent.sort(function (num1, num2) {
                 var td = num1.querySelectorAll('.time')[0].innerText
                 var td2 = num2.querySelectorAll('.time')[0].innerText
@@ -274,7 +295,7 @@ $(function () {
 
             })
             $('.content').html('')
-            $('.content').html(parent)
+            $('.content').html(lastArr)
         }
         this.list = function (all) {
             var cache = []
@@ -369,7 +390,6 @@ $(function () {
                         } else {
                             createTime = 0
                         }
-
                     } else {
                         createTime = 0
                     }
@@ -399,9 +419,12 @@ $(function () {
                         dom.find('.dian').attr("max-msg-id", maxMsgId).css('display', 'block')
                         // $('.content').prepend(dom)
                     }
-                    // else if (maxMsgId < prevMsgId) {
+
+                    // if (dataArr[0].content.int64_user_id == id) {
+                    //     maxMsgId = dataArr[0].id
                     //     dom.find('.dian').attr("max-msg-id", maxMsgId).css('display', 'none')
                     // }
+ 
                     if (localStorage.getItem('isFirst') == "true") {
                         localStorage.setItem('readMaxMsgId-' + id, maxMsgId)
                     }
@@ -451,6 +474,7 @@ $(function () {
                     _this.getCityIndex++
                     if (_this.getCityIndex >= _this.userids.length) {
                         _this.getCityIndex = 0
+                        _this.getData()
                         return;
                     } else {
                         _this.getCity()
@@ -543,8 +567,8 @@ $(function () {
                 var myMSG = encodeURIComponent($(this).find('.message').html())
                 var myHead = encodeURIComponent($(this).find('.hiddenHead').html())
                 var myMcheck = $(this).find('.hiddenMcheck').html()
-                // window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid;
-                window.location.href = `http://192.168.25.126:8080/talk.html?uid=${uid}`;
+                window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid;
+                // window.location.href = `http://192.168.25.126:8080/talk.html?uid=${uid}`;
                 cookie.set('uid', uid)
                 cookie.set('mcheck', myMcheck)
                 cookie.set('nickname', nickname)

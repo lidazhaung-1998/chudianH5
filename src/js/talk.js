@@ -109,7 +109,7 @@ function getScorce() {
         }
     })
 }
-setInterval(getScorce, 5000)
+setInterval(getScorce, 7000)
 
 function compileTime(time) {
     var msgAcceptTime = timeFormat('yyyy-MM-dd hh:mm:ss', time) //消息接收时间
@@ -123,7 +123,7 @@ function compileTime(time) {
         if (minute - msgMinute <= 1) {
             return "刚刚"
         } else if (minute - msgMinute > 1) {
-            return minute - msgMinute + "分种前"
+            return minute - msgMinute + "分钟前"
         }
     } else if (year == msgYear && month == msgMonth && day == msgDay) {
         return msgHours + ":" + msgMinute
@@ -159,9 +159,9 @@ function TalkList() {
         oldid = 0;
         var _this = this;
         this.upData(100)
-        setTimeout(() => {
+        setTimeout(function () {
             _this.removeRed()
-        }, 200);
+        }, 100)
         timerUpdata = setInterval(function () {
             _this.upData(70)
             _this.removeRed()
@@ -172,6 +172,7 @@ function TalkList() {
     }
     this.removeRed = function () {
         var items = $('.content .item');
+        // console.log(items)
         var length = items.length;
         var index = 0;
         items.each(function (idx, item) {
@@ -186,7 +187,6 @@ function TalkList() {
                 localStorage.setItem('readMaxMsgId-' + uid, maxid)
             }
         }
-
     }
     this.upData = function (num) {
         var _this = this;
@@ -201,7 +201,7 @@ function TalkList() {
                 token: token
             },
             success: function (data) {
-                // console.log(data)
+
                 bl = true
                 for (var i = 0; i < data.content.length; i++) {
                     if (data.content[i].id > maxid) {
@@ -321,26 +321,33 @@ function TalkList() {
         lastMsgTime = lastMsgTime.reverse()
         bl = false
     }
-    this.domSort = function () {
-        var domArr = Array.apply(Array, document.querySelectorAll('.content .item'))
-        domArr.sort(function (tr, tr1) {
-            var t1 = tr.querySelectorAll('.time')[0].innerText
-            var t1m = tr.querySelectorAll('.message')[0].innerText
-            var t2 = tr1.querySelectorAll('.time')[0].innerText
-            var t2m = tr.querySelectorAll('.message')[0].innerText
-            if (t1m == "已回复" || t2m == "已回复") {
-                return
-            }
-            if (t1 < t2) {
+
+    this.Funsort = function aaa(arr) {
+        arr.sort(function (t1, t2) {
+            var one = t1.querySelectorAll('.time')[0].innerText;
+            var two = t2.querySelectorAll('.time')[0].innerText;
+            if (one < two) {
                 return 1
-            } else if (t1 == t2) {
+            } else if (one == two) {
                 return 0
             } else {
                 return -1
             }
         })
+        return arr
+    }
+    this.domSort = function () {
+        var domArr = Array.apply(Array, document.querySelectorAll('.content .item'))
+        var newArr = [];
+        var yepBack = [];
+        domArr.forEach(function (item, inde) {
+            var time = item.querySelectorAll('.time')[0].innerText;
+            var isBack = item.querySelectorAll('.message')[0].innerText;
+            isBack == "已回复" ? yepBack.push(item) : newArr.push(item)
+        })
+        var lastArr = this.Funsort(newArr).concat(this.Funsort(yepBack))
         $('.content').html('')
-        $('.content').append(domArr)
+        $('.content').append(lastArr)
     }
     this.renderUserList = function () {
         var _this = this;
@@ -584,8 +591,7 @@ function Intalk() {
         timer2 = setInterval(function () {
             $('.content').append(_this.appendNewMsg())
             _this.newMsgHandle($('.itemWrap .content .contextBox').length)
-        }, 3000)
-
+        }, 1700)
     }
     this.getTalkMsg = function () {
         var self = this;
@@ -735,12 +741,16 @@ function Intalk() {
             var newSrc = $(this).find('audio').attr('src').substr(34)
             var src = $(this).find('audio').attr()
             amr = new BenzAMRRecorder()
-            amr.initWithUrl(newSrc).then(function () {
-                if (amr.isPlaying()) {
-                    amr.stop();
+            amr.initWithUrl("/api" + newSrc).then(function () {
+                if (item.getAttribute("playing")) {
+                    amr.stop()
+                    item.removeAttribute("playing")
                 } else {
                     amr.play();
                 }
+            })
+            amr.onPlay(function () {
+                item.setAttribute("playing", true)
             })
         })
         //播放音频抬起事件
@@ -1144,7 +1154,7 @@ function Intalk() {
                         success: function (data) {
                             var min = 0;
                             // console.log(_this.min)
-                            // console.log(data)
+                            console.log(data)
                             var handleMSGhtml = "";
                             data.content.reverse()
                             for (var i = 0; i < data.content.length; i++) {
@@ -1206,16 +1216,16 @@ $('.ListBack').tap(function () {
         istalk = false
         $('.app').removeAttr('style')
     } else {
-        // window.location.href = "http://123.57.87.160:80/cd/login.html"
-        window.location.href = "http://192.168.25.126:8080/login.html"
+        window.location.href = "http://123.57.87.160:80/cd/login.html";
+        // window.location.href = "http://192.168.25.126:8080/login.html";
 
     }
 })
 
 function isLoginOut() {
     if (!uid || !mcheck) {
-        // window.location.href = "http://123.57.87.160:80/cd/login.html"
-        window.location.href = "http://192.168.25.126:8080/login.html"
+        window.location.href = "http://123.57.87.160:80/cd/login.html";
+        // window.location.href = "http://192.168.25.126:8080/login.html";
     }
 }
 

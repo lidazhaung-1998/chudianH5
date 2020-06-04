@@ -10,6 +10,7 @@
 
 	"content"."string_tp"       = 区分消息类型，说明如下：{
 
+		"QI:GiftMsg"    = 送礼消息，查看说明 "content"."msg_user_goods"
 		"RC:SightMsg"   = 小视频消息，查看说明 "content"."msg_user_small_video"
 		"RC:VcMsg"      = 语音条消息，查看说明 "content"."msg_user_audio"
 		"RC:TxtMsg"     = 文本消息，查看说明 "content"."msg_user_private"
@@ -19,6 +20,35 @@
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+送礼消息
+
+{
+  "id": 1059,
+  "content": {
+	"uint32_cmd": 8,
+	"int64_user_id": 430177879,
+	"int64_target_user_id": 430143633
+	"int64_time": 1589796867251,
+	"string_order_id": "70645c77-8010-4b7a-b7d0-7c475ef88766",
+	"string_tp": "QI:GiftMsg",
+	"msg_user_goods": {
+	  "int64_goods_id": 10035,
+	  "uint32_goods_num": 10,
+	  "uint32_out_amount": 100,
+	  "string_group_id": ""
+	}
+  }
+}
+
+字段说明：
+
+"content"."msg_user_goods"."int64_goods_id" = 礼物的ID。
+"content"."msg_user_goods"."uint32_goods_num" = 礼物个数。
+"content"."msg_user_goods"."uint32_out_amount" = 目前不用管这个玩意，忽视他。
+"content"."msg_user_goods"."string_group_id" = 目前不用管这个玩意，忽视他。
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 小视频消息
 
 {
@@ -26,10 +56,10 @@
   "content": {
 	"uint32_cmd": 4,
 	"int64_user_id": 430044143,
+	"int64_target_user_id": 430143633
 	"int64_time": 1589423667889,
 	"string_order_id": "",
 	"msg_user_small_video": {
-	  "int64_target_user_id": 430143633,
 	  "string_video_url": "https://alibaba-resource.evkeji.cn/files/imvideo/20200514/430044143/430044143-1589423666_1168.mp4",
 	  "uint32_out_amount": 0
 	},
@@ -39,7 +69,6 @@
 
 字段说明：
 
-"content"."msg_user_small_video"."int64_target_user_id" = 接收者ID
 "content"."msg_user_small_video"."string_video_url" = 视频的 URL 地址。
 "content"."msg_user_small_video"."uint32_out_amount" = 目前不用管这个玩意，忽视他。
 
@@ -52,10 +81,10 @@
   "content": {
 	"uint32_cmd": 3,
 	"int64_user_id": 430032850,
+	"int64_target_user_id": 430143633
 	"int64_time": 1589432946956,
 	"string_order_id": "939f6705-8c1d-4e9e-a0b5-ecd0d4039540",
 	"msg_user_audio": {
-	  "int64_target_user_id": 430192972,
 	  "uint32_auido_duration": 5,
 	  "string_content": "https://alibaba-resource.evkeji.cn/files/imvideo/20200514/430032850/430032850-1589432945_1204.mp4",
 	  "uint32_out_amount": 5
@@ -66,7 +95,6 @@
 
 字段说明：
 
-"content"."msg_user_audio"."int64_target_user_id" = 接收者ID
 "content"."msg_user_audio"."uint32_auido_duration" = 语音文件时长，单位：秒。
 "content"."msg_user_audio"."string_content" = 语音文件 URL 地址。
 "content"."msg_user_audio"."uint32_out_amount" = 目前不用管这个玩意，忽视他。
@@ -80,10 +108,10 @@
   "content": {
 	"uint32_cmd": 2,
 	"int64_user_id": 430101549,
+	"int64_target_user_id": 430143633
 	"int64_time": 1589540739683,
 	"string_order_id": "a7b70c6a-0c04-48ac-b39c-00ca96a21d2e",
 	"msg_user_image": {
-	  "int64_target_user_id": 430192972,
 	  "string_image_url": "https://alibaba-resource.evkeji.cn/files/imphoto/20200515/430101549/430101549-1589540735_1512.jpg",
 	  "uint32_out_amount": 0
 	},
@@ -93,7 +121,6 @@
 
 字段说明：
 
-"content"."msg_user_image"."int64_target_user_id" = 接收者ID
 "content"."msg_user_image"."string_image_url" = 图片文件 URL 地址。
 "content"."msg_user_image"."uint32_out_amount" = 目前不用管这个玩意，忽视他。
 
@@ -106,10 +133,10 @@
   "content": {
 	"uint32_cmd": 1,
 	"int64_user_id": 430163346,
+	"int64_target_user_id": 430143633
 	"int64_time": 1589792071932,
 	"string_order_id": "f03eea84-7989-496a-a6b8-32a6bab98f34",
 	"msg_user_private": {
-	  "int64_target_user_id": 430044143,
 	  "string_content": "hi",
 	  "uint32_out_amount": 0
 	},
@@ -133,10 +160,10 @@
   "content": {
 	"uint32_cmd": 5,
 	"int64_user_id": 430163346,
+	"int64_target_user_id": 430143633
 	"int64_time": 1589790722896,
 	"string_order_id": "0f59044a-4f5a-49c8-80de-0d003b7a6b5d",
 	"msg_user_flatter": {
-	  "int64_target_user_id": 430035129,
 	  "string_image_url": "http://snszone.oss-cn-beijing.aliyuncs.com/files/goods/20200327/10000/10000-1585277502_939.png",
 	  "string_content": "收到搭讪礼物",
 	  "int64_goods_id": 10034,
@@ -150,7 +177,6 @@
 
 字段说明：
 
-"content"."msg_user_flatter"."int64_target_user_id" = 接收者ID
 "content"."msg_user_flatter"."string_image_url" = 搭讪礼物图片 URL 地址。
 "content"."msg_user_flatter"."string_content" = 搭讪说明。
 "content"."msg_user_flatter"."int64_goods_id" = 搭讪礼物的ID。

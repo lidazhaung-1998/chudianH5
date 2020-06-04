@@ -17,11 +17,11 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 查询快捷回复消息：
 
-格式：http://121.201.62.233:13888/delegate/res/quickreplylist?token={}
+格式：http://121.201.62.233:13888/delegate/res/quickreplylist/{userId}
 
-参数：token 后台登录返回的。
+参数：{userId} restful 的。
 
-例子：http://121.201.62.233:13888/delegate/res/quickreplylist?token=7df405d8b29f5830bce050e35d8e48df35eb4cffc4c1882d8602e50c143cb2bfedc4a38b1a31833340bb138c51257fcc6e653df29e8d8e1e60e4d789422353c8fb5295a7cf259de7ee9a408ac6ebfd5e
+例子：http://121.201.62.233:13888/delegate/res/quickreplylist/430147354
 
 
 
@@ -65,12 +65,28 @@
 格式：http://121.201.62.233:13888/delegate/msg/send/private/{userId}?mcheck={}&content={}&targetId={}
 
 参数：{userId} restful 的，发送者号码。
-参数：mcheck 通过手机号密码登录返回的。
+参数：mcheck 通过后台用户登录返回来的。
 参数：content 发送内容，UTF-8 格式。
 参数：targetId 接收者 ID，必填，不填返回失败。
 
 
 例子：http://121.201.62.233:13888/delegate/msg/send/private/430177879?mcheck=64f712eff44e63453cbfdc8bb4936a586d95ced6e6a400a4d2602b14d0677f39&content=%E4%BD%A0%E5%A5%BD%E5%A5%BD%E5%A5%BD%E5%A5%BD&targetId=430065821
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+发图片消息：
+
+格式：http://121.201.62.233:13888/delegate/msg/send/image/{userId}?mcheck={}&content={}&imageUrl={}&targetId={}
+
+参数：{userId} restful 的，发送者号码。
+参数：mcheck 通过手机号密码登录返回的。
+参数：content 图片内容，先把图片缩小到一个指定尺寸，然后把缩小后的图片内容做 base64 编码。具体需要问一下移动端的人。
+参数：imageUrl 图片地址，客户端必须先上传到服务器，拿到图片 URL 地址。
+参数：targetId 接收者 ID，必填，不填返回失败。
+
+
+例子：http://121.201.62.233:13888/delegate/msg/send/image/430177879?mcheck=8d901f2cddfbfecc7d6357b5aa2866f607c4f572cdd7552d9d4623213f4bbf4e&content=abcde&imageUrl=https://alibaba-resource.evkeji.cn/testenvfiles/userphoto/11120200045-2.jpg&targetId=430036321
 
 
 
