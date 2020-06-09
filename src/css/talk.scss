@@ -2,6 +2,19 @@
     display: flex;
     flex-direction: column;
 
+    .Block {
+        width: .5rem;
+        height: .5rem;
+        background: transparent;
+        position: absolute;
+        z-index: 999999;
+        right: 1.4rem;
+        padding: .1rem;
+        top: 50%;
+        margin-top: -.35rem;
+        font-size: .4rem;
+    }
+
     .itemWrap {
         flex: 1;
         overflow-x: hidden;
@@ -51,6 +64,7 @@
                 padding: 0 .24rem 0 .26rem;
                 margin-bottom: .27rem;
                 position: relative;
+
                 .head {
                     width: .9rem;
                     height: .9rem;
@@ -64,14 +78,16 @@
 
 
                 .lineBar {
-                    position:absolute;
+                    position: absolute;
                     display: flex;
                     top: .53rem;
                     left: 1.7rem;
+
                     div {
                         width: .03rem;
                     }
                 }
+
                 .textBox {
                     box-sizing: border-box;
                     padding: .29rem .3rem;
@@ -281,6 +297,41 @@
             }
         }
 
+        .emoji {
+
+            width: 100%;
+            height: 5rem;
+            position: absolute;
+            top: -5rem;
+            background: #ffff;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            display: none;
+
+            .emojiItem{
+                font-size: .3rem;
+            }
+
+            .cancel {
+                width: 100%;
+                height: .66rem;
+                font-size: .33rem;
+                color: #999999;
+                text-align: center;
+                // position: absolute;
+                // bottom: 0;
+                border-top-left-radius: .1rem;
+                border-top-right-radius: .1rem;
+                line-height: 2;
+                box-shadow: 0 -.01rem .02rem .01rem #999;
+
+            }
+        }
+        .yep {
+            display: none;
+        }
+
         .inputBox {
             width: 6.94rem;
             height: .86rem;
@@ -292,7 +343,7 @@
             overflow: hidden;
 
             .input {
-                width: 75%;
+                width: 65%;
                 height: .55rem;
                 position: absolute;
                 top: 50%;

@@ -159,6 +159,7 @@ function TalkList() {
         oldid = 0;
         var _this = this;
         this.upData(100)
+
         setTimeout(function () {
             _this.removeRed()
         }, 100)
@@ -501,47 +502,6 @@ function Intalk() {
             return giftHtml
         },
         giftTMsg: function (head, gift, num, my, target) {
-            // if (gift == 10036) {
-            //     gift = "玫瑰花"
-            // } else if (gift == 10001) {
-            //     gift = "爱心气球"
-            // } else if (gift == 10002) {
-            //     gift = "水晶球"
-            // } else if (gift == 10039) {
-            //     gift = "情侣对戒"
-            // } else if (gift == 10038) {
-            //     gift = "蛋糕"
-            // } else if (gift == 10035) {
-            //     gift = "冰淇淋"
-            // } else if (gift == 10007) {
-            //     gift = "一见钟情"
-            // } else if (gift == 10008) {
-            //     gift = "怦然心动"
-            // } else if (gift == 10043) {
-            //     gift = "甜蜜之旅"
-            // } else if (gift == 10037) {
-            //     gift = "强吻"
-            // } else if (gift == 10011) {
-            //     gift = "女王降临"
-            // } else if (gift == 10012) {
-            //     gift = "浪漫城堡"
-            // } else if (gift == 10015) {
-            //     gift = "比心"
-            // } else if (gift == 10044) {
-            //     gift = "一见钟情"
-            // } else if (gift == 10045) {
-            //     gift = "小黄瓜"
-            // } else if (gift == 10046) {
-            //     gift = "性感女神"
-            // } else if (gift == 10047) {
-            //     gift = "炫酷布加迪"
-            // } else if (gift == 10048) {
-            //     gift = "拉风超跑"
-            // } else if (gift == 10041) {
-            //     gift = "梦幻城堡"
-            // } else if (gift == 10042) {
-            //     gift = "水晶球"
-            // }
             var giftHtml = `<li class="contextBox ${my.a}">
                                 <div class="head ${my.b}" ${head}></div>
                                 <div class="textBox ${my.c}">
@@ -573,7 +533,7 @@ function Intalk() {
         this.goingTalk() //进入聊天页更改的页面样式已经title
         this.initLength = $('.content .contextBox').length
         this.getHuashu() //获取话术
-
+        this.getCity()
         var _this = this
         if (!inTalk) {
             this.isAudio() //是音频做出相应处理
@@ -583,6 +543,8 @@ function Intalk() {
             this.tapSendMsg() //点击发送
             this.scroll()
             this.closeBigImg()
+            this.tapEmoji()
+            this.chooseEmoji()
         }
         setTimeout(function () {
             $('.itemWrap').scrollTop($('.content').height() + 1000)
@@ -592,6 +554,22 @@ function Intalk() {
             $('.content').append(_this.appendNewMsg())
             _this.newMsgHandle($('.itemWrap .content .contextBox').length)
         }, 1700)
+    }
+    this.getCity = function () {
+        $.ajax({
+            url: "http://cgi-base.evkeji.cn/sns/base/location/getLocation?",
+            type: "POST",
+            async: true,
+            data: {
+                userId: uid,
+                fromUserId: uid
+            },
+            success(data) {
+                console.log(data)
+                var address = data.content.province + ' ' +data.content.city
+                $('.mymessage').html($('.mymessage').html() + address)
+            }
+        })
     }
     this.getTalkMsg = function () {
         var self = this;
@@ -775,7 +753,17 @@ function Intalk() {
             }, 300)
         })
     }
-
+    this.tapEmoji = function () {
+        $('.Block').tap(function () {
+            $('.emoji').toggle(200)
+        })
+    }
+    this.chooseEmoji = function () {
+        $('td').tap(function () {
+            $('.input').val(String($('.input').val()) + String($(this).html()))
+            $('.emoji').hide(200)
+        })
+    }
     this.choseImg = function () {
         $('.click').on('touchstart', function () {
 
@@ -1064,9 +1052,7 @@ function Intalk() {
             success: function (data) {
                 // console.log(data)
                 $('.content').append(_this.appendNewMsg())
-                if (data.state == 0) {
-
-                } else {
+                if (data.state == 0) {} else {
                     alert('发送失败')
                     $('.input').val(val)
                 }
@@ -1215,17 +1201,18 @@ $('.ListBack').tap(function () {
         getNowTime()
         istalk = false
         $('.app').removeAttr('style')
+        $('.input').val('')
     } else {
-        window.location.href = "http://123.57.87.160:80/cd/login.html";
-        // window.location.href = "http://192.168.25.126:8080/login.html";
+        // window.location.href = "http://123.57.87.160:80/cd/login.html";
+        window.location.href = "http://192.168.25.126:8080/login.html";
 
     }
 })
 
 function isLoginOut() {
     if (!uid || !mcheck) {
-        window.location.href = "http://123.57.87.160:80/cd/login.html";
-        // window.location.href = "http://192.168.25.126:8080/login.html";
+        // window.location.href = "http://123.57.87.160:80/cd/login.html";
+        window.location.href = "http://192.168.25.126:8080/login.html";
     }
 }
 

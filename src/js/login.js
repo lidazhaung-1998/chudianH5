@@ -159,8 +159,8 @@ $(function () {
             this.success()
             this.renderList()
             this.tapBack()
-            this.getCity()
-
+            // this.getCity()
+            _this.getData()
             this.clickListItem()
         }
 
@@ -238,7 +238,7 @@ $(function () {
                             <div class="taskName">${item.nickname}</div>
                             <!-- taskName -->
                             <div class="taskContext">
-                                <span class="message">${item.age} | ${item.job ? item.job : '暂无信息'} |</span>
+                                <span class="message">${item.age} | ${item.job ? item.job : '暂无信息'} </span>
                             </div>
                             <!-- taskContent -->
                         </dd>
@@ -300,7 +300,6 @@ $(function () {
         this.list = function (all) {
             var cache = []
             for (var ar of all) {
-                // console.log(ar)
                 if (cache.find(c => c.sendid == ar.sendid && c.targetid == ar.targetid)) {
                     continue
                 }
@@ -384,6 +383,8 @@ $(function () {
                 },
                 success: function (data) {
                     var createTime;
+                    var cache = [];
+                    var idx = 0;
                     if (data.content.length >= 1) {
                         if (data.content[0].content.int64_user_id != id) {
                             createTime = data.content[0].content.int64_time
@@ -401,6 +402,7 @@ $(function () {
                     }
                     // 红点
                     var maxMsgId = prevMsgId;
+
                     dataArr.forEach(function (item, index) {
                         if (item.content.int64_target_user_id == id) {
                             var currentMsgId = item.id;
@@ -409,6 +411,27 @@ $(function () {
                             }
                         }
                     });
+
+                    
+                        for (var value of dataArr) {
+                            if (cache.find(c => c.content.int64_target_user_id == value.content.int64_target_user_id)) {
+                                continue
+                            } else {
+                                cache.push(value)
+                            }
+                        }
+                        // console.log(cache)
+                        for (var i = 0; i < cache.length; i++) {
+                            if (cache[i].content.int64_user_id == id) {
+                                // console.log(cache[i])
+                                idx += 1
+                            }
+                            // console.log(cache[i])
+                        }
+                    //http://code.qiqi.com/dazhuang/chudianH5.git
+                        if(id == 430795188) {
+                            console.log(cache)
+                        }
                     var dom = $("#u" + id);
                     if (maxMsgId > prevMsgId) {
                         // 有红点
@@ -419,18 +442,19 @@ $(function () {
                         dom.find('.dian').attr("max-msg-id", maxMsgId).css('display', 'block')
                         // $('.content').prepend(dom)
                     }
+                    if (idx == cache.length) {
+                        console.log(idx, cache.length)
+                        maxMsgId = dataArr[0].id;
+                        dom.find('.dian').attr("max-msg-id", maxMsgId).css('display', 'none');
+                    }
 
-                    // if (dataArr[0].content.int64_user_id == id) {
-                    //     maxMsgId = dataArr[0].id
-                    //     dom.find('.dian').attr("max-msg-id", maxMsgId).css('display', 'none')
-                    // }
- 
                     if (localStorage.getItem('isFirst') == "true") {
                         localStorage.setItem('readMaxMsgId-' + id, maxMsgId)
                     }
                     // 自动回复
                     _this.index++
                     if (_this.index >= _this.userAccount.length) {
+
                         _this.index = 0;
                         var newUserIds = [];
                         var items = $(".content .item");
@@ -452,37 +476,36 @@ $(function () {
 
             })
         }
-        this.getCity = function () {
-            var _this = this;
-            $.ajax({
-                url: "http://cgi-base.evkeji.cn/sns/base/location/getLocation?",
-                type: "POST",
-                async: true,
-                data: {
-                    userId: _this.userids[_this.getCityIndex],
-                    fromUserId: _this.userids[_this.getCityIndex]
-                },
-                success(data) {
-                    var address = data.content.province + data.content.city
-                    var id = data.content.userId
-                    var dom = $('#u' + id)
-                    var msgDom = dom.find('.message')
-                    var info = msgDom.html()
-                    var newText = info.substr(0, info.lastIndexOf('|'))
-                    newText = newText + address
-                    msgDom.html(newText)
-                    _this.getCityIndex++
-                    if (_this.getCityIndex >= _this.userids.length) {
-                        _this.getCityIndex = 0
-                        _this.getData()
-                        return;
-                    } else {
-                        _this.getCity()
-                    }
-                }
-            })
-
-        }
+        // this.getCity = function () {
+        //     var _this = this;
+        //     $.ajax({
+        //         url: "http://cgi-base.evkeji.cn/sns/base/location/getLocation?",
+        //         type: "POST",
+        //         async: true,
+        //         data: {
+        //             userId: _this.userids[_this.getCityIndex],
+        //             fromUserId: _this.userids[_this.getCityIndex]
+        //         },
+        //         success(data) {
+        //             var address = data.content.province + data.content.city
+        //             var id = data.content.userId
+        //             var dom = $('#u' + id)
+        //             var msgDom = dom.find('.message')
+        //             var info = msgDom.html()
+        //             var newText = info.substr(0, info.lastIndexOf('|'))
+        //             newText = newText + address
+        //             msgDom.html(newText)
+        //             _this.getCityIndex++
+        //             if (_this.getCityIndex >= _this.userids.length) {
+        //                 _this.getCityIndex = 0
+        //                 _this.getData()
+        //                 return;
+        //             } else {
+        //                 _this.getCity()
+        //             }
+        //         }
+        //     })
+        // }
         this.getMsg = function () {
             var arr = [];
             var obj = {}
@@ -567,8 +590,8 @@ $(function () {
                 var myMSG = encodeURIComponent($(this).find('.message').html())
                 var myHead = encodeURIComponent($(this).find('.hiddenHead').html())
                 var myMcheck = $(this).find('.hiddenMcheck').html()
-                window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid;
-                // window.location.href = `http://192.168.25.126:8080/talk.html?uid=${uid}`;
+                // window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid;
+                window.location.href = `http://192.168.25.126:8080/talk.html?uid=${uid}`;
                 cookie.set('uid', uid)
                 cookie.set('mcheck', myMcheck)
                 cookie.set('nickname', nickname)
