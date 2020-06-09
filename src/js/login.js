@@ -412,26 +412,26 @@ $(function () {
                         }
                     });
 
-                    
-                        for (var value of dataArr) {
-                            if (cache.find(c => c.content.int64_target_user_id == value.content.int64_target_user_id)) {
-                                continue
-                            } else {
-                                cache.push(value)
-                            }
-                        }
-                        // console.log(cache)
-                        for (var i = 0; i < cache.length; i++) {
-                            if (cache[i].content.int64_user_id == id) {
-                                // console.log(cache[i])
-                                idx += 1
-                            }
-                            // console.log(cache[i])
-                        }
+
+                    // for (var value of dataArr) {
+                    //     if (cache.find(c => c.content.int64_target_user_id == value.content.int64_target_user_id)) {
+                    //         continue
+                    //     } else {
+                    //         cache.push(value)
+                    //     }
+                    // }
+                    // console.log(cache)
+                    // for (var i = 0; i < cache.length; i++) {
+                    //     if (cache[i].content.int64_user_id == id) {
+                    //         // console.log(cache[i])
+                    //         idx += 1
+                    //     }
+                    // console.log(cache[i])
+                    // }
                     //http://code.qiqi.com/dazhuang/chudianH5.git
-                        if(id == 430795188) {
-                            console.log(cache)
-                        }
+                    // if(id == 430795188) {
+                    //     console.log(cache)
+                    // }
                     var dom = $("#u" + id);
                     if (maxMsgId > prevMsgId) {
                         // 有红点
@@ -442,11 +442,11 @@ $(function () {
                         dom.find('.dian').attr("max-msg-id", maxMsgId).css('display', 'block')
                         // $('.content').prepend(dom)
                     }
-                    if (idx == cache.length) {
-                        console.log(idx, cache.length)
-                        maxMsgId = dataArr[0].id;
-                        dom.find('.dian').attr("max-msg-id", maxMsgId).css('display', 'none');
-                    }
+                    // if (idx == cache.length) {
+                    //     console.log(idx, cache.length)
+                    //     maxMsgId = dataArr[0].id;
+                    //     dom.find('.dian').attr("max-msg-id", maxMsgId).css('display', 'none');
+                    // }
 
                     if (localStorage.getItem('isFirst') == "true") {
                         localStorage.setItem('readMaxMsgId-' + id, maxMsgId)
