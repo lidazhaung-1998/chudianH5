@@ -2,6 +2,7 @@ var $ = require('../libs/zepto')
 var backIcon = require('../img/back.png')
 var md5 = require('../libs/md5.js')
 import "../css/login.scss"
+import kkkk from "./kkkk"
 var zuixin = []
 document.onreadystatechange = completeLoading;
 
@@ -160,8 +161,11 @@ $(function () {
             this.renderList()
             this.tapBack()
             // this.getCity()
-            _this.getData()
+            _this.callGetData() // TODO CALLDATA
             this.clickListItem()
+            setTimeout(function () {
+                kkkk.clearMaxLength(_this.userids, 100)
+            }, 5000)
         }
 
         //存储账号id 和mcheck
@@ -259,6 +263,7 @@ $(function () {
             })
             // this.scorce = []
             $('.itemWrap .content').html(accountHtml)
+            this.addRed()
         }
         this.FunSort = function (arr) {
             arr.sort(function (t1, t2) {
@@ -278,24 +283,34 @@ $(function () {
             var newArr = [];
             var yepBack = [];
             var lastArr = [];
-            parent.forEach(function (item, index) {
-                item.querySelectorAll('.dian')[0].getAttribute('style') == "display: block;" ? newArr.push(item) : yepBack.push(item);
-            })
-            var lastArr = this.FunSort(newArr).concat(this.FunSort(yepBack))
+            // parent.forEach(function (item, index) {
+            //     item.querySelectorAll('.dian')[0].getAttribute('style') == "display: block;" ? newArr.push(item) : yepBack.push(item);
+            // })
+            // var lastArr = this.FunSort(newArr).concat(this.FunSort(yepBack))
             parent.sort(function (num1, num2) {
-                var td = num1.querySelectorAll('.time')[0].innerText
-                var td2 = num2.querySelectorAll('.time')[0].innerText
-                if (td < td2) {
-                    return 1
-                } else if (td == td2) {
-                    return 0
+                var td = $(num1).attr("time"); //querySelectorAll('.time')[0].innerText
+                var td2 = $(num2).attr("time"); //querySelectorAll('.time')[0].innerText
+                var dian1 = $(num1).find('.dian').css('display');
+                var dian2 = $(num2).find('.dian').css('display');
+                var n1 = dian1 == "block" ? 1 : 0;
+                var n2 = dian2 == "block" ? 1 : 0;
+                if (n2 == n1) {
+
+                    if (td < td2) {
+                        return 1
+                    } else if (td == td2) {
+                        return 0
+                    } else {
+                        return -1
+                    }
                 } else {
-                    return -1
+                    return n2 - n1;
                 }
 
+
+
             })
-            $('.content').html('')
-            $('.content').html(lastArr)
+            $('.content').html(parent)
         }
         this.list = function (all) {
             var cache = []
@@ -366,9 +381,74 @@ $(function () {
             }
             localStorage.setItem('list', JSON.stringify(list.concat(lastStep)))
         }
-        this.getData = function (t) {
+        this.colls = function (id, data) {
+            var arrData = data.content;
+            var tb = new Object();
+            arrData.forEach(function (item, index) {
+                var targetId = item.content.int64_target_user_id;
+                var sendId = item.content.int64_user_id;
+                var lId = 0;
+                var rId = 0;
+                if (targetId == id) {
+                    lId = targetId;
+                    rId = sendId;
+                } else {
+                    lId = sendId;
+                    rId = targetId;
+                };
+                var key = lId + '-' + rId;
+                var colls = tb[key];
+                if (!colls) {
+                    colls = [];
+                    tb[key] = colls
+                }
+                colls.push(item)
+            })
+            return tb
+        }
+        this.callGetData = function (t) {
             var _this = t || this;
-            var id = _this.userids[_this.index]
+            var userIds = _this.userids;
+            var length = userIds.length;
+            var len1 = length == 1 ? 1 : length / 2;
+            var len2 = length;
+            console.log(len1, len2)
+            var callFunc1 = function (id, data, index) {
+
+                if (index >= len1) {
+                    _this.addRed()
+                    setTimeout(function () {
+                        _this.getData(_this, 0, callFunc1);
+                    }, 1000);
+                } else {
+                    _this.getData(_this, index + 1, callFunc1);
+                }
+            }
+            var callFunc2 = function (id, data, index) {
+                //console.log("index:" + index)
+                if (index >= len2) {
+                    _this.addRed()
+                    setTimeout(function () {
+                        _this.getData(_this, len1, callFunc2);
+                    }, 1000);
+                } else {
+                    _this.getData(_this, index + 1, callFunc2);
+                }
+            }
+
+            if (len1 > 0) {
+                this.getData(_this, 0, callFunc1);
+            }
+
+            if (len2 > 0) {
+                this.getData(_this, len1, callFunc2);
+            }
+
+        }
+        this.getData = function (t, index, callFunc) { // TODO DEFDATA
+            var _this = t || this;
+            //var id = _this.userids[_this.index]
+            var id = _this.userids[index];
 
             $.ajax({
                 url: "http://121.46.195.211:13888/delegate/msg/refresh/" + id + "?",
@@ -376,105 +456,62 @@ $(function () {
                 async: true,
                 dataType: "json",
                 data: {
-                    limit: 20,
+                    limit: 100,
                     targetId: "",
                     token: token,
                     lastId: 0
                 },
                 success: function (data) {
-                    var createTime;
-                    var cache = [];
-                    var idx = 0;
-                    if (data.content.length >= 1) {
-                        if (data.content[0].content.int64_user_id != id) {
-                            createTime = data.content[0].content.int64_time
-                        } else {
-                            createTime = 0
-                        }
-                    } else {
-                        createTime = 0
-                    }
-                    $("#u" + id).find('.time').html(createTime)
-                    var dataArr = data.content;
-                    var prevMsgId = localStorage.getItem("readMaxMsgId-" + id);
-                    if (!prevMsgId) {
-                        prevMsgId = 0;
-                    }
-                    // 红点
-                    var maxMsgId = prevMsgId;
-
-                    dataArr.forEach(function (item, index) {
-                        if (item.content.int64_target_user_id == id) {
-                            var currentMsgId = item.id;
-                            if (currentMsgId > maxMsgId) {
-                                maxMsgId = currentMsgId;
-                            }
-                        }
-                    });
-
-
-                    // for (var value of dataArr) {
-                    //     if (cache.find(c => c.content.int64_target_user_id == value.content.int64_target_user_id)) {
-                    //         continue
+                    kkkk.updateReplyLastMsg(id, data)
+                    // var createTime;
+                    // if (data.content.length >= 1) {
+                    //     if (data.content[0].content.int64_user_id != id) {
+                    //         createTime = data.content[0].content.int64_time
                     //     } else {
-                    //         cache.push(value)
+                    //         createTime = 0
                     //     }
+                    // } else {
+                    //     createTime = 0
                     // }
-                    // console.log(cache)
-                    // for (var i = 0; i < cache.length; i++) {
-                    //     if (cache[i].content.int64_user_id == id) {
-                    //         // console.log(cache[i])
-                    //         idx += 1
-                    //     }
-                    // console.log(cache[i])
+                    // $("#u" + id).find('.time').html(createTime)
+                    // _this.index++
+                    // if (_this.index >= _this.userAccount.length) {
+                    //     _this.addRed()
+                    //     setTimeout(function () {
+                    //         _this.getData(_this);
+                    //     }, 3000);
+                    // } else {
+                    //     _this.getData();
                     // }
-                    //http://code.qiqi.com/dazhuang/chudianH5.git
-                    // if(id == 430795188) {
-                    //     console.log(cache)
-                    // }
-                    var dom = $("#u" + id);
-                    if (maxMsgId > prevMsgId) {
-                        // 有红点
-                        var oArr = _this.userids;
-                        var ouserid = oArr.splice(_this.index, 1)
-                        oArr.unshift(ouserid[0])
-                        // dom.remove()
-                        dom.find('.dian').attr("max-msg-id", maxMsgId).css('display', 'block')
-                        // $('.content').prepend(dom)
-                    }
-                    // if (idx == cache.length) {
-                    //     console.log(idx, cache.length)
-                    //     maxMsgId = dataArr[0].id;
-                    //     dom.find('.dian').attr("max-msg-id", maxMsgId).css('display', 'none');
-                    // }
-
-                    if (localStorage.getItem('isFirst') == "true") {
-                        localStorage.setItem('readMaxMsgId-' + id, maxMsgId)
-                    }
-                    // 自动回复
-                    _this.index++
-                    if (_this.index >= _this.userAccount.length) {
-
-                        _this.index = 0;
-                        var newUserIds = [];
-                        var items = $(".content .item");
-                        _this.mySort(items)
-                        items.each(function (idx, listDom) {
-                            var cuid = $(listDom).attr('id').substr(1)
-                            newUserIds[idx] = cuid;
-                        })
-                        _this.userids = newUserIds
-                        localStorage.setItem('isFirst', false)
-                        // 延迟执行getData
-                        setTimeout(function () {
-                            _this.getData(_this);
-                        }, 4000);
-                    } else {
-                        _this.getData();
-                    }
+                    callFunc(id, data, index);
                 }
 
             })
+        }
+        this.addRed = function (t) {
+            var _this = t || this;
+            var userIds = _this.userids;
+            for (var i in userIds) {
+                var userId = userIds[i];
+                var state = kkkk.verifyReply(userId);
+                // console.log(state)
+                var dom = $('#u' + userId);
+                if (state) {
+                    // 没红点
+                    dom.find('.dian').css('display', 'none')
+                } else {
+                    // 有红点
+                    dom.find('.dian').css('display', 'block')
+                }
+                var recode = kkkk.getRecode(userId);
+                var orderRecode = kkkk.getOrderRecode(userId, recode);
+                if (orderRecode && orderRecode.length > 0) {
+                    dom.attr("time", orderRecode[0].time);
+                }
+
+            }
+            var items = $(".content .item");
+            _this.mySort(items);
         }
         // this.getCity = function () {
         //     var _this = this;
@@ -618,3 +655,29 @@ $(function () {
         cookie.set('token', token)
     }
 })
+
+
+
+// for (i in json) {
+//     var item = json[i];
+//     var targetId = item.targetId;
+//     var sendId = item.sendId;
+//     var lId = 0;
+//     var rId = 0;
+
+//     if (targetId == userId) {
+//         lId = targetId;
+//         rid = sendId;
+//     } else {
+//         rId = targetId;
+//         lid = sendId;
+//     }
+//     var key = lid + "-" + rId;
+//     var colls = tb[key];
+//     if (!colls) {
+//         colls = [];
+//         tb[key] = colls;
+//     }
+//     colls.push(item);
+// }
+// return tb;

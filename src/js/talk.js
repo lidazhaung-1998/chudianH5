@@ -1,4 +1,5 @@
 import "../css/index.scss";
+import kkkk from "./kkkk";
 var $ = require('../libs/zepto');
 var timeFormat = require('../libs/timeFormat')
 var cookie = {
@@ -72,13 +73,10 @@ var mcheck = cookie.get('mcheck')
 var token = cookie.get('token')
 var menId, menName, menHead = ""; //男性账号
 var istalk = false; //判断是否在聊天页
-
-
 isLoginOut()
-
-var intalk = new Intalk()
-var inTalk = false
-var maxid, lastmsg, lasttext, obj, menAllId, msgLength, oldid, lastMsgTime, loop = null
+var intalk = new Intalk();
+var inTalk = false;
+var maxid, lastmsg, lasttext, obj, menAllId, msgLength, oldid, lastMsgTime, loop = null;
 var timer2 = "";
 var bl = true;
 var timerUpdata = "";
@@ -157,44 +155,26 @@ function TalkList() {
         lastMsgTime = []; //发消息的所有男用户的最后一条消息时间
         loop = [];
         oldid = 0;
+        this.colls = [];
         var _this = this;
+        _this.renderUserList();
         this.upData(100)
-
-        setTimeout(function () {
-            _this.removeRed()
-        }, 100)
+        setTimeout(function () {}, 300)
         timerUpdata = setInterval(function () {
-            _this.upData(70)
-            _this.removeRed()
+            _this.upData(100)
         }, 2000)
         this.outTalkHtml()
         this.scrollPosition()
-
-    }
-    this.removeRed = function () {
-        var items = $('.content .item');
-        // console.log(items)
-        var length = items.length;
-        var index = 0;
-        items.each(function (idx, item) {
-            if ($(item).find('.message').html() == "已回复") {
-                index++;
-            }
-        })
-        if (index) {
-            if (index >= length) {
-                // 全部已回复
-                // 获取最大的消息ID 进行存储
-                localStorage.setItem('readMaxMsgId-' + uid, maxid)
-            }
-        }
+        setTimeout(function () {
+            kkkk.clearMaxLength([uid], 100);
+        }, 5000)
     }
     this.upData = function (num) {
         var _this = this;
         $.ajax({
             url: "http://121.46.195.211:13888/delegate/msg/refresh/" + uid,
             type: "POST",
-            async: false,
+            async: true,
             data: {
                 limit: num,
                 targetId: "",
@@ -202,24 +182,36 @@ function TalkList() {
                 token: token
             },
             success: function (data) {
+                data.content = data.content.reverse();
+                kkkk.updateReplyLastMsg(uid, data);
+                _this.renderUserList();
 
-                bl = true
-                for (var i = 0; i < data.content.length; i++) {
-                    if (data.content[i].id > maxid) {
-                        maxid = data.content[i].id
-                        if (_this.flag) {
-                            _this.handleArray(data.content)
-                            _this.renderUserList()
-                            _this.flag = false
-                        } else {
-                            if (bl) {
-                                _this.newMsg(data.content)
-                                _this.renderUserList()
-                                _this.state()
-                            }
-                        }
-                    }
+                if (data.content[0].id > maxid) {
+                    maxid = data.content[0].id;
                 }
+                //bl = true
+                // for (var i = 0; i < data.content.length; i++) {
+                // if (data.content[i].id > maxid) {
+                // console.log(_this.colls)
+                // if (_this.colls[1] == data.content[i].content.int64_target_user_id)
+                // maxid = data.content[i].id
+                // if (_this.flag) {
+                // _this.handleArray(data.content)
+
+                //_this.flag = false
+                // } else {
+                // if (bl) {
+                // console.log(data)
+                // data.content = data.content.reverse();
+                // var reverseData = data;
+                // kkkk.updateReplyLastMsg(uid, reverseData)
+                // _this.newMsg(data.content)
+                //_this.renderUserList()
+                //_this.state()
+                // }
+                // }
+                // }
+                // }
 
             }
         })
@@ -250,7 +242,6 @@ function TalkList() {
                 msgLength.push(obj[at])
             }
         }
-
         this.lastMSGData()
         menAllId = menAllId.reverse()
         msgLength = msgLength.reverse()
@@ -291,7 +282,6 @@ function TalkList() {
         }
         lastMsgTime.reverse()
         lastmsg = lastmsg.reverse()
-
     }
     this.newMsg = function (newArr) {
         menAllId = []
@@ -299,13 +289,13 @@ function TalkList() {
         loop = []
         lastMsgTime = []
         for (var i = 0; i < newArr.length; i++) {
-            // if (newArr[i].content.int64_user_id != uid) {
+
             if (obj[newArr[i].content.int64_user_id]) {
                 obj[newArr[i].content.int64_user_id]++
             } else {
                 obj[newArr[i].content.int64_user_id] = 1
             }
-            // }
+
 
         }
         for (var ar in obj) {
@@ -314,15 +304,11 @@ function TalkList() {
                 msgLength.push(obj[ar])
             }
         }
-        // console.log(obj)
         this.lastMSGData()
-        // msgLength = msgLength.reverse()
-        // menAllId = menAllId.reverse()
         lastmsg.reverse()
         lastMsgTime = lastMsgTime.reverse()
         bl = false
     }
-
     this.Funsort = function aaa(arr) {
         arr.sort(function (t1, t2) {
             var one = t1.querySelectorAll('.time')[0].innerText;
@@ -353,18 +339,30 @@ function TalkList() {
     this.renderUserList = function () {
         var _this = this;
         var html = '';
+
+        var recode = kkkk.getRecode(uid);
+        var recodeList = kkkk.getOrderRecode(uid, recode);
+        var userIds = [];
+        for (var i in recodeList) {
+            var item = recodeList[i];
+            var userId = item["userId2"];
+            userIds.push(userId);
+        }
+
         $.ajax({
             url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
             type: "POST",
             dataType: "json",
             async: true,
             data: {
-                userIds: menAllId.join(',')
+                userIds: userIds.join(',')
             },
             success: function (data) {
-                for (var i = 0; i < menAllId.length; i++) {
-                    var userid = menAllId[i]
-                    html += ` <li class="item border-1px EverylastBorderDone">
+                // console.log(data)
+                for (var i = 0; i < userIds.length; i++) {
+                    var userid = userIds[i]
+                    var content = recode[uid + "-" + userid].content;
+                    html += ` <li id="${'u'+userid}" class="item border-1px EverylastBorderDone">
                         <div class="hiddenUserid" style="display:none;">${userid}</div>
                         <div class="taskIcon" style="background-image:url(${data.content[userid].head});"></div>
                         <div class="hiddenHead" style="display:none;">${data.content[userid].head}</div>
@@ -372,11 +370,11 @@ function TalkList() {
                         <div class="taskContent">
                             <div class="taskName">${data.content[userid].nickname}</div>
                             <div class="taskContext">
-                                <span class="message">${lastmsg[i]}</span>
+                                <span class="message">${kkkk.msgType(content,uid)}</span>
                             </div>
                         </div>
                         <div class="contentWrap">
-                            <div class="redIcon">${compileTime(lastMsgTime[i])}</div>
+                            <div class="redIcon">${compileTime(content.int64_time)}</div>
                             <div class="time" style="display:none;">${lastMsgTime[i]}</div>
                             <div class="plusMoney">
                             </div>
@@ -386,11 +384,52 @@ function TalkList() {
                 $('.content').html(html)
                 _this.clickListItem()
                 _this.state()
-                _this.domSort()
+                // _this.domSort()
             }
         })
 
     }
+    // this.renderUserList = function () {
+    //     console.log(this.colls)
+    //     var _this = this;
+    //     var html = '';
+    //     $.ajax({
+    //         url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
+    //         type: "POST",
+    //         dataType: "json",
+    //         async: true,
+    //         data: {
+    //             userIds: menAllId.join(',')
+    //         },
+    //         success: function (data) {
+    //             for (var i = 0; i < menAllId.length; i++) {
+    //                 var userid = menAllId[i]
+    //                 html += ` <li class="item border-1px EverylastBorderDone">
+    //                     <div class="hiddenUserid" style="display:none;">${userid}</div>
+    //                     <div class="taskIcon" style="background-image:url(${data.content[userid].head});"></div>
+    //                     <div class="hiddenHead" style="display:none;">${data.content[userid].head}</div>
+    //                     <div class="hiddenName" style="display:none;">${data.content[userid].nickname}</div>
+    //                     <div class="taskContent">
+    //                         <div class="taskName">${data.content[userid].nickname}</div>
+    //                         <div class="taskContext">
+    //                             <span class="message">${lastmsg[i]}</span>
+    //                         </div>
+    //                     </div>
+    //                     <div class="contentWrap">
+    //                         <div class="redIcon">${compileTime(lastMsgTime[i])}</div>
+    //                         <div class="time" style="display:none;">${lastMsgTime[i]}</div>
+    //                         <div class="plusMoney">
+    //                         </div>
+    //                     </div>
+    //                 </li>`
+    //             }
+    //             $('.content').html(html)
+    //             _this.clickListItem()
+    //             _this.state()
+    //             _this.domSort()
+    //         }
+    //     })
+    // }
     this.outTalkHtml = function () {
         $('.content').removeClass('talkPage')
         $('.accountDefaultStyle').removeClass('accountName')
@@ -553,7 +592,10 @@ function Intalk() {
         timer2 = setInterval(function () {
             $('.content').append(_this.appendNewMsg())
             _this.newMsgHandle($('.itemWrap .content .contextBox').length)
-        }, 1700)
+        }, 1500) // TODO CALLSEND
+        setTimeout(function () {
+            kkkk.clearMaxLength([uid], 100);
+        }, 5000)
     }
     this.getCity = function () {
         $.ajax({
@@ -566,7 +608,7 @@ function Intalk() {
             },
             success(data) {
                 console.log(data)
-                var address = data.content.province + ' ' +data.content.city
+                var address = data.content.province + ' ' + data.content.city
                 $('.mymessage').html($('.mymessage').html() + address)
             }
         })
@@ -851,11 +893,10 @@ function Intalk() {
     this.appendNewMsg = function () {
         var _this = this;
         var html = "";
-        // console.log(lastId)
         $.ajax({
             url: "http://121.46.195.211:13888/delegate/msg/refresh/" + uid + "?",
             type: "POST",
-            async: false,
+            async: true,
             cache: true,
             dataType: "json",
             data: {
@@ -865,11 +906,15 @@ function Intalk() {
                 lastId: _this.max
             },
             success: function (data) {
-                // console.log(data)
+                console.log(data)
                 html = _this.handleNewMsgHtml(data)
+                kkkk.updateReplyLastMsg(uid, data);
+                $(".content").append(html);
+                console.log("---")
+                console.log(html)
             }
         })
-        return html;
+        return "";
     }
     this.handleNewMsgHtml = function (data) {
         var _this = this;
@@ -1024,7 +1069,10 @@ function Intalk() {
             },
             success: function (data) {
                 // console.log(data)
-                $('.content').append(_this.appendNewMsg())
+                setTimeout(function () {
+                    var htmlcontent = _this.appendNewMsg();
+                    $('.content').append(_this.appendNewMsg(htmlcontent))
+                }, 1000);
                 if (data.state == 0) {
                     Base64Img = ""
                 } else {
@@ -1051,7 +1099,8 @@ function Intalk() {
             },
             success: function (data) {
                 // console.log(data)
-                $('.content').append(_this.appendNewMsg())
+                //$('.content').append(_this.appendNewMsg())
+                _this.appendNewMsg()
                 if (data.state == 0) {} else {
                     alert('发送失败')
                     $('.input').val(val)
@@ -1140,7 +1189,7 @@ function Intalk() {
                         success: function (data) {
                             var min = 0;
                             // console.log(_this.min)
-                            console.log(data)
+                            // console.log(data)
                             var handleMSGhtml = "";
                             data.content.reverse()
                             for (var i = 0; i < data.content.length; i++) {
