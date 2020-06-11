@@ -1,5 +1,5 @@
 import "../css/index.scss";
-import kkkk from "./kkkk";
+import record from "./recoed";
 var $ = require('../libs/zepto');
 var timeFormat = require('../libs/timeFormat')
 var cookie = {
@@ -166,7 +166,7 @@ function TalkList() {
         this.outTalkHtml()
         this.scrollPosition()
         setTimeout(function () {
-            kkkk.clearMaxLength([uid], 100);
+            record.clearMaxLength([uid], 100);
         }, 5000)
     }
     this.upData = function (num) {
@@ -183,7 +183,7 @@ function TalkList() {
             },
             success: function (data) {
                 data.content = data.content.reverse();
-                kkkk.updateReplyLastMsg(uid, data);
+                record.updateReplyLastMsg(uid, data);
                 _this.renderUserList();
 
                 if (data.content[0].id > maxid) {
@@ -204,7 +204,7 @@ function TalkList() {
                 // console.log(data)
                 // data.content = data.content.reverse();
                 // var reverseData = data;
-                // kkkk.updateReplyLastMsg(uid, reverseData)
+                // record.updateReplyLastMsg(uid, reverseData)
                 // _this.newMsg(data.content)
                 //_this.renderUserList()
                 //_this.state()
@@ -339,9 +339,8 @@ function TalkList() {
     this.renderUserList = function () {
         var _this = this;
         var html = '';
-
-        var recode = kkkk.getRecode(uid);
-        var recodeList = kkkk.getOrderRecode(uid, recode);
+        var recode = record.getRecode(uid);
+        var recodeList = record.getOrderRecode(uid, recode);
         var userIds = [];
         for (var i in recodeList) {
             var item = recodeList[i];
@@ -358,7 +357,6 @@ function TalkList() {
                 userIds: userIds.join(',')
             },
             success: function (data) {
-                // console.log(data)
                 for (var i = 0; i < userIds.length; i++) {
                     var userid = userIds[i]
                     var content = recode[uid + "-" + userid].content;
@@ -370,7 +368,7 @@ function TalkList() {
                         <div class="taskContent">
                             <div class="taskName">${data.content[userid].nickname}</div>
                             <div class="taskContext">
-                                <span class="message">${kkkk.msgType(content,uid)}</span>
+                                <span class="message">${record.msgType(content,uid)}</span>
                             </div>
                         </div>
                         <div class="contentWrap">
@@ -384,52 +382,10 @@ function TalkList() {
                 $('.content').html(html)
                 _this.clickListItem()
                 _this.state()
-                // _this.domSort()
+                _this.domSort()
             }
         })
-
     }
-    // this.renderUserList = function () {
-    //     console.log(this.colls)
-    //     var _this = this;
-    //     var html = '';
-    //     $.ajax({
-    //         url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
-    //         type: "POST",
-    //         dataType: "json",
-    //         async: true,
-    //         data: {
-    //             userIds: menAllId.join(',')
-    //         },
-    //         success: function (data) {
-    //             for (var i = 0; i < menAllId.length; i++) {
-    //                 var userid = menAllId[i]
-    //                 html += ` <li class="item border-1px EverylastBorderDone">
-    //                     <div class="hiddenUserid" style="display:none;">${userid}</div>
-    //                     <div class="taskIcon" style="background-image:url(${data.content[userid].head});"></div>
-    //                     <div class="hiddenHead" style="display:none;">${data.content[userid].head}</div>
-    //                     <div class="hiddenName" style="display:none;">${data.content[userid].nickname}</div>
-    //                     <div class="taskContent">
-    //                         <div class="taskName">${data.content[userid].nickname}</div>
-    //                         <div class="taskContext">
-    //                             <span class="message">${lastmsg[i]}</span>
-    //                         </div>
-    //                     </div>
-    //                     <div class="contentWrap">
-    //                         <div class="redIcon">${compileTime(lastMsgTime[i])}</div>
-    //                         <div class="time" style="display:none;">${lastMsgTime[i]}</div>
-    //                         <div class="plusMoney">
-    //                         </div>
-    //                     </div>
-    //                 </li>`
-    //             }
-    //             $('.content').html(html)
-    //             _this.clickListItem()
-    //             _this.state()
-    //             _this.domSort()
-    //         }
-    //     })
-    // }
     this.outTalkHtml = function () {
         $('.content').removeClass('talkPage')
         $('.accountDefaultStyle').removeClass('accountName')
@@ -594,8 +550,8 @@ function Intalk() {
             _this.newMsgHandle($('.itemWrap .content .contextBox').length)
         }, 1500) // TODO CALLSEND
         setTimeout(function () {
-            kkkk.clearMaxLength([uid], 100);
-        }, 5000)
+            record.clearMaxLength([uid], 100);
+        }, 20000)
     }
     this.getCity = function () {
         $.ajax({
@@ -607,7 +563,7 @@ function Intalk() {
                 fromUserId: uid
             },
             success(data) {
-                console.log(data)
+                // console.log(data)
                 var address = data.content.province + ' ' + data.content.city
                 $('.mymessage').html($('.mymessage').html() + address)
             }
@@ -808,7 +764,6 @@ function Intalk() {
     }
     this.choseImg = function () {
         $('.click').on('touchstart', function () {
-
             $(this).css("background", "#ccc")
             if ($(this).hasClass('checkImg')) {
                 // return;
@@ -833,9 +788,9 @@ function Intalk() {
             cache: false,
             success: function (data) {
                 for (var i = 0; i < data.content.length; i++) {
-                    huashuHtml += `<li class="huashu_text">${data.content[i]}</li>`
+                    huashuHtml += `<li class="huashu_text">${data.content[i]}</li>`;
                 }
-                $('.huashu_textWrap').html(huashuHtml)
+                $('.huashu_textWrap').html(huashuHtml);
             }
         })
     }
@@ -906,12 +861,10 @@ function Intalk() {
                 lastId: _this.max
             },
             success: function (data) {
-                console.log(data)
+                // console.log(data)
                 html = _this.handleNewMsgHtml(data)
-                kkkk.updateReplyLastMsg(uid, data);
+                record.updateReplyLastMsg(uid, data);
                 $(".content").append(html);
-                console.log("---")
-                console.log(html)
             }
         })
         return "";
@@ -1188,15 +1141,11 @@ function Intalk() {
                         },
                         success: function (data) {
                             var min = 0;
-                            // console.log(_this.min)
-                            // console.log(data)
                             var handleMSGhtml = "";
                             data.content.reverse()
                             for (var i = 0; i < data.content.length; i++) {
                                 if (data.content[i].id < _this.min) {
-                                    // console.log('？')
                                     min = data.content[0].id
-                                    // console.log(_this.min)
                                     var loway = data.content[i].content
                                     var tarid = data.content[i].content.int64_target_user_id
                                     var senid = data.content[i].content.int64_user_id

@@ -140,7 +140,6 @@ function updateReplyLastMsg(userId, data) {
         var item = list[0]; // 最新的
         var prev = recode[key];
         if (!prev || prev.id < item.id) {
-
             recode[key] = item;
         }
     }
@@ -155,7 +154,6 @@ function updateReplyLastMsgOne(userId, item) {
         recode[key] = item;
     }
     setRecode(userId, recode);
-
 }
 
 /**
@@ -164,10 +162,8 @@ function updateReplyLastMsgOne(userId, item) {
  * @return true 全部回复 false 未全部回复
  */
 function verifyReply(userId) {
-
     // 获得当前这个账户的记录
     var recode = getRecode(userId);
-
     for (var key in recode) {
         var item = recode[key];
         if (item.content.int64_user_id != userId) {
@@ -186,7 +182,8 @@ function clearMaxLength(userIds, size) {
     for (var i in userIds) {
         var userId = userIds[i];
         var recode = getRecode(userId);
-        if (recode.length > size) {
+        var len = Object.keys(recode);
+        if (len.length > size) {
             // 1 排序得到按照接受时间倒序 [11111-33333, 11111-44444]
             var sortlist = [];
             for (var key in recode) {
@@ -237,14 +234,12 @@ function clearMaxLength(userIds, size) {
         }
     }
 }
-
 function group(id, data) {
     var arrData = data.content;
     var tb = new Object();
     if (!arrData || arrData.length == 0) {
         return tb;
     }
-
     arrData.forEach(function (item, index) {
         var targetId = item.content.int64_target_user_id;
         var sendId = item.content.int64_user_id;
@@ -267,8 +262,6 @@ function group(id, data) {
     })
     return tb
 }
-
-
 module.exports = {
     group,
     clearMaxLength,

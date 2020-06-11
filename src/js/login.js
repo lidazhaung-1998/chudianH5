@@ -2,7 +2,7 @@ var $ = require('../libs/zepto')
 var backIcon = require('../img/back.png')
 var md5 = require('../libs/md5.js')
 import "../css/login.scss"
-import kkkk from "./kkkk"
+import record from "./recoed"
 var zuixin = []
 document.onreadystatechange = completeLoading;
 
@@ -15,7 +15,6 @@ function completeLoading() {
 }
 completeLoading()
 $(function () {
-
     var cookie = {
         set: function (cookieKey, cookieValue, cookieOpts) {
             var arr = [];
@@ -145,7 +144,6 @@ $(function () {
         this.userids = [] // 该数组存储  20个账户的userid
         this.userContentSelf = []
         this.mcheckArr = []
-        this.scorce = []
         this.city = []
         this.auto = []
         this.index = 0;
@@ -164,10 +162,9 @@ $(function () {
             _this.callGetData() // TODO CALLDATA
             this.clickListItem()
             setTimeout(function () {
-                kkkk.clearMaxLength(_this.userids, 100)
-            }, 5000)
+                record.clearMaxLength(_this.userids, 100)
+            }, 20000)
         }
-
         //存储账号id 和mcheck
         this.getuserContet = function (userid) {
             var _this = this;
@@ -194,27 +191,6 @@ $(function () {
                 }
             })
         }
-        this.getScorce = function () {
-            var self = this;
-            $.each(this.userAccount, function (index, userContent) {
-                $.ajax({
-                    url: "http://cgi-vas.evkeji.cn/sns/cash/userpoint/get?",
-                    type: "POST",
-                    dataType: "json",
-                    async: false,
-                    data: {
-                        userId: userContent.userId,
-                        meck: userContent.userMCheck
-                    },
-                    success: function (req) {
-                        // console.log(req)
-                        self.scorce.push(req.content.balance)
-                    }
-                })
-            })
-
-        }
-
         this.success = function () {
             $('.title').html(` <div class="ListBack"><img src="${backIcon}" alt=""></div>账号列表`)
             $('.loginWrap').css('display', 'none');
@@ -251,17 +227,13 @@ $(function () {
                             <div class="dian"></div>
                                 <span class="weiduMsg"></span>
                                 </div>
-                            <div class="plusMoney">
-                                <!--积分 : <span class="num">${self.scorce[index]}</span>-->
-                            </div>
-                            
+                            <div class="plusMoney"></div>
                         </dd>
                         <div class="hiddenMcheck" style="display:none;">${self.mcheckArr[index]}</div>
                         <div class="time" style="display:none;">0</div>
                         <div class="newId" style="display:none;">${zuixin[index] ? zuixin[index] : 0}</div>
                     </dl>`
             })
-            // this.scorce = []
             $('.itemWrap .content').html(accountHtml)
             this.addRed()
         }
@@ -286,30 +258,26 @@ $(function () {
             // parent.forEach(function (item, index) {
             //     item.querySelectorAll('.dian')[0].getAttribute('style') == "display: block;" ? newArr.push(item) : yepBack.push(item);
             // })
-            // var lastArr = this.FunSort(newArr).concat(this.FunSort(yepBack))
             parent.sort(function (num1, num2) {
-                var td = $(num1).attr("time"); //querySelectorAll('.time')[0].innerText
-                var td2 = $(num2).attr("time"); //querySelectorAll('.time')[0].innerText
+                var td = $(num1).attr("time");
+                var td2 = $(num2).attr("time");
                 var dian1 = $(num1).find('.dian').css('display');
                 var dian2 = $(num2).find('.dian').css('display');
                 var n1 = dian1 == "block" ? 1 : 0;
                 var n2 = dian2 == "block" ? 1 : 0;
                 if (n2 == n1) {
-
                     if (td < td2) {
-                        return 1
+                        return 1;
                     } else if (td == td2) {
-                        return 0
+                        return 0;
                     } else {
-                        return -1
+                        return -1;
                     }
                 } else {
                     return n2 - n1;
                 }
-
-
-
             })
+            // var lastArr = this.FunSort(newArr).concat(this.FunSort(yepBack))
             $('.content').html(parent)
         }
         this.list = function (all) {
@@ -381,40 +349,13 @@ $(function () {
             }
             localStorage.setItem('list', JSON.stringify(list.concat(lastStep)))
         }
-        this.colls = function (id, data) {
-            var arrData = data.content;
-            var tb = new Object();
-            arrData.forEach(function (item, index) {
-                var targetId = item.content.int64_target_user_id;
-                var sendId = item.content.int64_user_id;
-                var lId = 0;
-                var rId = 0;
-                if (targetId == id) {
-                    lId = targetId;
-                    rId = sendId;
-                } else {
-                    lId = sendId;
-                    rId = targetId;
-                };
-                var key = lId + '-' + rId;
-                var colls = tb[key];
-                if (!colls) {
-                    colls = [];
-                    tb[key] = colls
-                }
-                colls.push(item)
-            })
-            return tb
-        }
         this.callGetData = function (t) {
             var _this = t || this;
             var userIds = _this.userids;
             var length = userIds.length;
             var len1 = length == 1 ? 1 : length / 2;
             var len2 = length;
-            console.log(len1, len2)
             var callFunc1 = function (id, data, index) {
-
                 if (index >= len1) {
                     _this.addRed()
                     setTimeout(function () {
@@ -462,7 +403,7 @@ $(function () {
                     lastId: 0
                 },
                 success: function (data) {
-                    kkkk.updateReplyLastMsg(id, data)
+                    record.updateReplyLastMsg(id, data)
                     // var createTime;
                     // if (data.content.length >= 1) {
                     //     if (data.content[0].content.int64_user_id != id) {
@@ -493,8 +434,7 @@ $(function () {
             var userIds = _this.userids;
             for (var i in userIds) {
                 var userId = userIds[i];
-                var state = kkkk.verifyReply(userId);
-                // console.log(state)
+                var state = record.verifyReply(userId);
                 var dom = $('#u' + userId);
                 if (state) {
                     // 没红点
@@ -503,122 +443,14 @@ $(function () {
                     // 有红点
                     dom.find('.dian').css('display', 'block')
                 }
-                var recode = kkkk.getRecode(userId);
-                var orderRecode = kkkk.getOrderRecode(userId, recode);
+                var recode = record.getRecode(userId);
+                var orderRecode = record.getOrderRecode(userId, recode);
                 if (orderRecode && orderRecode.length > 0) {
                     dom.attr("time", orderRecode[0].time);
                 }
-
             }
             var items = $(".content .item");
             _this.mySort(items);
-        }
-        // this.getCity = function () {
-        //     var _this = this;
-        //     $.ajax({
-        //         url: "http://cgi-base.evkeji.cn/sns/base/location/getLocation?",
-        //         type: "POST",
-        //         async: true,
-        //         data: {
-        //             userId: _this.userids[_this.getCityIndex],
-        //             fromUserId: _this.userids[_this.getCityIndex]
-        //         },
-        //         success(data) {
-        //             var address = data.content.province + data.content.city
-        //             var id = data.content.userId
-        //             var dom = $('#u' + id)
-        //             var msgDom = dom.find('.message')
-        //             var info = msgDom.html()
-        //             var newText = info.substr(0, info.lastIndexOf('|'))
-        //             newText = newText + address
-        //             msgDom.html(newText)
-        //             _this.getCityIndex++
-        //             if (_this.getCityIndex >= _this.userids.length) {
-        //                 _this.getCityIndex = 0
-        //                 _this.getData()
-        //                 return;
-        //             } else {
-        //                 _this.getCity()
-        //             }
-        //         }
-        //     })
-        // }
-        this.getMsg = function () {
-            var arr = [];
-            var obj = {}
-            zuixin = []
-            var _this = this
-            $.each(this.userAccount, function (idx, item) {
-                $.ajax({
-                    url: "http://121.46.195.211:13888/delegate/msg/refresh/" + item.userId + "?",
-                    type: "POST",
-                    async: true,
-                    dataType: "json",
-                    data: {
-                        limit: 20,
-                        targetId: "",
-                        token: token,
-                        lastId: 0
-                    },
-                    success: function (data) {
-                        // console.log(data)
-                        if (data.state != 0) {
-                            alert('出错了~' + idx)
-                        }
-                        if (data.content.length) {
-                            arr.push(data.content)
-                            _this.auto.push(data.content)
-                        }
-
-                    }
-
-                })
-            })
-
-            for (var i = 0; i < arr.length; i++) {
-                zuixin.push(arr[i][0].id)
-                $('.content .item .time').eq(i).html(arr[i][0].content.int64_time)
-                if (la[i] != undefined) {
-                    if (arr[i][0].id > la[i]) {
-                        la[i] = arr[i][0].id
-                        $('.content .item').each(function (index, item) {
-                            if ($(this).find('.hiddenUserid').html() == arr[i][0].content.int64_target_user_id) {
-                                var name = $(this).find('.taskName').html()
-                                for (var l = 0; l < _this.bb.length; l++) {
-                                    if (_this.bb[l].text.indexOf(name) != -1) {
-                                        _this.bb[l].state = false
-                                    }
-                                }
-                            }
-                        })
-                    }
-                } else {
-                    la.push(arr[i][0].id)
-                }
-                if (arr[i][0].content.int64_user_id != _this.userAccount[i].userId) {
-                    if ((arr[i][0].id > _this.bb[i].id)) {
-                        $('.content .item').each(function (ind, item) {
-                            var name = $(this).find('.taskName').html()
-                            if (_this.bb[i].text == name) {
-                                _this.bb[i].state = false
-                            }
-                        })
-                    }
-                }
-
-                for (var j = 0; j < arr[i].length; j++) {
-                    if (arr[i][j].content.int64_target_user_id == _this.userAccount[i].userId) {
-                        if (obj[arr[i][j].content.int64_target_user_id]) {
-                            obj[arr[i][j].content.int64_target_user_id]++
-                        } else {
-                            obj[arr[i][j].content.int64_target_user_id] = 1
-                        }
-                    }
-
-                }
-            }
-            localStorage.setItem('bb', JSON.stringify(_this.bb))
-            // console.log(la)
         }
         this.clickListItem = function () {
             $('.content .item').tap(function () {
@@ -629,7 +461,7 @@ $(function () {
                 var myMcheck = $(this).find('.hiddenMcheck').html()
                 // window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid;
                 window.location.href = `http://192.168.25.126:8080/talk.html?uid=${uid}`;
-                cookie.set('uid', uid)
+                cookie.set('uid', uid);
                 cookie.set('mcheck', myMcheck)
                 cookie.set('nickname', nickname)
                 cookie.set('myMSG', myMSG)
@@ -655,29 +487,3 @@ $(function () {
         cookie.set('token', token)
     }
 })
-
-
-
-// for (i in json) {
-//     var item = json[i];
-//     var targetId = item.targetId;
-//     var sendId = item.sendId;
-//     var lId = 0;
-//     var rId = 0;
-
-//     if (targetId == userId) {
-//         lId = targetId;
-//         rid = sendId;
-//     } else {
-//         rId = targetId;
-//         lid = sendId;
-//     }
-//     var key = lid + "-" + rId;
-//     var colls = tb[key];
-//     if (!colls) {
-//         colls = [];
-//         tb[key] = colls;
-//     }
-//     colls.push(item);
-// }
-// return tb;
