@@ -5,7 +5,7 @@
 
     2 开启一个线程 每隔一段时间执行，校验用户的红点，并操作dom位置。
       获取userIds (用户ID集合) 循环调用 verifyReply(userId)
-      返回 true false，如果时真，则没有红点，假有红点，并且将当前dom节点置顶。
+      返回 true false，如果是true，则没有红点，假有红点，并且将当前dom节点置顶。
 
     3 开启一个线程 每隔一段时间执行，用于清理超过长度的列表。
       调用 clearMaxLength(userIds, 100);
@@ -63,7 +63,6 @@ function getOrderRecode(userId, recode) {
         };
         sortlist.push(item);
     }
-
     /* recode = {
         "430153271-430084866": {
         "id": 3736,
@@ -99,7 +98,6 @@ function getOrderRecode(userId, recode) {
     });
     return sortlist;
 }
-
 function msgType(content, uid) {
     if (content.int64_user_id == uid) {
         return '已回复'
@@ -139,6 +137,7 @@ function updateReplyLastMsg(userId, data) {
         var list = tb[key]; // key = 11111-33333 val = {}
         var item = list[0]; // 最新的
         var prev = recode[key];
+        // console.log(prev)
         if (!prev || prev.id < item.id) {
             recode[key] = item;
         }
@@ -147,12 +146,25 @@ function updateReplyLastMsg(userId, data) {
     setRecode(userId, recode);
 }
 
-function updateReplyLastMsgOne(userId, item) {
+function updateReplyLastMsgOne(userId, data) {
+    var tb = group(userId, data);
+    // 获得当前这个账户的记录
     var recode = getRecode(userId);
-    var prev = recode[key];
-    if (!prev && prev.id < item.id) {
-        recode[key] = item;
+    /*
+        {
+            "11111-33333":[item0],
+            "11111-55555":[item1]
+        }   
+    */
+    for (var key in tb) {
+        var list = tb[key]; // key = 11111-33333 val = {}
+        var item = list[list.length - 1]; // 最新的
+        var prev = recode[key];
+        if (!prev || prev.id < item.id) {
+            recode[key] = item;
+        }
     }
+    // 将记录覆盖
     setRecode(userId, recode);
 }
 
@@ -234,6 +246,7 @@ function clearMaxLength(userIds, size) {
         }
     }
 }
+
 function group(id, data) {
     var arrData = data.content;
     var tb = new Object();

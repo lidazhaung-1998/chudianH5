@@ -161,7 +161,7 @@ $(function () {
             // this.getCity()
             _this.callGetData() // TODO CALLDATA
             this.clickListItem()
-            setTimeout(function () {
+            setInterval(function () {
                 record.clearMaxLength(_this.userids, 100)
             }, 20000)
         }
@@ -390,9 +390,8 @@ $(function () {
             var _this = t || this;
             //var id = _this.userids[_this.index]
             var id = _this.userids[index];
-
             $.ajax({
-                url: "http://121.46.195.211:13888/delegate/msg/refresh/" + id + "?",
+                url: "http://121.46.195.211:13888/delegate/msg/refresh/" + id,
                 type: "POST",
                 async: true,
                 dataType: "json",
@@ -404,26 +403,6 @@ $(function () {
                 },
                 success: function (data) {
                     record.updateReplyLastMsg(id, data)
-                    // var createTime;
-                    // if (data.content.length >= 1) {
-                    //     if (data.content[0].content.int64_user_id != id) {
-                    //         createTime = data.content[0].content.int64_time
-                    //     } else {
-                    //         createTime = 0
-                    //     }
-                    // } else {
-                    //     createTime = 0
-                    // }
-                    // $("#u" + id).find('.time').html(createTime)
-                    // _this.index++
-                    // if (_this.index >= _this.userAccount.length) {
-                    //     _this.addRed()
-                    //     setTimeout(function () {
-                    //         _this.getData(_this);
-                    //     }, 3000);
-                    // } else {
-                    //     _this.getData();
-                    // }
                     callFunc(id, data, index);
                 }
 

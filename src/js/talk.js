@@ -60,7 +60,7 @@ var cookie = {
 };
 var amr;
 
-var year, month, day, hours, minute, seconds, Base64Img = "" //记录现在时间
+var year, month, day, hours, minute, seconds, Base64Img = ""; //记录现在时间
 getNowTime() //获取现在时间函数
 var enCodeNickName = decodeURIComponent(cookie.get('nickname')) //获取当前账号昵称
 var nickname = decodeURIComponent(enCodeNickName) //虚拟女账号昵称
@@ -90,6 +90,7 @@ function getNowTime() {
     minute = nowDate.substr(14, 2)
     seconds = nowDate.substr(17, 2)
 }
+
 getScorce()
 
 function getScorce() {
@@ -165,9 +166,9 @@ function TalkList() {
         }, 2000)
         this.outTalkHtml()
         this.scrollPosition()
-        setTimeout(function () {
+        setInterval(function () {
             record.clearMaxLength([uid], 100);
-        }, 5000)
+        }, 20000)
     }
     this.upData = function (num) {
         var _this = this;
@@ -182,146 +183,42 @@ function TalkList() {
                 token: token
             },
             success: function (data) {
-                data.content = data.content.reverse();
-                record.updateReplyLastMsg(uid, data);
-                _this.renderUserList();
-
-                if (data.content[0].id > maxid) {
-                    maxid = data.content[0].id;
+                if (data.content.length > 0) {
+                    if ((data.content[0].id) < data.content[data.content.length - 1].id) {
+                        data.content = data.content.reverse();
+                    }
+                    record.updateReplyLastMsg(uid, data);
+                    _this.renderUserList();
+                    if (data.content[0].id > maxid) {
+                        maxid = data.content[0].id;
+                    }
                 }
-                //bl = true
-                // for (var i = 0; i < data.content.length; i++) {
-                // if (data.content[i].id > maxid) {
-                // console.log(_this.colls)
-                // if (_this.colls[1] == data.content[i].content.int64_target_user_id)
-                // maxid = data.content[i].id
-                // if (_this.flag) {
-                // _this.handleArray(data.content)
-
-                //_this.flag = false
-                // } else {
-                // if (bl) {
-                // console.log(data)
-                // data.content = data.content.reverse();
-                // var reverseData = data;
-                // record.updateReplyLastMsg(uid, reverseData)
-                // _this.newMsg(data.content)
-                //_this.renderUserList()
-                //_this.state()
-                // }
-                // }
-                // }
-                // }
-
             }
         })
     }
     this.state = function () {
         $('.message').each(function (index, item) {
             if ($(this).html() == "已回复") {
-                $(this).css("color", "green")
+                $(this).css("color", "green");
             } else {
-                $(this).css("color", "red")
+                $(this).css("color", "red");
             }
         })
     }
-    this.handleArray = function (arr) {
-        for (var i = 0; i < arr.length; i++) {
-            // 发送者消息接收者是当前虚拟女号得id才是正确未读消息
-            if (arr[i].content.int64_user_id != uid) {
-                if (obj[arr[i].content.int64_user_id]) {
-                    obj[arr[i].content.int64_user_id]++
-                } else {
-                    obj[arr[i].content.int64_user_id] = 1
-                }
-            }
-        }
-        for (var at in obj) {
-            if (at != uid) {
-                menAllId.push(at)
-                msgLength.push(obj[at])
-            }
-        }
-        this.lastMSGData()
-        menAllId = menAllId.reverse()
-        msgLength = msgLength.reverse()
-    }
-    this.lastMSGData = function () {
-        for (var i = 0; i < menAllId.length; i++) {
-            $.ajax({
-                url: "http://121.46.195.211:13888/delegate/msg/refresh/" + uid,
-                type: "GET",
-                async: false,
-                data: {
-                    limit: 1,
-                    targetId: menAllId[i],
-                    lastId: 0,
-                    token: token
-                },
-                success: function (data) {
-                    lastMsgTime.push(data.content[0].content.int64_time)
-                    if (data.content[0].content.string_tp == "QI:FlatterMsg") {
-                        lastmsg[i] = '搭讪消息'
-                    } else if (data.content[0].content.string_tp == "RC:VcMsg") {
-                        lastmsg[i] = "语音消息"
-                    } else if (data.content[0].content.string_tp == "RC:ImgMsg") {
-                        lastmsg[i] = "图片"
-                    } else if (data.content[0].content.string_tp == "RC:SightMsg") {
-                        lastmsg[i] = "视频消息"
-                    } else if (data.content[0].content.string_tp == "RC:TxtMsg") {
-                        lastmsg[i] = data.content[0].content.msg_user_private.string_content
-                    } else if (data.content[0].content.string_tp == "QI:GiftMsg") {
-                        lastmsg[i] = "收到了对方送出的礼物"
-                    }
-                    if (data.content[0].content.int64_user_id == uid) {
-                        lastmsg[i] = '已回复'
-                    }
-                }
 
-            })
-        }
-        lastMsgTime.reverse()
-        lastmsg = lastmsg.reverse()
-    }
-    this.newMsg = function (newArr) {
-        menAllId = []
-        msgLength = []
-        loop = []
-        lastMsgTime = []
-        for (var i = 0; i < newArr.length; i++) {
-
-            if (obj[newArr[i].content.int64_user_id]) {
-                obj[newArr[i].content.int64_user_id]++
-            } else {
-                obj[newArr[i].content.int64_user_id] = 1
-            }
-
-
-        }
-        for (var ar in obj) {
-            if (ar != uid) {
-                menAllId.push(ar)
-                msgLength.push(obj[ar])
-            }
-        }
-        this.lastMSGData()
-        lastmsg.reverse()
-        lastMsgTime = lastMsgTime.reverse()
-        bl = false
-    }
     this.Funsort = function aaa(arr) {
         arr.sort(function (t1, t2) {
             var one = t1.querySelectorAll('.time')[0].innerText;
             var two = t2.querySelectorAll('.time')[0].innerText;
             if (one < two) {
-                return 1
+                return 1;
             } else if (one == two) {
-                return 0
+                return 0;
             } else {
-                return -1
+                return -1;
             }
         })
-        return arr
+        return arr;
     }
     this.domSort = function () {
         var domArr = Array.apply(Array, document.querySelectorAll('.content .item'))
@@ -347,7 +244,6 @@ function TalkList() {
             var userId = item["userId2"];
             userIds.push(userId);
         }
-
         $.ajax({
             url: "http://cgi-base.evkeji.cn/sns/base/userinfo/gets?",
             type: "POST",
@@ -357,6 +253,10 @@ function TalkList() {
                 userIds: userIds.join(',')
             },
             success: function (data) {
+                var mod = $('.content').attr("content-mod");
+                if (mod && mod != "" && mod == "chat") { // CALLLIST
+                    return;
+                }
                 for (var i = 0; i < userIds.length; i++) {
                     var userid = userIds[i]
                     var content = recode[uid + "-" + userid].content;
@@ -397,7 +297,7 @@ function TalkList() {
     }
 
     //点击好友列表项
-    this.clickListItem = function () {
+    this.clickListItem = function () { // CALLClICK
         var _this = this;
         $('.item').tap(function () {
             istalk = true //区分是退出到好友列表页or退出好友列表页
@@ -408,14 +308,14 @@ function TalkList() {
             clearInterval(timerUpdata)
             intalk.init() //进入聊天界面
             inTalk = true
+            $(".content").attr("content-mod", "chat");
+            $('.content').css('padding-bottom', '2rem')
         })
     }
     this.scrollPosition = function () {
         this.scrollT == 0 ? $('.itemWrap').scrollTop(0) : $('.itemWrap').scrollTop(this.scrollT)
     }
 }
-
-
 
 // 聊天界面
 function Intalk() {
@@ -547,9 +447,9 @@ function Intalk() {
 
         timer2 = setInterval(function () {
             $('.content').append(_this.appendNewMsg())
-            _this.newMsgHandle($('.itemWrap .content .contextBox').length)
+            _this.newMsgHandle($('.itemWrap .content .contextBox').length) // CALLnewMsgHandle
         }, 1500) // TODO CALLSEND
-        setTimeout(function () {
+        setInterval(function () {
             record.clearMaxLength([uid], 100);
         }, 20000)
     }
@@ -572,12 +472,12 @@ function Intalk() {
     this.getTalkMsg = function () {
         var self = this;
         $.ajax({
-            url: "http://121.46.195.211:13888/delegate/msg/refresh/" + uid + "?",
+            url: "http://121.46.195.211:13888/delegate/msg/refresh/" + uid,
             type: "POST",
             async: false,
             dataType: "json",
             data: {
-                limit: "",
+                limit: 100,
                 targetId: menId,
                 token: token,
                 lastId: 0
@@ -717,7 +617,7 @@ function Intalk() {
             var newSrc = $(this).find('audio').attr('src').substr(34)
             var src = $(this).find('audio').attr()
             amr = new BenzAMRRecorder()
-            amr.initWithUrl("/api" + newSrc).then(function () {
+            amr.initWithUrl(newSrc).then(function () {
                 if (item.getAttribute("playing")) {
                     amr.stop()
                     item.removeAttribute("playing")
@@ -785,7 +685,6 @@ function Intalk() {
         $.ajax({
             url: "http://121.46.195.211:13888/delegate/res/quickreplylist/" + uid,
             type: "POST",
-            cache: false,
             success: function (data) {
                 for (var i = 0; i < data.content.length; i++) {
                     huashuHtml += `<li class="huashu_text">${data.content[i]}</li>`;
@@ -840,7 +739,6 @@ function Intalk() {
             var len = $('.content .contextBox').length;
             _this.nowMySendMsg = len - 1
             $('.itemWrap').scrollTop($('.content .contextBox').get(len - 1).offsetTop)
-            // _this.sendMsg()
             $(this).val('')
         })
 
@@ -849,22 +747,25 @@ function Intalk() {
         var _this = this;
         var html = "";
         $.ajax({
-            url: "http://121.46.195.211:13888/delegate/msg/refresh/" + uid + "?",
+            url: "http://121.46.195.211:13888/delegate/msg/refresh/" + uid,
             type: "POST",
             async: true,
-            cache: true,
             dataType: "json",
             data: {
-                limit: "",
+                limit: 100,
                 targetId: menId,
                 token: token,
                 lastId: _this.max
             },
             success: function (data) {
+                var mod = $(".content").attr("content-mod");
+                if (mod && mod == "chat") {
+                    html = _this.handleNewMsgHtml(data)
+                    record.updateReplyLastMsgOne(uid, data);
+                    $(".content").append(html);
+                }
                 // console.log(data)
-                html = _this.handleNewMsgHtml(data)
-                record.updateReplyLastMsg(uid, data);
-                $(".content").append(html);
+                // console.log(_this.max)
             }
         })
         return "";
@@ -1024,7 +925,7 @@ function Intalk() {
                 // console.log(data)
                 setTimeout(function () {
                     var htmlcontent = _this.appendNewMsg();
-                    $('.content').append(_this.appendNewMsg(htmlcontent))
+                    $('.content').append(_this.appendNewMsg(htmlcontent));
                 }, 1000);
                 if (data.state == 0) {
                     Base64Img = ""
@@ -1051,11 +952,11 @@ function Intalk() {
                 targetId: menId
             },
             success: function (data) {
-                // console.log(data)
-                //$('.content').append(_this.appendNewMsg())
                 _this.appendNewMsg()
-                if (data.state == 0) {} else {
-                    alert('发送失败')
+                if (data.state == 0) {
+
+                } else {
+                    alert('发送失败,"错误码：' + data.state)
                     $('.input').val(val)
                 }
             },
@@ -1110,77 +1011,84 @@ function Intalk() {
         var _scroll = "";
         var _touch = "";
         var flag = true;
-
         $('.itemWrap').on('touchstart', function (e) {
-            x = e.touches[0].clientY
+            x = e.touches[0].clientY;
+            var f = $('.content').attr('content-mod')
+            if (f && f == "chat") {
+                $('.itemWrap').on('touchmove', function (e) {
+                    _touch = e.touches[0].clientY
+                    _scroll = $('.itemWrap').scrollTop()
+                    if (_scroll <= 0) {
+                        $('.itemWrap').css({
+                            "transform": "transLateY(" + (_touch - x) / 3.5 + "px)",
+                            "transition": "transform linear"
+                        })
+                    }
+                    var scrollHiddenTop = $('.itemWrap').css('transform').substr(11, 2)
+                    if (scrollHiddenTop >= 50) {
+                        if (flag) {
+                            $.ajax({
+                                url: "http://121.46.195.211:13888/delegate/msg/history/" + uid + "?",
+                                type: "POST",
+                                async: false,
+                                cache: true,
+                                dataType: "json",
+                                data: {
+                                    limit: 100,
+                                    targetId: menId,
+                                    token: token,
+                                    lastId: _this.min
+                                },
+                                success: function (data) {
+                                    var min = 0;
+                                    var handleMSGhtml = "";
+                                    data.content.reverse()
+                                    for (var i = 0; i < data.content.length; i++) {
+                                        if (data.content[i].id < _this.min) {
+                                            min = data.content[0].id
+                                            var loway = data.content[i].content
+                                            var tarid = data.content[i].content.int64_target_user_id
+                                            var senid = data.content[i].content.int64_user_id
+                                            handleMSGhtml += _this.addFun(loway, tarid, senid)
+                                        }
 
-        })
-        $('.itemWrap').on('touchmove', function (e) {
-            _touch = e.touches[0].clientY
-            _scroll = $('.itemWrap').scrollTop()
-            if (_scroll <= 0) {
-                $('.itemWrap').css({
-                    "transform": "transLateY(" + (_touch - x) / 3.5 + "px)",
-                    "transition": "transform linear"
-                })
-            }
-            var scrollHiddenTop = $('.itemWrap').css('transform').substr(11, 2)
-            if (scrollHiddenTop >= 50) {
-                if (flag) {
-                    $.ajax({
-                        url: "http://121.46.195.211:13888/delegate/msg/history/" + uid + "?",
-                        type: "POST",
-                        async: false,
-                        cache: true,
-                        dataType: "json",
-                        data: {
-                            limit: 100,
-                            targetId: menId,
-                            token: token,
-                            lastId: _this.min
-                        },
-                        success: function (data) {
-                            var min = 0;
-                            var handleMSGhtml = "";
-                            data.content.reverse()
-                            for (var i = 0; i < data.content.length; i++) {
-                                if (data.content[i].id < _this.min) {
-                                    min = data.content[0].id
-                                    var loway = data.content[i].content
-                                    var tarid = data.content[i].content.int64_target_user_id
-                                    var senid = data.content[i].content.int64_user_id
-                                    handleMSGhtml += _this.addFun(loway, tarid, senid)
+                                    }
+                                    _this.min = min
+                                    $('.content').prepend(handleMSGhtml)
+                                    flag = false
                                 }
-
-                            }
-                            _this.min = min
-                            $('.content').prepend(handleMSGhtml)
-                            flag = false
+                            })
                         }
-                    })
-                }
-            }
-            if (scrollHiddenTop <= 30) {
-                flag = true
-            }
-        })
-        $('.itemWrap').on('touchend', function (e) {
-            if (_scroll <= 0) {
-                $('.itemWrap').css({
-                    "transform": "transLateY(0px)",
-                    "transition": "transform .5s linear"
+                    }
+                    if (scrollHiddenTop <= 30) {
+                        flag = true
+                    }
                 })
+                $('.itemWrap').on('touchend', function (e) {
+                    if (_scroll <= 0) {
+                        $('.itemWrap').css({
+                            "transform": "transLateY(0px)",
+                            "transition": "transform .5s linear"
+                        })
+                    }
+                })
+            } else {
+                $('.itemWrap').unbind('touchmove');
+                $('.itemWrap').unbind('touchend');
             }
         })
-
     }
 
     this.newMsgHandle = function (len) {
+        var contextBox = $('.content .contextBox');
+        if (!contextBox || contextBox.length == 0) {
+            $('.itemWrap').scrollTop(1000000);
+            return;
+        }
         var num = $('.content .contextBox').eq(this.initLength - 1).offset().top;
-        if (num < 560 && num > 0) {
+        if (num < 600 && num > 0) {
             $('.itemWrap').scrollTop($('.content .contextBox').get(len - 1).offsetTop)
         }
-        // this.audioLength()
         this.initLength = len
     }
 }
@@ -1195,11 +1103,14 @@ function Intalk() {
 $('.ListBack').tap(function () {
     if (istalk) {
         clearInterval(timer2)
+        $(".content").html("")
+        $(".content").removeAttr("content-mod");
         talkList.init()
         getNowTime()
         istalk = false
         $('.app').removeAttr('style')
         $('.input').val('')
+        $('.content').removeAttr('style')
     } else {
         // window.location.href = "http://123.57.87.160:80/cd/login.html";
         window.location.href = "http://192.168.25.126:8080/login.html";
@@ -1230,54 +1141,54 @@ function isLoginOut() {
 
 
 
-// var obj = $("#file");
-// var fileName = obj.val(); //上传的本地文件绝对路径
-// var suffix = fileName.substring(fileName.lastIndexOf("."), fileName.length); //后缀名
-// var file = obj.get(0).files[0]; //上传的文件
-// var size = file.size > 1024 ? file.size / 1024 > 1024 ? file.size / (1024 * 1024) > 1024 ? (file.size / (1024 * 1024 * 1024)).toFixed(2) + 'GB' : (file.size /
-//     (1024 * 1024)).toFixed(2) + 'MB' : (file.size /
-//     1024).toFixed(2) + 'KB' : (file.size).toFixed(2) + 'B'; //文件上传大小
+/*var obj = $("#file");
+var fileName = obj.val(); //上传的本地文件绝对路径
+var suffix = fileName.substring(fileName.lastIndexOf("."), fileName.length); //后缀名
+var file = obj.get(0).files[0]; //上传的文件
+var size = file.size > 1024 ? file.size / 1024 > 1024 ? file.size / (1024 * 1024) > 1024 ? (file.size / (1024 * 1024 * 1024)).toFixed(2) + 'GB' : (file.size /
+    (1024 * 1024)).toFixed(2) + 'MB' : (file.size /
+    1024).toFixed(2) + 'KB' : (file.size).toFixed(2) + 'B'; //文件上传大小
 
-// $.ajax({
-//     type: 'post',
-//     url: "/QiniuUpToken",
-//     data: {
-//         "suffix": suffix
-//     },
-//     dataType: 'json',
-//     success: function (result) {
-//         if (result.success == 1) {
-//             var observer = { //设置上传过程的监听函数
-//                 next(result) { //上传中(result参数带有total字段的 object，包含loaded、total、percent三个属性)
-//                     Math.floor(result.total.percent); //查看进度[loaded:已上传大小(字节);total:本次上传总大小;percent:当前上传进度(0-100)]
-//                 },
-//                 error(err) { //失败后
-//                     alert(err.message);
-//                 },
-//                 complete(res) { //成功后
-//                     // ?imageView2/2/h/100：展示缩略图，不加显示原图
-//                     // ?vframe/jpg/offset/0/w/480/h/360：用于获取视频截图的后缀，0：秒，w：宽，h：高
-//                     $("#image").attr("src", result.domain + result.imgUrl + "?imageView2/2/w/400/h/400/q/100");
-//                 }
-//             };
-//             var putExtra = {
-//                 fname: "", //原文件名
-//                 params: {}, //用来放置自定义变量
-//                 mimeType: null //限制上传文件类型
-//             };
-//             var config = {
-//                 region: qiniu.region.z2, //存储区域(z0:代表华东;z2:代表华南,不写默认自动识别)
-//                 concurrentRequestLimit: 3 //分片上传的并发请求量
-//             };
-//             var observable = qiniu.upload(file, result.imgUrl, result.token, putExtra, config);
-//             var subscription = observable.subscribe(observer); // 上传开始
-//             // 取消上传
-//             // subscription.unsubscribe();
-//         } else {
-//             alert(result.message); //获取凭证失败
-//         }
-//     },
-//     error: function () { //服务器响应失败处理函数
-//         alert("服务器繁忙");
-//     }
-// });
+$.ajax({
+    type: 'post',
+    url: "/QiniuUpToken",
+    data: {
+        "suffix": suffix
+    },
+    dataType: 'json',
+    success: function (result) {
+        if (result.success == 1) {
+            var observer = { //设置上传过程的监听函数
+                next(result) { //上传中(result参数带有total字段的 object，包含loaded、total、percent三个属性)
+                    Math.floor(result.total.percent); //查看进度[loaded:已上传大小(字节);total:本次上传总大小;percent:当前上传进度(0-100)]
+                },
+                error(err) { //失败后
+                    alert(err.message);
+                },
+                complete(res) { //成功后
+                    // ?imageView2/2/h/100：展示缩略图，不加显示原图
+                    // ?vframe/jpg/offset/0/w/480/h/360：用于获取视频截图的后缀，0：秒，w：宽，h：高
+                    $("#image").attr("src", result.domain + result.imgUrl + "?imageView2/2/w/400/h/400/q/100");
+                }
+            };
+            var putExtra = {
+                fname: "", //原文件名
+                params: {}, //用来放置自定义变量
+                mimeType: null //限制上传文件类型
+            };
+            var config = {
+                region: qiniu.region.z2, //存储区域(z0:代表华东;z2:代表华南,不写默认自动识别)
+                concurrentRequestLimit: 3 //分片上传的并发请求量
+            };
+            var observable = qiniu.upload(file, result.imgUrl, result.token, putExtra, config);
+            var subscription = observable.subscribe(observer); // 上传开始
+            // 取消上传
+            // subscription.unsubscribe();
+        } else {
+            alert(result.message); //获取凭证失败
+        }
+    },
+    error: function () { //服务器响应失败处理函数
+        alert("服务器繁忙");
+    }
+});*/
