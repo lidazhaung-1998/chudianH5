@@ -40,8 +40,38 @@ function setRecode(userId, recode) {
     localStorage.setItem(recodeKey, JSON.stringify(recode));
 }
 
+function getBlackList(uid) {
+    var balckKey = "u-black" + uid;
+    var b_recode = JSON.parse(localStorage.getItem(balckKey));
+    if (!b_recode) {
+        b_recode = {};
+    }
+    return b_recode;
+}
+
+function setBlackList(uid, b_recode) {
+    var balckKey = "u-black" + uid;
+    var b_recode = localStorage.setItem(balckKey, JSON.stringify(b_recode));
+}
+
+function removeOneTalkList(id, removeId) {
+    var b_recode = getBlackList(id);
+    var removeKey = id + "-" + removeId;
+    if (!Object.keys(b_recode).length) {
+        b_recode[removeKey] = true;
+        setBlackList(id, b_recode);
+    }
+    for (key in b_recode) {
+        if (key.indexOf(removeKey) == -1) { //没有
+            b_recode[removeKey] = true;
+            setBlackList(id, b_recode);
+        }
+    }
+}
+
 function getOrderRecode(userId, recode) {
     var sortlist = [];
+    var b_recode = getBlackList(userId);
     for (key in recode) {
         var userId1 = userId;
         var userId2 = userId;
@@ -61,7 +91,9 @@ function getOrderRecode(userId, recode) {
             "userId2": userId2,
             "recv": recv,
         };
-        sortlist.push(item);
+        if (!b_recode[key]) {
+            sortlist.push(item);
+        }
     }
     /* recode = {
         "430153271-430084866": {
@@ -89,33 +121,33 @@ function getOrderRecode(userId, recode) {
         var num1 = o1.time;
         var num2 = o2.time;
         if (num2 > num1) {
-            return 1
+            return 1;
         } else if (num2 == num1) {
-            return 0
+            return 0;
         } else {
-            return -1
+            return -1;
         }
     });
     return sortlist;
 }
+
 function msgType(content, uid) {
     if (content.int64_user_id == uid) {
-        return '已回复'
+        return '已回复';
     }
     if (content.string_tp == "QI:FlatterMsg") {
-        return '搭讪消息'
+        return '搭讪消息';
     } else if (content.string_tp == "RC:VcMsg") {
-        return "语音消息"
+        return "语音消息";
     } else if (content.string_tp == "RC:ImgMsg") {
-        return "图片"
+        return "图片";
     } else if (content.string_tp == "RC:SightMsg") {
-        return "视频消息"
+        return "视频消息";
     } else if (content.string_tp == "RC:TxtMsg") {
         return content.msg_user_private.string_content
     } else if (content.string_tp == "QI:GiftMsg") {
-        return "收到了对方送出的礼物"
+        return "收到了对方送出的礼物";
     }
-
 }
 
 /** 更新记录最后一条回复的消息
@@ -137,7 +169,6 @@ function updateReplyLastMsg(userId, data) {
         var list = tb[key]; // key = 11111-33333 val = {}
         var item = list[0]; // 最新的
         var prev = recode[key];
-        // console.log(prev)
         if (!prev || prev.id < item.id) {
             recode[key] = item;
         }
@@ -185,12 +216,16 @@ function verifyReply(userId) {
     return true;
 }
 
+
+
 /**
  * 清理超过最大长度的用户。只保留 一部分数据
  * @param userIds 所有子账户ID集合
  * @param size 保留多少个用户
  */
+
 function clearMaxLength(userIds, size) {
+    console.log(userIds)
     for (var i in userIds) {
         var userId = userIds[i];
         var recode = getRecode(userId);
@@ -205,44 +240,26 @@ function clearMaxLength(userIds, size) {
                 };
                 sortlist.push(item);
             }
-
-            /* recode = {
-                "430153271-430084866": {
-                "id": 3736,
-                "content": {
-                    "uint32_cmd": 5,
-                    "int64_user_id": 430084866,
-                    "int64_time": 1591354368416,
-                    "string_order_id": "0b770df7-9859-4445-a8ae-528c28740877",
-                    "msg_user_flatter": {
-                        "string_image_url": "http://snszone.oss-cn-beijing.aliyuncs.com/files/goods/20200327/10000/10000-1585277936_946.png",
-                        "string_content": "收到搭讪礼物",
-                        "int64_goods_id": 10040,
-                        "uint32_goods_num": 1,
-                        "uint32_out_amount": 0,
-                        "uint32_type": 4
-                    },
-                    "string_tp": "QI:FlatterMsg",
-                    "int64_target_user_id": 430153271
-                    }
-                }
-            }*/
             // 排序
-            sortlist.sort(function (o1, o2) {
-                var num1 = o1.time;
-                var num2 = o2.time;
-                if (num2 > num1) {
-                    return 1
-                } else if (num2 == num1) {
-                    return 0
-                } else {
-                    return -1
-                }
-            })
+            sortlist.sort(compare("tiem"));
             for (var i = size; i < sortlist.length; i++) {
                 var key = sortlist[i].key;
                 delete recode[key];
             }
+        }
+        setRecode(userId, recode)
+    }
+}
+function compare(key) {
+    return function (o1, o2) {
+        var num1 = o1[key];
+        var num2 = o2[key];
+        if (num2 > num1) {
+            return 1;
+        } else if (num2 == num1) {
+            return 0;
+        } else {
+            return -1;
         }
     }
 }
@@ -283,5 +300,6 @@ module.exports = {
     getRecode,
     getOrderRecode,
     msgType,
-    updateReplyLastMsgOne
+    updateReplyLastMsgOne,
+    removeOneTalkList
 }

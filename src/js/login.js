@@ -154,16 +154,14 @@ $(function () {
             var _this = this;
             this.userAccount = arr
             this.getuserContet()
-            // this.getScorce()
             this.success()
             this.renderList()
             this.tapBack()
-            // this.getCity()
             _this.callGetData() // TODO CALLDATA
             this.clickListItem()
             setInterval(function () {
                 record.clearMaxLength(_this.userids, 100)
-            }, 20000)
+            }, 10000)
         }
         //存储账号id 和mcheck
         this.getuserContet = function (userid) {
@@ -202,7 +200,6 @@ $(function () {
                 self.reloadLogin()
             })
         }
-
 
 
         this.renderList = function (item) {
@@ -366,7 +363,6 @@ $(function () {
                 }
             }
             var callFunc2 = function (id, data, index) {
-                //console.log("index:" + index)
                 if (index >= len2) {
                     _this.addRed()
                     setTimeout(function () {
@@ -396,7 +392,7 @@ $(function () {
                 async: true,
                 dataType: "json",
                 data: {
-                    limit: 100,
+                    limit: 200,
                     targetId: "",
                     token: token,
                     lastId: 0
@@ -438,8 +434,9 @@ $(function () {
                 var myMSG = encodeURIComponent($(this).find('.message').html())
                 var myHead = encodeURIComponent($(this).find('.hiddenHead').html())
                 var myMcheck = $(this).find('.hiddenMcheck').html()
-                // window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid;
-                window.location.href = `http://192.168.25.126:8080/talk.html?uid=${uid}`;
+                window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid;
+                // window.location.href = `http://192.168.25.126:8080/talk.html?uid=${uid}`;
+                // window.location.href = `http://page.qxiu.com/ldz/chudianh5/talk.html?uid=${uid}`;
                 cookie.set('uid', uid);
                 cookie.set('mcheck', myMcheck)
                 cookie.set('nickname', nickname)
@@ -466,3 +463,5 @@ $(function () {
         cookie.set('token', token)
     }
 })
+// 121.201.62.233:
+// 121.46.195.211:

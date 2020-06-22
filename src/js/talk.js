@@ -159,7 +159,7 @@ function TalkList() {
         this.colls = [];
         var _this = this;
         _this.renderUserList();
-        this.upData(100)
+        this.upData(200)
         setTimeout(function () {}, 300)
         timerUpdata = setInterval(function () {
             _this.upData(100)
@@ -168,7 +168,7 @@ function TalkList() {
         this.scrollPosition()
         setInterval(function () {
             record.clearMaxLength([uid], 100);
-        }, 20000)
+        }, 10000)
     }
     this.upData = function (num) {
         var _this = this;
@@ -939,6 +939,7 @@ function Intalk() {
         })
     }
     //发送普通消息请求
+
     this.sendMsg = function (val) {
         var _this = this;
         $.ajax({
@@ -952,9 +953,12 @@ function Intalk() {
                 targetId: menId
             },
             success: function (data) {
-                _this.appendNewMsg()
                 if (data.state == 0) {
-
+                    _this.appendNewMsg()
+                } else if (data.state == 10) {
+                    record.removeOneTalkList(uid, menId)
+                    alert('发送失败,"错误码：' + data.state)
+                    $('.input').val(val)
                 } else {
                     alert('发送失败,"错误码：' + data.state)
                     $('.input').val(val)
@@ -1112,16 +1116,17 @@ $('.ListBack').tap(function () {
         $('.input').val('')
         $('.content').removeAttr('style')
     } else {
-        // window.location.href = "http://123.57.87.160:80/cd/login.html";
-        window.location.href = "http://192.168.25.126:8080/login.html";
-
+        window.location.href = "http://123.57.87.160:80/cd/login.html";
+        // window.location.href = "http://192.168.25.126:8080/login.html";
+        // window.location.href = "http://page.qxiu.com/ldz/chudianh5/login.html";
     }
 })
 
 function isLoginOut() {
     if (!uid || !mcheck) {
-        // window.location.href = "http://123.57.87.160:80/cd/login.html";
-        window.location.href = "http://192.168.25.126:8080/login.html";
+        window.location.href = "http://123.57.87.160:80/cd/login.html";
+        // window.location.href = "http://192.168.25.126:8080/login.html";
+        // window.location.href = "http://page.qxiu.com/ldz/chudianh5/login.html";
     }
 }
 
