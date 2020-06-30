@@ -82,7 +82,7 @@ $(function () {
         }
         passWord = $('.password').val()
         md5String = md5(passWord);
-
+        console.log(md5String)
         isLoginSucc()
         storageLoginStatus()
     })
@@ -99,7 +99,6 @@ $(function () {
                 password: md5String || cookie.get('pwd')
             },
             success: function (response) {
-                // console.log(response)
                 if (response.content) {
                     token = response.content.token;
                 }
@@ -161,7 +160,7 @@ $(function () {
             this.clickListItem()
             setInterval(function () {
                 record.clearMaxLength(_this.userids, 100)
-            }, 10000)
+            }, 5000)
         }
         //存储账号id 和mcheck
         this.getuserContet = function (userid) {
@@ -434,9 +433,9 @@ $(function () {
                 var myMSG = encodeURIComponent($(this).find('.message').html())
                 var myHead = encodeURIComponent($(this).find('.hiddenHead').html())
                 var myMcheck = $(this).find('.hiddenMcheck').html()
-                window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid;
-                // window.location.href = `http://192.168.25.126:8080/talk.html?uid=${uid}`;
-                // window.location.href = `http://page.qxiu.com/ldz/chudianh5/talk.html?uid=${uid}`;
+               // window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid;               //线上
+                 window.location.href = `http://192.168.25.126:8080/talk.html?uid=${uid}`;            //本地
+                // window.location.href = `http://page.qxiu.com/ldz/chudianh5/talk.html?uid=${uid}`;    // 测试
                 cookie.set('uid', uid);
                 cookie.set('mcheck', myMcheck)
                 cookie.set('nickname', nickname)

@@ -144,9 +144,11 @@ function msgType(content, uid) {
     } else if (content.string_tp == "RC:SightMsg") {
         return "视频消息";
     } else if (content.string_tp == "RC:TxtMsg") {
-        return content.msg_user_private.string_content
+        return content.msg_user_private.string_content;
     } else if (content.string_tp == "QI:GiftMsg") {
         return "收到了对方送出的礼物";
+    } else if(content.string_tp == "RC:GIFMsg") {
+        return "(动画表情)";
     }
 }
 
@@ -225,7 +227,6 @@ function verifyReply(userId) {
  */
 
 function clearMaxLength(userIds, size) {
-    console.log(userIds)
     for (var i in userIds) {
         var userId = userIds[i];
         var recode = getRecode(userId);
@@ -247,7 +248,7 @@ function clearMaxLength(userIds, size) {
                 delete recode[key];
             }
         }
-        setRecode(userId, recode)
+        setRecode(userId, recode);
     }
 }
 function compare(key) {

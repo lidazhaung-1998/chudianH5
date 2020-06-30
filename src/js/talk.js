@@ -327,6 +327,18 @@ function Intalk() {
     this.max = 0;
     this.min = 100000000;
     this.handleHtml = {
+        gifMsg: function (head, image, my) {
+            var imageHtml = `<li class="contextBox ${my.a}">
+                                <div class="head ${my.b}" ${head}></div>
+                                <div class="textBox ${my.c}" style="padding:0;">
+                                    <div class="text">
+                                        <img src="${image}" alt="">
+                                    </div>
+                                    ${my.e ? `<div class='pScorce'>${my.e}积分</div>` : ""}
+                                </div>
+                            </li>`
+            return imageHtml
+        },
         textMsg: function (head, text, my) {
             var textHtml = `<li class="contextBox ${my.a}">
                                 <div class="head ${my.b}" ${head}></div>
@@ -451,7 +463,7 @@ function Intalk() {
         }, 1500) // TODO CALLSEND
         setInterval(function () {
             record.clearMaxLength([uid], 100);
-        }, 20000)
+        }, 5000)
     }
     this.getCity = function () {
         $.ajax({
@@ -463,7 +475,6 @@ function Intalk() {
                 fromUserId: uid
             },
             success(data) {
-                // console.log(data)
                 var address = data.content.province + ' ' + data.content.city
                 $('.mymessage').html($('.mymessage').html() + address)
             }
@@ -483,7 +494,6 @@ function Intalk() {
                 lastId: 0
             },
             success: function (data) {
-                // console.log(data)
                 for (var i = 0; i < data.content.length; i++) {
                     if (data.content[i].id > self.max) {
                         self.max = data.content[i].id
@@ -492,7 +502,6 @@ function Intalk() {
                         self.min = data.content[i].id
                     }
                 }
-                // console.log(data)
                 self.renderTalkHtml(data.content.reverse())
             }
         })
@@ -558,6 +567,8 @@ function Intalk() {
                     html += _this.handleHtml.giftMsg(menHead, loway.msg_user_flatter.string_content, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.string_image_url, {}, '你')
                 } else if (loway.string_tp == "QI:GiftMsg") { //礼物
                     html += _this.handleHtml.giftTMsg(menHead, loway.msg_user_goods.string_goods_name, loway.msg_user_goods.uint32_goods_num, {}, '你')
+                } else if (loway.string_tp == "RC:GIFMsg") {
+                    html += _this.handleHtml.gifMsg(menHead, loway.msg_user_gif.string_url, {})
                 }
             }
             if (sendid == uid) { //我发送的消息               sendid 等于 uid  发送消息的是我
@@ -566,35 +577,42 @@ function Intalk() {
                         a: "myContentBox",
                         b: "myhead",
                         c: "mytextBox",
-                        d: "jiantouRight",
+                        d: "jiantouRight"
                     })
                 } else if (loway.string_tp == "RC:ImgMsg") {
                     html += _this.handleHtml.imgMsg(_this.nvtou, loway.msg_user_image.string_image_url, {
                         a: "myContentBox",
                         b: "myhead",
                         c: "mytextBox",
-                        d: "jiantouRight",
+                        d: "jiantouRight"
                     })
                 } else if (loway.string_tp == "RC:VcMsg") {
                     html += _this.handleHtml.audioMsg(_this.nvtou, loway.msg_user_audio.string_content, {
                         a: "myContentBox",
                         b: "myhead",
                         c: "mytextBox",
-                        d: "jiantouRight",
+                        d: "jiantouRight"
                     }, loway.msg_user_audio.uint32_auido_duration)
                 } else if (loway.string_tp == "QI:FlatterMsg") {
                     html += _this.handleHtml.giftMsg(_this.nvtou, loway.msg_user_flatter.string_content, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.string_image_url, {
                         a: "myContentBox",
                         b: "myhead",
                         c: "mytextBox",
-                        d: "jiantouRight",
+                        d: "jiantouRight"
                     }, menName)
                 } else if (loway.string_tp == "RC:SightMsg") {
                     html += _this.handleHtml.videoMsg(_this.nvtou, loway.msg_user_small_video.string_video_url, {
                         a: "myContentBox",
                         b: "myhead",
                         c: "mytextBox",
-                        d: "jiantouRight",
+                        d: "jiantouRight"
+                    })
+                } else if (loway.string_tp == "RC:GIFMsg") {
+                    html += _this.handleHtml.gifMsg(_this.nvtou, loway.msg_user_gif.string_url, {
+                        a: "myContengBox",
+                        b: "myhead",
+                        c: "mytextBox",
+                        d: "jiantouRight"
                     })
                 }
             }
@@ -803,6 +821,8 @@ function Intalk() {
                 handleMSGhtml += _this.handleHtml.giftMsg(menHead, loway.msg_user_flatter.string_content, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.string_image_url, {}, "你")
             } else if (loway.string_tp == "QI:GiftMsg") { //送出礼物
                 handleMSGhtml += _this.handleHtml.giftTMsg(menHead, loway.msg_user_goods.string_goods_name, loway.msg_user_goods.uint32_goods_num, {}, "你")
+            } else if (loway.string_tp == "RC:GIFMsg") {
+                html += _this.handleHtml.gifMsg(menHead, loway.msg_user_gif.string_url, {})
             }
         }
         if (senid == uid) { // 我发送消息
@@ -834,6 +854,13 @@ function Intalk() {
                     b: "myhead",
                     c: "mytextBox",
                     d: "jiantouRight",
+                })
+            } else if (loway.string_tp == "RC:GIFMsg") {
+                html += _this.handleHtml.gifMsg(_this.nvtou, loway.msg_user_gif.string_url, {
+                    a: "myContengBox",
+                    b: "myhead",
+                    c: "mytextBox",
+                    d: "jiantouRight"
                 })
             }
         }
@@ -1116,17 +1143,17 @@ $('.ListBack').tap(function () {
         $('.input').val('')
         $('.content').removeAttr('style')
     } else {
-        window.location.href = "http://123.57.87.160:80/cd/login.html";
-        // window.location.href = "http://192.168.25.126:8080/login.html";
-        // window.location.href = "http://page.qxiu.com/ldz/chudianh5/login.html";
+        //window.location.href = "http://123.57.87.160:80/cd/login.html";             //线上
+         window.location.href = "http://192.168.25.126:8080/login.html";          //本地
+        // window.location.href = "http://page.qxiu.com/ldz/chudianh5/login.html";  //测试
     }
 })
 
 function isLoginOut() {
     if (!uid || !mcheck) {
-        window.location.href = "http://123.57.87.160:80/cd/login.html";
-        // window.location.href = "http://192.168.25.126:8080/login.html";
-        // window.location.href = "http://page.qxiu.com/ldz/chudianh5/login.html";
+        //window.location.href = "http://123.57.87.160:80/cd/login.html";             //线上
+         window.location.href = "http://192.168.25.126:8080/login.html";          //本地
+        // window.location.href = "http://page.qxiu.com/ldz/chudianh5/login.html";  //测试
     }
 }
 
