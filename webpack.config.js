@@ -46,7 +46,7 @@ module.exports = function (env) {
 	})
 	return {
 		devServer: {
-			host: "192.168.25.126",
+			host: "localhost",
 			contentBase: path.join(__dirname, 'dist'), //运行那个文件夹
 			port: '8080', //端口号
 			overlay: true, //浏览器页面显示错误

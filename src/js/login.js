@@ -1,11 +1,9 @@
+import "../css/login.scss"
+import record from "./recoed"
 var $ = require('../libs/zepto')
 var backIcon = require('../img/back.png')
 var md5 = require('../libs/md5.js')
-import "../css/login.scss"
-import record from "./recoed"
-var zuixin = []
 document.onreadystatechange = completeLoading;
-
 function completeLoading() {
     if (document.readyState == "complete") {
         $('.loading').css('display', 'none')
@@ -110,30 +108,26 @@ $(function () {
         })
         return ControllerData;
     }
-
     isLogin()
 
     function isLogin() {
-        if (!cookie.get('pwd') && !cookie.get('account')) {
+        if (!cookie.get('pwd') || !cookie.get('account')) {
+            // 查询cookie中保存的账号和密码到期没，到期就获取不到，获取不到终止这个函数
             return;
         }
-        //已经登录在这里调用接口获取实际的APP手机号和密码
-        isLoginSucc()
+
+        // 有账号和密码调用登录函数
+        isLoginSucc();
     }
 
     function isLoginSucc() {
-        var response = loginController()
+        var response = loginController(); // 发送ajax请求返回请求到的数据
         if (response.state == 0) {
             var loginSuc = new LoginSuc()
             loginSuc.init(response.content.appAccounts) //从这里把20个账户密码传到构造函数中过去
         } else {
             alert(response.message)
         }
-    }
-    if (localStorage.getItem('isFirst') == "false") {
-        localStorage.setItem('isFirst', false)
-    } else {
-        localStorage.setItem('isFirst', true)
     }
 
 
@@ -143,12 +137,7 @@ $(function () {
         this.userids = [] // 该数组存储  20个账户的userid
         this.userContentSelf = []
         this.mcheckArr = []
-        this.city = []
-        this.auto = []
         this.index = 0;
-        this.upDataArr = []
-        this.getCityIndex = 0
-        this.bb = JSON.parse(localStorage.getItem('bb')) || []
         this.init = function (arr) {
             var _this = this;
             this.userAccount = arr
@@ -199,8 +188,6 @@ $(function () {
                 self.reloadLogin()
             })
         }
-
-
         this.renderList = function (item) {
             var self = this;
             var accountHtml = "";
@@ -226,34 +213,12 @@ $(function () {
                             <div class="plusMoney"></div>
                         </dd>
                         <div class="hiddenMcheck" style="display:none;">${self.mcheckArr[index]}</div>
-                        <div class="time" style="display:none;">0</div>
-                        <div class="newId" style="display:none;">${zuixin[index] ? zuixin[index] : 0}</div>
                     </dl>`
             })
             $('.itemWrap .content').html(accountHtml)
             this.addRed()
         }
-        this.FunSort = function (arr) {
-            arr.sort(function (t1, t2) {
-                var one = t1.querySelectorAll('.time')[0].innerText;
-                var two = t2.querySelectorAll('.time')[0].innerText;
-                if (one < two) {
-                    return 1
-                } else if (one == two) {
-                    return 0
-                } else {
-                    return -1
-                }
-            })
-            return arr
-        }
         this.mySort = function (parent) {
-            var newArr = [];
-            var yepBack = [];
-            var lastArr = [];
-            // parent.forEach(function (item, index) {
-            //     item.querySelectorAll('.dian')[0].getAttribute('style') == "display: block;" ? newArr.push(item) : yepBack.push(item);
-            // })
             parent.sort(function (num1, num2) {
                 var td = $(num1).attr("time");
                 var td2 = $(num2).attr("time");
@@ -273,77 +238,7 @@ $(function () {
                     return n2 - n1;
                 }
             })
-            // var lastArr = this.FunSort(newArr).concat(this.FunSort(yepBack))
             $('.content').html(parent)
-        }
-        this.list = function (all) {
-            var cache = []
-            for (var ar of all) {
-                if (cache.find(c => c.sendid == ar.sendid && c.targetid == ar.targetid)) {
-                    continue
-                }
-                cache.push(ar)
-            }
-            return cache
-        }
-        this.autoMsg = function () {
-            var _this = this;
-            var arr = this.auto
-            var all = [];
-            var userId = this.userAccount
-            var storage = JSON.parse(localStorage.getItem('list')) || [];
-            for (var i = 0; i < this.auto.length; i++) {
-                for (var j = 0; j < arr[i].length; j++) {
-                    if (arr[i][j].content.string_tp == "QI:FlatterMsg") {
-                        all.push({
-                            targetid: arr[i][j].content.int64_user_id,
-                            sendid: arr[i][j].content.int64_target_user_id
-                        })
-                    }
-                }
-            }
-            var list = _this.list(all)
-
-            var lastStep = []
-            for (var a of list) {
-                if (storage.find(c => c.sendid == a.sendid && a.targetid == c.targetid)) {
-                    continue
-                }
-                lastStep.push(a)
-            }
-            for (var k = 0; k < lastStep.length; k++) {
-                var index = k;
-                $.ajax({
-                    url: "http://121.46.195.211:13888/delegate/res/quickreplylist/" + lastStep[index].sendid,
-                    async: true,
-                    type: "GET",
-                    success: function (re) {
-                        var msg = re.content[0]
-                        var mcheck = ""
-                        for (var i = 0; i < _this.userAccount.length; i++) {
-                            if (_this.userAccount[i].userId == lastStep[index].sendid) {
-                                mcheck = _this.userAccount[i].userMCheck
-                            }
-                        }
-                        if (msg) {
-                            // console.log(mcheck)
-                            $.ajax({
-                                url: "http://121.46.195.211:13888/delegate/msg/send/private/" + lastStep[index].sendid,
-                                async: true,
-                                data: {
-                                    mcheck: mcheck,
-                                    content: msg,
-                                    targetId: lastStep[index].targetid
-                                },
-                                success: function (a) {
-                                    // console.log(a)
-                                }
-                            })
-                        }
-                    }
-                })
-            }
-            localStorage.setItem('list', JSON.stringify(list.concat(lastStep)))
         }
         this.callGetData = function (t) {
             var _this = t || this;
@@ -433,8 +328,8 @@ $(function () {
                 var myMSG = encodeURIComponent($(this).find('.message').html())
                 var myHead = encodeURIComponent($(this).find('.hiddenHead').html())
                 var myMcheck = $(this).find('.hiddenMcheck').html()
-               // window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid;               //线上
-                 window.location.href = `http://192.168.25.126:8080/talk.html?uid=${uid}`;            //本地
+                // window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid;               //线上
+                window.location.href = `http://localhost:8080/talk.html?uid=${uid}`; //本地
                 // window.location.href = `http://page.qxiu.com/ldz/chudianh5/talk.html?uid=${uid}`;    // 测试
                 cookie.set('uid', uid);
                 cookie.set('mcheck', myMcheck)
@@ -443,9 +338,6 @@ $(function () {
                 cookie.set('myHead', myHead)
                 localStorage.setItem('num', $(this).index())
             })
-        }
-        this.loadMoreStyle = function (text, opt, time) {
-            $('.loadMore').text(text).animate(opt, time);
         }
         // 退出登录
         this.reloadLogin = function () {

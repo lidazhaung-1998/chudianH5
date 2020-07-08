@@ -147,7 +147,7 @@ function msgType(content, uid) {
         return content.msg_user_private.string_content;
     } else if (content.string_tp == "QI:GiftMsg") {
         return "收到了对方送出的礼物";
-    } else if(content.string_tp == "RC:GIFMsg") {
+    } else if (content.string_tp == "RC:GIFMsg") {
         return "(动画表情)";
     }
 }
@@ -163,15 +163,16 @@ function updateReplyLastMsg(userId, data) {
     var recode = getRecode(userId);
     /*
         {
-            "11111-33333":[item0],
+            "11111-33333":[{},{}],
             "11111-55555":[item1]
+            "11111-33333": {}
         }   
-    */
-    for (var key in tb) {
-        var list = tb[key]; // key = 11111-33333 val = {}
-        var item = list[0]; // 最新的
-        var prev = recode[key];
-        if (!prev || prev.id < item.id) {
+        */
+       for (var key in tb) {
+           var list = tb[key]; // key = 11111-33333 val = {}
+           var item = list[0]; // 最新的
+           var prev = recode[key];
+           if (!prev || prev.id < item.id) {
             recode[key] = item;
         }
     }
@@ -251,6 +252,7 @@ function clearMaxLength(userIds, size) {
         setRecode(userId, recode);
     }
 }
+
 function compare(key) {
     return function (o1, o2) {
         var num1 = o1[key];
@@ -287,12 +289,36 @@ function group(id, data) {
         var colls = tb[key];
         if (!colls) {
             colls = [];
-            tb[key] = colls
+            tb[key] = colls;
         }
-        colls.push(item)
+        colls.push(item);
     })
-    return tb
+    return tb;
+} 
+/*
+{
+    "123456-456789":
 }
+*/
+/*{
+    "id": 3736,
+    "content": {
+        "uint32_cmd": 5,
+        "int64_user_id": 430084866,
+        "int64_time": 1591354368416,
+        "string_order_id": "0b770df7-9859-4445-a8ae-528c28740877",
+        "msg_user_flatter": {
+            "string_image_url": "http://snszone.oss-cn-beijing.aliyuncs.com/files/goods/20200327/10000/10000-1585277936_946.png",
+            "string_content": "收到搭讪礼物",
+            "int64_goods_id": 10040,
+            "uint32_goods_num": 1,
+            "uint32_out_amount": 0,
+            "uint32_type": 4
+        },
+        "string_tp": "QI:FlatterMsg",
+        "int64_target_user_id": 430153271
+    }
+}*/
 module.exports = {
     group,
     clearMaxLength,

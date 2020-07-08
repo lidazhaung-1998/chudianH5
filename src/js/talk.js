@@ -76,9 +76,8 @@ var istalk = false; //判断是否在聊天页
 isLoginOut()
 var intalk = new Intalk();
 var inTalk = false;
-var maxid, lastmsg, lasttext, obj, menAllId, msgLength, oldid, lastMsgTime, loop = null;
+var maxid = 0;
 var timer2 = "";
-var bl = true;
 var timerUpdata = "";
 
 function getNowTime() {
@@ -148,15 +147,6 @@ function TalkList() {
     this.init = function () {
         this.flag = true
         maxid = 0; //目前最大消息
-        lastmsg = []; //最后一条信息
-        lasttext = []
-        obj = {} //男性用户id，和发送了几条消息
-        menAllId = [] //发送消息的所有男用户id
-        msgLength = []; //发消息的所有男用户的消息条数
-        lastMsgTime = []; //发消息的所有男用户的最后一条消息时间
-        loop = [];
-        oldid = 0;
-        this.colls = [];
         var _this = this;
         _this.renderUserList();
         this.upData(200)
@@ -206,33 +196,33 @@ function TalkList() {
         })
     }
 
-    this.Funsort = function aaa(arr) {
-        arr.sort(function (t1, t2) {
-            var one = t1.querySelectorAll('.time')[0].innerText;
-            var two = t2.querySelectorAll('.time')[0].innerText;
-            if (one < two) {
-                return 1;
-            } else if (one == two) {
-                return 0;
-            } else {
-                return -1;
-            }
-        })
-        return arr;
-    }
-    this.domSort = function () {
-        var domArr = Array.apply(Array, document.querySelectorAll('.content .item'))
-        var newArr = [];
-        var yepBack = [];
-        domArr.forEach(function (item, inde) {
-            var time = item.querySelectorAll('.time')[0].innerText;
-            var isBack = item.querySelectorAll('.message')[0].innerText;
-            isBack == "已回复" ? yepBack.push(item) : newArr.push(item)
-        })
-        var lastArr = this.Funsort(newArr).concat(this.Funsort(yepBack))
-        $('.content').html('')
-        $('.content').append(lastArr)
-    }
+    // this.Funsort = function aaa(arr) {
+    //     arr.sort(function (t1, t2) {
+    //         var one = t1.querySelectorAll('.time')[0].innerText;
+    //         var two = t2.querySelectorAll('.time')[0].innerText;
+    //         if (one < two) {
+    //             return 1;
+    //         } else if (one == two) {
+    //             return 0;
+    //         } else {
+    //             return -1;
+    //         }
+    //     })
+    //     return arr;
+    // }
+    // this.domSort = function () {
+    //     var domArr = Array.apply(Array, document.querySelectorAll('.content .item'))
+    //     var newArr = [];
+    //     var yepBack = [];
+    //     domArr.forEach(function (item, inde) {
+    //         var isBack = item.querySelectorAll('.message')[0].innerText;
+    //         isBack == "已回复" ? yepBack.push(item) : newArr.push(item)
+    //     })
+    //     var lastArr = this.Funsort(newArr).concat(this.Funsort(yepBack))
+    //     console.log(lastArr)
+    //     $('.content').html('')
+    //     $('.content').append(lastArr)
+    // }
     this.renderUserList = function () {
         var _this = this;
         var html = '';
@@ -273,8 +263,8 @@ function TalkList() {
                         </div>
                         <div class="contentWrap">
                             <div class="redIcon">${compileTime(content.int64_time)}</div>
-                            <div class="time" style="display:none;">${lastMsgTime[i]}</div>
                             <div class="plusMoney">
+                            <!--<div class="time" style="display:none;">0</div>-->
                             </div>
                         </div>
                     </li>`
@@ -282,7 +272,7 @@ function TalkList() {
                 $('.content').html(html)
                 _this.clickListItem()
                 _this.state()
-                _this.domSort()
+                // _this.domSort()
             }
         })
     }
@@ -321,9 +311,8 @@ function TalkList() {
 function Intalk() {
     this.menNickName = "";
     this.initLength = 0;
-    this.nantou = "";
     this.nvtou = `style="background-image:url(${myHead});"`
-    this.nowMySendMsg = null;
+    this.nowMySendMsg = 0;
     this.max = 0;
     this.min = 100000000;
     this.handleHtml = {
@@ -435,7 +424,6 @@ function Intalk() {
     this.init = function () {
         $('.content').html('')
         $('.app').css("background", '#333')
-
         this.getTalkMsg() //获取聊天记录并渲染聊天记录
         this.goingTalk() //进入聊天页更改的页面样式已经title
         this.initLength = $('.content .contextBox').length
@@ -1109,7 +1097,6 @@ function Intalk() {
             }
         })
     }
-
     this.newMsgHandle = function (len) {
         var contextBox = $('.content .contextBox');
         if (!contextBox || contextBox.length == 0) {
@@ -1144,7 +1131,7 @@ $('.ListBack').tap(function () {
         $('.content').removeAttr('style')
     } else {
         //window.location.href = "http://123.57.87.160:80/cd/login.html";             //线上
-         window.location.href = "http://192.168.25.126:8080/login.html";          //本地
+         window.location.href = "http://localhost:8080/login.html";          //本地
         // window.location.href = "http://page.qxiu.com/ldz/chudianh5/login.html";  //测试
     }
 })
@@ -1152,7 +1139,7 @@ $('.ListBack').tap(function () {
 function isLoginOut() {
     if (!uid || !mcheck) {
         //window.location.href = "http://123.57.87.160:80/cd/login.html";             //线上
-         window.location.href = "http://192.168.25.126:8080/login.html";          //本地
+         window.location.href = "http://localhost:8080/login.html";          //本地
         // window.location.href = "http://page.qxiu.com/ldz/chudianh5/login.html";  //测试
     }
 }
