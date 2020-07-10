@@ -4,6 +4,7 @@ var $ = require('../libs/zepto')
 var backIcon = require('../img/back.png')
 var md5 = require('../libs/md5.js')
 document.onreadystatechange = completeLoading;
+
 function completeLoading() {
     if (document.readyState == "complete") {
         $('.loading').css('display', 'none')
@@ -80,9 +81,7 @@ $(function () {
         }
         passWord = $('.password').val()
         md5String = md5(passWord);
-        console.log(md5String)
         isLoginSucc()
-        storageLoginStatus()
     })
 
     function loginController() {
@@ -115,7 +114,6 @@ $(function () {
             // 查询cookie中保存的账号和密码到期没，到期就获取不到，获取不到终止这个函数
             return;
         }
-
         // 有账号和密码调用登录函数
         isLoginSucc();
     }
@@ -123,6 +121,7 @@ $(function () {
     function isLoginSucc() {
         var response = loginController(); // 发送ajax请求返回请求到的数据
         if (response.state == 0) {
+            storageLoginStatus();
             var loginSuc = new LoginSuc()
             loginSuc.init(response.content.appAccounts) //从这里把20个账户密码传到构造函数中过去
         } else {
@@ -251,7 +250,7 @@ $(function () {
                     _this.addRed()
                     setTimeout(function () {
                         _this.getData(_this, 0, callFunc1);
-                    }, 1000);
+                    }, 2000);
                 } else {
                     _this.getData(_this, index + 1, callFunc1);
                 }
@@ -261,7 +260,7 @@ $(function () {
                     _this.addRed()
                     setTimeout(function () {
                         _this.getData(_this, len1, callFunc2);
-                    }, 1000);
+                    }, 2000);
                 } else {
                     _this.getData(_this, index + 1, callFunc2);
                 }
@@ -286,7 +285,7 @@ $(function () {
                 async: true,
                 dataType: "json",
                 data: {
-                    limit: 200,
+                    limit: 300,
                     targetId: "",
                     token: token,
                     lastId: 0
@@ -328,8 +327,8 @@ $(function () {
                 var myMSG = encodeURIComponent($(this).find('.message').html())
                 var myHead = encodeURIComponent($(this).find('.hiddenHead').html())
                 var myMcheck = $(this).find('.hiddenMcheck').html()
-                // window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid;               //线上
-                window.location.href = `http://localhost:8080/talk.html?uid=${uid}`; //本地
+                 window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid;               //线上
+                // window.location.href = `http://localhost:8080/talk.html?uid=${uid}`; //本地
                 // window.location.href = `http://page.qxiu.com/ldz/chudianh5/talk.html?uid=${uid}`;    // 测试
                 cookie.set('uid', uid);
                 cookie.set('mcheck', myMcheck)
@@ -342,16 +341,17 @@ $(function () {
         // 退出登录
         this.reloadLogin = function () {
             $('.title').html('账号登录'), $('.loginWrap').css('display', 'block');
-            $('.itemWrap').css('display', 'none')
-            cookie.remove('pwd')
-            cookie.remove('account')
+            $('.itemWrap').css('display', 'none');
+            cookie.remove("account");
+            cookie.remove("pwd");
+            location.reload();
         }
     }
 
     function storageLoginStatus() {
-        cookie.set('account', userName)
-        cookie.set('pwd', md5String)
-        cookie.set('token', token)
+        cookie.set('account', userName || cookie.get("account"));
+        cookie.set('pwd', md5String || cookie.get("pwd"));
+        cookie.set('token', token);
     }
 })
 // 121.201.62.233:

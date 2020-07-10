@@ -3,11 +3,11 @@
     1 调用接口获取用户消息日志时，每个用户的消息返回后调用函数
       updateReplyLastMsg(userId, data); 进行刷新缓存。
 
-    2 开启一个线程 每隔一段时间执行，校验用户的红点，并操作dom位置。
+    2 向消息队列（任务队列）添加任务，每隔一段时间执行，校验用户的红点，并操作dom位置。
       获取userIds (用户ID集合) 循环调用 verifyReply(userId)
       返回 true false，如果是true，则没有红点，假有红点，并且将当前dom节点置顶。
 
-    3 开启一个线程 每隔一段时间执行，用于清理超过长度的列表。
+    3 向消息队列（任务队列）添加任务 每隔一段时间执行，用于清理超过长度的列表。
       调用 clearMaxLength(userIds, 100);
 
 
@@ -25,6 +25,7 @@
         "1111-4444": msgItem
     }
 */
+
 function getRecode(userId) {
     var recodeKey = "ulast" + userId;
     // 获得当前这个账户的记录
@@ -95,27 +96,7 @@ function getOrderRecode(userId, recode) {
             sortlist.push(item);
         }
     }
-    /* recode = {
-        "430153271-430084866": {
-        "id": 3736,
-        "content": {
-            "uint32_cmd": 5,
-            "int64_user_id": 430084866,
-            "int64_time": 1591354368416,
-            "string_order_id": "0b770df7-9859-4445-a8ae-528c28740877",
-            "msg_user_flatter": {
-                "string_image_url": "http://snszone.oss-cn-beijing.aliyuncs.com/files/goods/20200327/10000/10000-1585277936_946.png",
-                "string_content": "收到搭讪礼物",
-                "int64_goods_id": 10040,
-                "uint32_goods_num": 1,
-                "uint32_out_amount": 0,
-                "uint32_type": 4
-            },
-            "string_tp": "QI:FlatterMsg",
-            "int64_target_user_id": 430153271
-            }
-        }
-    }*/
+    
     // 排序
     sortlist.sort(function (o1, o2) {
         var num1 = o1.time;
@@ -295,30 +276,6 @@ function group(id, data) {
     })
     return tb;
 } 
-/*
-{
-    "123456-456789":
-}
-*/
-/*{
-    "id": 3736,
-    "content": {
-        "uint32_cmd": 5,
-        "int64_user_id": 430084866,
-        "int64_time": 1591354368416,
-        "string_order_id": "0b770df7-9859-4445-a8ae-528c28740877",
-        "msg_user_flatter": {
-            "string_image_url": "http://snszone.oss-cn-beijing.aliyuncs.com/files/goods/20200327/10000/10000-1585277936_946.png",
-            "string_content": "收到搭讪礼物",
-            "int64_goods_id": 10040,
-            "uint32_goods_num": 1,
-            "uint32_out_amount": 0,
-            "uint32_type": 4
-        },
-        "string_tp": "QI:FlatterMsg",
-        "int64_target_user_id": 430153271
-    }
-}*/
 module.exports = {
     group,
     clearMaxLength,

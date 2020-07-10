@@ -76,7 +76,7 @@ var istalk = false; //判断是否在聊天页
 isLoginOut()
 var intalk = new Intalk();
 var inTalk = false;
-var maxid = 0;
+var maxid = null;
 var timer2 = "";
 var timerUpdata = "";
 
@@ -147,9 +147,10 @@ function TalkList() {
     this.init = function () {
         this.flag = true
         maxid = 0; //目前最大消息
+        this.colls = [];
         var _this = this;
         _this.renderUserList();
-        this.upData(200)
+        // this.upData(200)
         setTimeout(function () {}, 300)
         timerUpdata = setInterval(function () {
             _this.upData(100)
@@ -158,7 +159,7 @@ function TalkList() {
         this.scrollPosition()
         setInterval(function () {
             record.clearMaxLength([uid], 100);
-        }, 10000)
+        }, 7000)
     }
     this.upData = function (num) {
         var _this = this;
@@ -195,34 +196,18 @@ function TalkList() {
             }
         })
     }
-
-    // this.Funsort = function aaa(arr) {
-    //     arr.sort(function (t1, t2) {
-    //         var one = t1.querySelectorAll('.time')[0].innerText;
-    //         var two = t2.querySelectorAll('.time')[0].innerText;
-    //         if (one < two) {
-    //             return 1;
-    //         } else if (one == two) {
-    //             return 0;
-    //         } else {
-    //             return -1;
-    //         }
-    //     })
-    //     return arr;
-    // }
-    // this.domSort = function () {
-    //     var domArr = Array.apply(Array, document.querySelectorAll('.content .item'))
-    //     var newArr = [];
-    //     var yepBack = [];
-    //     domArr.forEach(function (item, inde) {
-    //         var isBack = item.querySelectorAll('.message')[0].innerText;
-    //         isBack == "已回复" ? yepBack.push(item) : newArr.push(item)
-    //     })
-    //     var lastArr = this.Funsort(newArr).concat(this.Funsort(yepBack))
-    //     console.log(lastArr)
-    //     $('.content').html('')
-    //     $('.content').append(lastArr)
-    // }
+    this.domSort = function () {
+        var domArr = Array.apply(Array, document.querySelectorAll('.content .item'))
+        var newArr = [];
+        var yepBack = [];
+        domArr.forEach(function (item, inde) {
+            var isBack = item.querySelectorAll('.message')[0].innerText;
+            isBack == "已回复" ? yepBack.push(item) : newArr.push(item)
+        })
+        var lastArr = newArr.concat(yepBack)
+        $('.content').html('');
+        $('.content').append(lastArr);
+    }
     this.renderUserList = function () {
         var _this = this;
         var html = '';
@@ -263,16 +248,13 @@ function TalkList() {
                         </div>
                         <div class="contentWrap">
                             <div class="redIcon">${compileTime(content.int64_time)}</div>
-                            <div class="plusMoney">
-                            <!--<div class="time" style="display:none;">0</div>-->
-                            </div>
                         </div>
                     </li>`
                 }
                 $('.content').html(html)
                 _this.clickListItem()
                 _this.state()
-                // _this.domSort()
+                _this.domSort()
             }
         })
     }
@@ -311,8 +293,9 @@ function TalkList() {
 function Intalk() {
     this.menNickName = "";
     this.initLength = 0;
+    this.nantou = "";
     this.nvtou = `style="background-image:url(${myHead});"`
-    this.nowMySendMsg = 0;
+    this.nowMySendMsg = null;
     this.max = 0;
     this.min = 100000000;
     this.handleHtml = {
@@ -351,7 +334,7 @@ function Intalk() {
                                         ${my.e ? `<div class='pScorce'>${my.e}积分</div>` : ""}
                                     </div>
                                 </div>
-                                <div class="lineBar">
+                                <div class="lineBar" ${my.f}>
                                     <div style="height:.11rem;background:#000;position:absolute;bottom:0;left:-.08rem;"></div>
                                     <div style="height:.18rem;background:#000;position:absolute;bottom:0;left:.02rem;"></div>
                                     <div style="height:.1rem;background:#000;position:absolute;bottom:0;left:.12rem;"></div>
@@ -424,6 +407,7 @@ function Intalk() {
     this.init = function () {
         $('.content').html('')
         $('.app').css("background", '#333')
+
         this.getTalkMsg() //获取聊天记录并渲染聊天记录
         this.goingTalk() //进入聊天页更改的页面样式已经title
         this.initLength = $('.content .contextBox').length
@@ -579,7 +563,8 @@ function Intalk() {
                         a: "myContentBox",
                         b: "myhead",
                         c: "mytextBox",
-                        d: "jiantouRight"
+                        d: "jiantouRight",
+                        f: "style='left:4.4rem'"
                     }, loway.msg_user_audio.uint32_auido_duration)
                 } else if (loway.string_tp == "QI:FlatterMsg") {
                     html += _this.handleHtml.giftMsg(_this.nvtou, loway.msg_user_flatter.string_content, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.string_image_url, {
@@ -1097,6 +1082,7 @@ function Intalk() {
             }
         })
     }
+
     this.newMsgHandle = function (len) {
         var contextBox = $('.content .contextBox');
         if (!contextBox || contextBox.length == 0) {
@@ -1130,16 +1116,16 @@ $('.ListBack').tap(function () {
         $('.input').val('')
         $('.content').removeAttr('style')
     } else {
-        //window.location.href = "http://123.57.87.160:80/cd/login.html";             //线上
-         window.location.href = "http://localhost:8080/login.html";          //本地
+        window.location.href = "http://123.57.87.160:80/cd/login.html";             //线上
+        // window.location.href = "http://localhost:8080/login.html";          //本地
         // window.location.href = "http://page.qxiu.com/ldz/chudianh5/login.html";  //测试
     }
 })
 
 function isLoginOut() {
     if (!uid || !mcheck) {
-        //window.location.href = "http://123.57.87.160:80/cd/login.html";             //线上
-         window.location.href = "http://localhost:8080/login.html";          //本地
+        window.location.href = "http://123.57.87.160:80/cd/login.html";             //线上
+        // window.location.href = "http://localhost:8080/login.html";          //本地
         // window.location.href = "http://page.qxiu.com/ldz/chudianh5/login.html";  //测试
     }
 }
