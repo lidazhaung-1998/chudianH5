@@ -28,7 +28,6 @@ var htmlArray = [{
 	}
 ]
 module.exports = function (env) {
-
 	var plugins = [
 		new miniCssExtractPlugin({
 			filename: env.dev ? "css/[name].css" : "css/[name].[contenthash:8].css",

@@ -1,10 +1,11 @@
-import "../css/login.scss"
-import record from "./recoed"
-var $ = require('../libs/zepto')
-var backIcon = require('../img/back.png')
-var md5 = require('../libs/md5.js')
-document.onreadystatechange = completeLoading;
+import "../css/login.scss";
+import record from "./recoed";
 
+var $ = require('../libs/zepto');
+var backIcon = require('../img/back.png');
+
+var md5 = require('../libs/md5.js');
+document.onreadystatechange = completeLoading;
 function completeLoading() {
     if (document.readyState == "complete") {
         $('.loading').css('display', 'none')
@@ -75,13 +76,10 @@ $(function () {
     var passWord = "";
     var token = "";
     $('.login').tap(function () {
-        userName = $('.username').val()
-        if (userName != cookie.get('account')) {
-            localStorage.setItem('isFirst', true)
-        }
-        passWord = $('.password').val()
-        md5String = md5(passWord);
-        isLoginSucc()
+        userName = $('.username').val();
+        passWord = $('.password').val();
+        md5String = md5.hex_md5(passWord);
+        isLoginSucc();
     })
 
     function loginController() {
@@ -285,13 +283,13 @@ $(function () {
                 async: true,
                 dataType: "json",
                 data: {
-                    limit: 300,
+                    limit: 200,
                     targetId: "",
                     token: token,
                     lastId: 0
                 },
                 success: function (data) {
-                    record.updateReplyLastMsg(id, data)
+                    record.updateReplyLastMsg(id, data);
                     callFunc(id, data, index);
                 }
 
@@ -327,8 +325,8 @@ $(function () {
                 var myMSG = encodeURIComponent($(this).find('.message').html())
                 var myHead = encodeURIComponent($(this).find('.hiddenHead').html())
                 var myMcheck = $(this).find('.hiddenMcheck').html()
-                 window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid;               //线上
-                // window.location.href = `http://localhost:8080/talk.html?uid=${uid}`; //本地
+                // window.location.href = "http://123.57.87.160:80/cd/talk.html?uid=" + uid;               //线上
+                 window.location.href = `http://localhost:8080/talk.html?uid=${uid}`; //本地
                 // window.location.href = `http://page.qxiu.com/ldz/chudianh5/talk.html?uid=${uid}`;    // 测试
                 cookie.set('uid', uid);
                 cookie.set('mcheck', myMcheck)
@@ -342,6 +340,7 @@ $(function () {
         this.reloadLogin = function () {
             $('.title').html('账号登录'), $('.loginWrap').css('display', 'block');
             $('.itemWrap').css('display', 'none');
+            localStorage.clear();
             cookie.remove("account");
             cookie.remove("pwd");
             location.reload();

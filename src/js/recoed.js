@@ -148,8 +148,8 @@ function updateReplyLastMsg(userId, data) {
             "11111-55555":[item1]
             "11111-33333": {}
         }   
-        */
-       for (var key in tb) {
+    */
+        for (var key in tb) {
            var list = tb[key]; // key = 11111-33333 val = {}
            var item = list[0]; // 最新的
            var prev = recode[key];
@@ -213,7 +213,7 @@ function clearMaxLength(userIds, size) {
         var userId = userIds[i];
         var recode = getRecode(userId);
         var len = Object.keys(recode);
-        if (len.length > size) {
+        if (len.length < size) {
             // 1 排序得到按照接受时间倒序 [11111-33333, 11111-44444]
             var sortlist = [];
             for (var key in recode) {

@@ -1,5 +1,6 @@
 import "../css/index.scss";
 import record from "./recoed";
+
 var $ = require('../libs/zepto');
 var timeFormat = require('../libs/timeFormat')
 var cookie = {
@@ -150,11 +151,11 @@ function TalkList() {
         this.colls = [];
         var _this = this;
         _this.renderUserList();
-        // this.upData(200)
+        this.upData(200)
         setTimeout(function () {}, 300)
         timerUpdata = setInterval(function () {
             _this.upData(100)
-        }, 2000)
+        }, 1500)
         this.outTalkHtml()
         this.scrollPosition()
         setInterval(function () {
@@ -564,7 +565,7 @@ function Intalk() {
                         b: "myhead",
                         c: "mytextBox",
                         d: "jiantouRight",
-                        f: "style='left:4.4rem'"
+                        f: "style='left:4.4rem';"
                     }, loway.msg_user_audio.uint32_auido_duration)
                 } else if (loway.string_tp == "QI:FlatterMsg") {
                     html += _this.handleHtml.giftMsg(_this.nvtou, loway.msg_user_flatter.string_content, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.uint32_goods_num, loway.msg_user_flatter.string_image_url, {
@@ -820,6 +821,7 @@ function Intalk() {
                     b: "myhead",
                     c: "mytextBox",
                     d: "jiantouRight",
+                    f: "style='left:4.4rem';"
                 }, loway.msg_user_audio.uint32_auido_duration)
             } else if (loway.string_tp == "RC:SightMsg") {
                 handleMSGhtml += _this.handleHtml.videoMsg(_this.nvtou, loway.msg_user_small_video.string_video_url, {
@@ -1116,20 +1118,19 @@ $('.ListBack').tap(function () {
         $('.input').val('')
         $('.content').removeAttr('style')
     } else {
-        window.location.href = "http://123.57.87.160:80/cd/login.html";             //线上
-        // window.location.href = "http://localhost:8080/login.html";          //本地
+       // window.location.href = "http://123.57.87.160:80/cd/login.html";             //线上
+         window.location.href = "http://localhost:8080/login.html";          //本地
         // window.location.href = "http://page.qxiu.com/ldz/chudianh5/login.html";  //测试
     }
 })
 
 function isLoginOut() {
     if (!uid || !mcheck) {
-        window.location.href = "http://123.57.87.160:80/cd/login.html";             //线上
-        // window.location.href = "http://localhost:8080/login.html";          //本地
-        // window.location.href = "http://page.qxiu.com/ldz/chudianh5/login.html";  //测试
+       // window.location.href = "http://123.57.87.160:80/cd/login.html";             //线上
+        window.location.href = "http://localhost:8080/login.html";          //本地
+       // window.location.href = "http://page.qxiu.com/ldz/chudianh5/login.html";  //测试
     }
 }
-
 
 
 

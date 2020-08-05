@@ -22,6 +22,5 @@ function getqiqiUserId(str) {
             userId: 430015078
         }
     }
-
 }
 module.exports = getqiqiUserId
